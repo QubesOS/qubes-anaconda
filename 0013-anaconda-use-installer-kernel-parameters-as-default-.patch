@@ -1,4 +1,4 @@
-From 66a87473c6360bac0f47e14fca6293cda8c15bc7 Mon Sep 17 00:00:00 2001
+From 9d6230cf09eec0345e1ed9cc86f3eda117b047df Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
@@ -12,13 +12,13 @@ This way if any kernel parameter was need to boot Qubes on particular hardware, 
 
 Fixes QubesOS/qubes-issues#1650
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/bootloader.py | 18 ++++++++----------
  1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 908020ad0..963af46f9 100644
+index 24a635d5d..672aa66ec 100644
 --- a/pyanaconda/bootloader.py
 +++ b/pyanaconda/bootloader.py
 @@ -229,14 +229,13 @@ class BootLoader(object):
@@ -41,8 +41,8 @@ index 908020ad0..963af46f9 100644
      _trusted_boot = False
  
      def __init__(self):
-@@ -870,11 +869,10 @@ class BootLoader(object):
-             self.boot_args.add("iscsi_firmware")
+@@ -899,11 +898,10 @@ class BootLoader(object):
+             self.boot_args.add("rd.iscsi.firmware")
  
          #
 -        # preservation of some of our boot args
@@ -57,5 +57,5 @@ index 908020ad0..963af46f9 100644
  
              arg = flags.cmdline.get(opt)
 -- 
-2.14.4
+2.20.1
 

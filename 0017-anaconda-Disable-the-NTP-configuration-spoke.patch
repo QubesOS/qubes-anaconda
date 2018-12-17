@@ -1,4 +1,4 @@
-From dc6d56efd644de06468ddd225c436bd3610a6527 Mon Sep 17 00:00:00 2001
+From 7a32fa4ac6c39a19e73a23f1ec4d527393ca66b0 Mon Sep 17 00:00:00 2001
 From: "M. Vefa Bicakci" <m.v.b@runbox.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
 Subject: [PATCH] anaconda: Disable the NTP configuration spoke
@@ -6,14 +6,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
- pyanaconda/ui/gui/spokes/datetime_spoke.glade | 300 +----------------------
- pyanaconda/ui/gui/spokes/datetime_spoke.py    | 332 --------------------------
- 2 files changed, 2 insertions(+), 630 deletions(-)
+ pyanaconda/ui/gui/spokes/datetime_spoke.glade | 300 +---------------
+ pyanaconda/ui/gui/spokes/datetime_spoke.py    | 334 ------------------
+ 2 files changed, 2 insertions(+), 632 deletions(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.glade b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
-index 9179640fe..fab5ad067 100644
+index 37c7c6edc..4adb8dffe 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 @@ -1,14 +1,9 @@
@@ -32,7 +32,7 @@ index 9179640fe..fab5ad067 100644
    <object class="GtkListStore" id="cities">
      <columns>
        <!-- column-name name -->
-@@ -26,11 +21,6 @@
+@@ -25,11 +20,6 @@
      <property name="inline_completion">True</property>
      <signal name="match-selected" handler="on_completion_match_selected" object="cityCombobox" swapped="no"/>
    </object>
@@ -44,7 +44,7 @@ index 9179640fe..fab5ad067 100644
    <object class="GtkListStore" id="days">
      <columns>
        <!-- column-name idx -->
-@@ -91,221 +81,6 @@
+@@ -89,221 +79,6 @@
        <column type="gboolean"/>
      </columns>
    </object>
@@ -266,7 +266,7 @@ index 9179640fe..fab5ad067 100644
    <object class="GtkImage" id="upImage">
      <property name="visible">True</property>
      <property name="can_focus">False</property>
-@@ -463,78 +238,7 @@
+@@ -461,78 +236,7 @@
                                </packing>
                              </child>
                              <child>
@@ -347,18 +347,18 @@ index 9179640fe..fab5ad067 100644
                            </object>
                          </child>
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 0a1b0b5a8..5fffb670a 100644
+index 93594e2d5..e5a1970c2 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -45,7 +45,6 @@ from pyanaconda import iutil
+@@ -40,7 +40,6 @@ from pyanaconda.ui.helpers import InputCheck
+ from pyanaconda.core import util, constants
  from pyanaconda import isys
  from pyanaconda import network
- from pyanaconda import nm
 -from pyanaconda import ntp
  from pyanaconda import flags
- from pyanaconda import constants
- from pyanaconda.threads import threadMgr, AnacondaThread
-@@ -149,247 +148,6 @@ def _new_date_field_box(store):
+ from pyanaconda.modules.common.constants.services import TIMEZONE, NETWORK
+ from pyanaconda.threading import threadMgr, AnacondaThread
+@@ -150,250 +149,6 @@ def _new_date_field_box(store):
  
      return (box, combo, suffix_label)
  
@@ -367,8 +367,8 @@ index 0a1b0b5a8..5fffb670a 100644
 -    mainWidgetName = "ntpConfigDialog"
 -    uiFile = "spokes/datetime_spoke.glade"
 -
--    def __init__(self, *args):
--        GUIObject.__init__(self, *args)
+-    def __init__(self, data, timezone_module):
+-        GUIObject.__init__(self, data)
 -
 -        # Use GUIDIalogInputCheckHandler to manipulate the sensitivity of the
 -        # add button, and check for valid input in on_entry_activated
@@ -378,6 +378,7 @@ index 0a1b0b5a8..5fffb670a 100644
 -        #epoch is increased when serversStore is repopulated
 -        self._epoch = 0
 -        self._epoch_lock = threading.Lock()
+-        self._timezone_module = timezone_module
 -
 -    @property
 -    def working_server(self):
@@ -435,8 +436,10 @@ index 0a1b0b5a8..5fffb670a 100644
 -    def _initialize_store_from_config(self):
 -        self._serversStore.clear()
 -
--        if self.data.timezone.ntpservers:
--            pools, servers = ntp.internal_to_pools_and_servers(self.data.timezone.ntpservers)
+-        kickstart_ntp_servers = self._timezone_module.proxy.NTPServers
+-
+-        if kickstart_ntp_servers:
+-            pools, servers = ntp.internal_to_pools_and_servers(kickstart_ntp_servers)
 -        else:
 -            try:
 -                pools, servers = ntp.get_servers_from_config()
@@ -484,7 +487,7 @@ index 0a1b0b5a8..5fffb670a 100644
 -
 -            if flags.can_touch_runtime_system("save NTP servers configuration"):
 -                ntp.save_servers_to_config(new_pools, new_servers)
--                iutil.restart_service(NTP_SERVICE)
+-                util.restart_service(NTP_SERVICE)
 -
 -        #Cancel clicked, window destroyed...
 -        else:
@@ -505,11 +508,11 @@ index 0a1b0b5a8..5fffb670a 100644
 -
 -        """
 -
--        @gtk_action_nowait
+-        @async_action_nowait
 -        def set_store_value(arg_tuple):
 -            """
 -            We need a function for this, because this way it can be added to
--            the MainLoop with thread-safe GLib.idle_add (but only with one
+-            the MainLoop with thread-safe async_action_nowait (but only with one
 -            argument).
 -
 -            :param arg_tuple: (store, itr, column, value)
@@ -533,13 +536,13 @@ index 0a1b0b5a8..5fffb670a 100644
 -            if orig_hostname == actual_hostname:
 -                if server_working:
 -                    set_store_value((self._serversStore,
--                                    itr, SERVER_WORKING, constants.NTP_SERVER_OK))
+-                                     itr, SERVER_WORKING, constants.NTP_SERVER_OK))
 -                else:
 -                    set_store_value((self._serversStore,
--                                    itr, SERVER_WORKING, constants.NTP_SERVER_NOK))
+-                                     itr, SERVER_WORKING, constants.NTP_SERVER_NOK))
 -        self._epoch_lock.release()
 -
--    @gtk_action_nowait
+-    @async_action_nowait
 -    def _refresh_server_working(self, itr):
 -        """ Runs a new thread with _set_server_ok_nok(itr) as a taget. """
 -
@@ -606,7 +609,7 @@ index 0a1b0b5a8..5fffb670a 100644
  class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
      """
         .. inheritance-diagram:: DatetimeSpoke
-@@ -480,8 +238,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -499,8 +254,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          self._year_format, suffix = formats[widgets.index(year_box)]
          year_label.set_text(suffix)
  
@@ -615,30 +618,30 @@ index 0a1b0b5a8..5fffb670a 100644
          self._regions_zones = get_all_regions_and_timezones()
  
          # Set the initial sensitivity of the AM/PM toggle based on the time-type selected
-@@ -490,9 +246,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -509,9 +262,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          if not flags.can_touch_runtime_system("modify system time and date"):
              self._set_date_time_setting_sensitive(False)
  
--        self._config_dialog = NTPconfigDialog(self.data)
+-        self._config_dialog = NTPconfigDialog(self.data, self._timezone_module)
 -        self._config_dialog.initialize()
 -
          threadMgr.add(AnacondaThread(name=constants.THREAD_DATE_TIME,
                                       target=self._initialize))
  
-@@ -574,8 +327,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
-             self.data.timezone.seen = False
+@@ -599,8 +349,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+             # TODO: seen should be set from the module
              self._kickstarted = False
  
--        self.data.timezone.nontp = not self._ntpSwitch.get_active()
+-        self._timezone_module.proxy.SetNTPEnabled(self._ntpSwitch.get_active())
 -
      def execute(self):
-         if self._update_datetime_timer_id is not None:
-             GLib.source_remove(self._update_datetime_timer_id)
-@@ -610,20 +361,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+         if self._update_datetime_timer is not None:
+             self._update_datetime_timer.cancel()
+@@ -638,20 +386,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
  
          self._update_datetime()
  
--        has_active_network = nm.nm_is_connected()
+-        has_active_network = self._network_module.proxy.Connected
 -        if not has_active_network:
 -            self._show_no_network_warning()
 -        else:
@@ -646,16 +649,16 @@ index 0a1b0b5a8..5fffb670a 100644
 -            gtk_call_once(self._config_dialog.refresh_servers_state)
 -
 -        if flags.can_touch_runtime_system("get NTP service state"):
--            ntp_working = has_active_network and iutil.service_running(NTP_SERVICE)
+-            ntp_working = has_active_network and util.service_running(NTP_SERVICE)
 -        else:
--            ntp_working = not self.data.timezone.nontp
+-            ntp_working = self._timezone_module.proxy.NTPEnabled
 -
 -        self._ntpSwitch.set_active(ntp_working)
 -
-     @gtk_action_wait
+     @async_action_wait
      def _set_timezone(self, timezone):
          """
-@@ -1078,72 +815,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -1104,71 +838,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          #contains all date/time setting widgets
          footer_alignment = self.builder.get_object("footerAlignment")
          footer_alignment.set_sensitive(sensitive)
@@ -674,7 +677,7 @@ index 0a1b0b5a8..5fffb670a 100644
 -                #cannot touch runtime system, not much to do here
 -                return
 -
--            if not nm.nm_is_connected():
+-            if not self._network_module.proxy.Connected:
 -                self._show_no_network_warning()
 -                switch.set_active(False)
 -                return
@@ -689,12 +692,12 @@ index 0a1b0b5a8..5fffb670a 100644
 -                    #the time as drastically as we need
 -                    ntp.one_time_sync_async(working_server)
 -
--            ret = iutil.start_service(NTP_SERVICE)
+-            ret = util.start_service(NTP_SERVICE)
 -            self._set_date_time_setting_sensitive(False)
 -
 -            #if starting chronyd failed and chronyd is not running,
 -            #set switch back to OFF
--            if (ret != 0) and not iutil.service_running(NTP_SERVICE):
+-            if (ret != 0) and not util.service_running(NTP_SERVICE):
 -                switch.set_active(False)
 -
 -        else:
@@ -704,11 +707,11 @@ index 0a1b0b5a8..5fffb670a 100644
 -                return
 -
 -            self._set_date_time_setting_sensitive(True)
--            ret = iutil.stop_service(NTP_SERVICE)
+-            ret = util.stop_service(NTP_SERVICE)
 -
 -            #if stopping chronyd failed and chronyd is running,
 -            #set switch back to ON
--            if (ret != 0) and iutil.service_running(NTP_SERVICE):
+-            if (ret != 0) and util.service_running(NTP_SERVICE):
 -                switch.set_active(True)
 -
 -            self.clear_info()
@@ -721,13 +724,12 @@ index 0a1b0b5a8..5fffb670a 100644
 -
 -        if response == 1:
 -            pools, servers = self._config_dialog.pools_servers
--            self.data.timezone.ntpservers = ntp.pools_servers_to_internal(pools, servers)
+-            self._timezone_module.proxy.SetNTPServers(ntp.pools_servers_to_internal(pools, servers))
 -
 -            if self._config_dialog.working_server is None:
 -                self._show_no_ntp_server_warning()
 -            else:
 -                self.clear_info()
--
 -- 
-2.14.4
+2.20.1
 

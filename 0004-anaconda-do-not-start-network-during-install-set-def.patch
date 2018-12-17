@@ -1,4 +1,4 @@
-From 7d67dbbb889a754c71a878fa69fcf2aa18fcdbb7 Mon Sep 17 00:00:00 2001
+From 1a89f90354fa5e42f533b4f8d426f56d625ee6cf Mon Sep 17 00:00:00 2001
 From: Marek Marczykowski <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
 Subject: [PATCH] anaconda: do not start network during install, set default
@@ -7,18 +7,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/network.py               |   14 +-
- pyanaconda/ui/gui/spokes/network.py | 1750 -----------------------------------
- 2 files changed, 8 insertions(+), 1756 deletions(-)
+ pyanaconda/ui/gui/spokes/network.py | 1815 ---------------------------
+ 2 files changed, 8 insertions(+), 1821 deletions(-)
  delete mode 100644 pyanaconda/ui/gui/spokes/network.py
 
 diff --git a/pyanaconda/network.py b/pyanaconda/network.py
-index b92fb8acf..5d3dcd604 100644
+index 76e6c0c55..802b63ad1 100644
 --- a/pyanaconda/network.py
 +++ b/pyanaconda/network.py
-@@ -54,7 +54,7 @@ networkConfFile = "%s/network" % (sysconfigDir)
+@@ -56,7 +56,7 @@ networkConfFile = "%s/network" % (sysconfigDir)
  hostnameFile = "/etc/hostname"
  ipv6ConfFile = "/etc/sysctl.d/anaconda.conf"
  ifcfgLogFile = "/tmp/ifcfg.log"
@@ -27,7 +27,7 @@ index b92fb8acf..5d3dcd604 100644
  
  ifcfglog = None
  
-@@ -1191,24 +1191,26 @@ def write_sysconfig_network(rootpath, overwrite=False):
+@@ -1355,6 +1355,7 @@ def write_sysconfig_network(rootpath, overwrite=False):
  
      with open(cfgfile, "w") as f:
          f.write("# Created by anaconda\n")
@@ -35,16 +35,17 @@ index b92fb8acf..5d3dcd604 100644
      return True
  
  def write_network_config(storage, ksdata, instClass, rootpath):
-     # overwrite previous settings for LiveCD or liveimg installations
-     overwrite = flags.livecdInstall or ksdata.method.method == "liveimg"
+@@ -1363,18 +1364,19 @@ def write_network_config(storage, ksdata, instClass, rootpath):
  
--    write_hostname(rootpath, ksdata, overwrite=overwrite)
-+    write_hostname(rootpath, ksdata, overwrite=flags.livecdInstall)
-     if ksdata.network.hostname != DEFAULT_HOSTNAME:
-         set_hostname(ksdata.network.hostname)
+     network_proxy = NETWORK.get_proxy()
+     hostname = network_proxy.Hostname
+-    write_hostname(rootpath, hostname, overwrite=overwrite)
++    write_hostname(rootpath, hostname, overwrite=flags.livecdInstall)
+     if hostname != DEFAULT_HOSTNAME:
+         set_hostname(hostname)
 -    write_sysconfig_network(rootpath, overwrite=overwrite)
 +    write_sysconfig_network(rootpath, overwrite=flags.livecdInstall)
-     disableIPV6(rootpath)
+     disable_ipv6_on_target_system(rootpath)
      copyIfcfgFiles(rootpath)
      copyDhclientConfFiles(rootpath)
      copyFileToPath("/etc/resolv.conf", rootpath, overwrite=overwrite)
@@ -61,10 +62,10 @@ index b92fb8acf..5d3dcd604 100644
      for nd in ksdata.network.network:
 diff --git a/pyanaconda/ui/gui/spokes/network.py b/pyanaconda/ui/gui/spokes/network.py
 deleted file mode 100644
-index a15a07ccb..000000000
+index 00cbde354..000000000
 --- a/pyanaconda/ui/gui/spokes/network.py
 +++ /dev/null
-@@ -1,1750 +0,0 @@
+@@ -1,1815 +0,0 @@
 -# Network configuration spoke classes
 -#
 -# Copyright (C) 2011  Red Hat, Inc.
@@ -86,17 +87,16 @@ index a15a07ccb..000000000
 -
 -import gi
 -gi.require_version("Gtk", "3.0")
--gi.require_version("GLib", "2.0")
 -gi.require_version("GObject", "2.0")
 -gi.require_version("Pango", "1.0")
 -gi.require_version("Gio", "2.0")
 -gi.require_version("NM", "1.0")
 -
 -from gi.repository import Gtk
--from gi.repository import GLib, GObject, Pango, Gio, NM
+-from gi.repository import GObject, Pango, Gio, NM
 -
 -from pyanaconda.flags import can_touch_runtime_system
--from pyanaconda.i18n import _, N_, C_, CN_
+-from pyanaconda.core.i18n import _, N_, C_, CN_
 -from pyanaconda.flags import flags as anaconda_flags
 -from pyanaconda.ui.communication import hubQ
 -from pyanaconda.ui.gui import GUIObject
@@ -105,8 +105,11 @@ index a15a07ccb..000000000
 -from pyanaconda.ui.gui.hubs.summary import SummaryHub
 -from pyanaconda.ui.gui.utils import gtk_call_once, escape_markup, really_hide, really_show
 -from pyanaconda.ui.common import FirstbootSpokeMixIn
--from pyanaconda.iutil import startProgram
--from pyanaconda.constants import ANACONDA_ENVIRON
+-from pyanaconda.core.util import startProgram
+-from pyanaconda.core.process_watchers import PidWatcher
+-from pyanaconda.core.constants import ANACONDA_ENVIRON
+-from pyanaconda.core import glib
+-from pyanaconda.modules.common.constants.services import NETWORK
 -
 -from pyanaconda import network
 -from pyanaconda import nm
@@ -120,8 +123,8 @@ index a15a07ccb..000000000
 -from dbus.mainloop.glib import DBusGMainLoop
 -DBusGMainLoop(set_as_default=True)
 -
--import logging
--log = logging.getLogger("anaconda")
+-from pyanaconda.anaconda_loggers import get_module_logger
+-log = get_module_logger(__name__)
 -
 -NM._80211ApFlags = getattr(NM, "80211ApFlags")
 -NM._80211ApSecurityFlags = getattr(NM, "80211ApSecurityFlags")
@@ -185,12 +188,12 @@ index a15a07ccb..000000000
 -    __gproperties__ = {
 -        "signal": (GObject.TYPE_UINT,
 -                   "Signal", "Signal",
--                   0, GObject.G_MAXUINT, 0,
--                   GObject.PARAM_READWRITE),
+-                   0, glib.MAXUINT, 0,
+-                   GObject.ParamFlags.READWRITE),
 -    }
 -
 -    def __init__(self):
--        Gtk.CellRendererPixbuf.__init__(self)
+-        super().__init__()
 -        self.signal = 0
 -
 -
@@ -236,15 +239,14 @@ index a15a07ccb..000000000
 -class CellRendererSecurity(Gtk.CellRendererPixbuf):
 -
 -    __gtype_name__ = "CellRendererSecurity"
--    __gproperties__ = {
--        "security": (GObject.TYPE_UINT,
--                   "Security", "Security",
--                   0, GObject.G_MAXUINT, 0,
--                   GObject.PARAM_READWRITE),
--    }
+-    __gproperties__ = {"security": (GObject.TYPE_UINT,
+-                                    "Security", "Security",
+-                                    0, glib.MAXUINT, 0,
+-                                    GObject.ParamFlags.READWRITE),
+-                       }
 -
 -    def __init__(self):
--        Gtk.CellRendererPixbuf.__init__(self)
+-        super().__init__()
 -        self.security = NM_AP_SEC_UNKNOWN
 -        self.icon_name = ""
 -
@@ -310,9 +312,9 @@ index a15a07ccb..000000000
 -class NetworkControlBox(GObject.GObject):
 -
 -    __gsignals__ = {
--        "nm-state-changed": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
--        "device-state-changed": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, [str, int, int, int]),
--        "apply-hostname": (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, []),
+-        "nm-state-changed": (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE, []),
+-        "device-state-changed": (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE, [str, int, int, int]),
+-        "apply-hostname": (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE, []),
 -    }
 -
 -    supported_device_types = [
@@ -349,7 +351,7 @@ index a15a07ccb..000000000
 -
 -    def __init__(self, builder, client, spoke=None):
 -
--        GObject.GObject.__init__(self)
+-        super().__init__()
 -
 -        self.builder = builder
 -        self._running_nmce = None
@@ -457,44 +459,70 @@ index a15a07ccb..000000000
 -    def add_connection_to_list(self, con):
 -        uuid = con.get_uuid()
 -        if self.dev_cfg(uuid=uuid):
--            log.debug("network: GUI, not adding connection %s, already in list", uuid)
+-            log.debug("not adding connection %s, already in list", uuid)
 -            return False
 -        con_setting = con.get_setting_connection()
 -        if con_setting and con_setting.get_read_only():
--            log.debug("network: GUI, not adding read-only connection %s", uuid)
+-            log.debug("not adding read-only connection %s", uuid)
 -            return False
 -        dev_cfg = DeviceConfiguration(con=con)
--        if network.is_libvirt_device(dev_cfg.get_iface() or ""):
--            log.debug("network: GUI, not adding %s", dev_cfg.get_iface())
+-        iface = dev_cfg.get_iface()
+-        if network.is_libvirt_device(iface or ""):
+-            log.debug("not adding %s", iface)
 -            return False
--        if network.is_ibft_configured_device(dev_cfg.get_iface() or ""):
--            log.debug("network: GUI, not adding %s configured from iBFT", dev_cfg.get_iface())
+-        if network.is_ibft_configured_device(iface or ""):
+-            log.debug("not adding %s configured from iBFT", iface)
 -            return False
 -        if dev_cfg.get_device_type() not in self.supported_device_types:
--            log.debug("network: GUI, not adding connection %s of unsupported type", uuid)
+-            log.debug("not adding connection %s of unsupported type", uuid)
 -            return False
 -        if dev_cfg.get_device_type() == NM.DeviceType.ETHERNET:
 -            if con_setting and con_setting.get_master():
--                log.debug("network: GUI, not adding slave connection %s", uuid)
+-                log.debug("not adding slave connection %s", uuid)
 -                return False
 -        # Wireless settings are handled in scope of its device's dev_cfg
 -        if dev_cfg.get_device_type() == NM.DeviceType.WIFI:
--            log.debug("network: GUI, not adding wireless connection %s", uuid)
+-            log.debug("not adding wireless connection %s", uuid)
 -            return False
--        existing_dev_cfg = self.dev_cfg(iface=dev_cfg.get_iface())
+-        # Handle also vlan connections without interface-name specified
+-        if dev_cfg.get_device_type() == NM.DeviceType.VLAN:
+-            if not iface:
+-                iface = self._get_vlan_interface_name_from_connection(con)
+-                log.debug("interface name for vlan connection %s inferred: %s", uuid, iface)
+-
+-        existing_dev_cfg = self.dev_cfg(iface=iface)
 -        if existing_dev_cfg:
 -            if existing_dev_cfg.con:
--                log.debug("network: GUI, not adding connection %s, already have %s for device %s",
+-                log.debug("not adding connection %s, already have %s for device %s",
 -                          uuid, existing_dev_cfg.get_uuid(), existing_dev_cfg.device.get_iface())
 -                return False
 -            else:
--                log.debug("network: GUI, attaching connection %s to device %s",
+-                log.debug("attaching connection %s to device %s",
 -                          uuid, existing_dev_cfg.device.get_iface())
 -                existing_dev_cfg.con = con
 -        else:
--            log.debug("network: GUI, adding connection %s", uuid)
+-            log.debug("adding connection %s", uuid)
 -            self.add_dev_cfg(dev_cfg)
 -        return True
+-
+-    def _get_vlan_interface_name_from_connection(self, connection):
+-        """Get vlan interface name from vlan connection.
+-
+-        If no interface name is specified in the connection settings, infer
+-        the value as <PARENT_IFACE>.<VLAN_ID> - same as NetworkManager.
+-        """
+-        iface = connection.get_setting_connection().get_interface_name()
+-        if not iface:
+-            setting_vlan = connection.get_setting_vlan()
+-            if setting_vlan:
+-                vlanid = setting_vlan.get_id()
+-                parent = setting_vlan.get_parent()
+-                # if parent is specified by UUID
+-                if len(parent) == 36:
+-                    parent = self.client.get_connection_by_uuid(parent).get_interface_name()
+-                if vlanid and parent:
+-                    iface = network.default_ks_vlan_interface_name(parent, vlanid)
+-        return iface
 -
 -    def initialize(self):
 -        self.client.connect("device-added", self.on_device_added)
@@ -558,7 +586,7 @@ index a15a07ccb..000000000
 -        ap, ssid_target = combobox.get_model().get(itr, 0, 1)
 -        self.selected_ap = ap
 -
--        log.info("network: selected access point: %s", ssid_target)
+-        log.info("selected access point: %s", ssid_target)
 -
 -        cons = ap.filter_connections(device.filter_connections(self.client.get_connections()))
 -        if cons:
@@ -575,7 +603,7 @@ index a15a07ccb..000000000
 -                s_wireless = NM.SettingWireless.new()
 -                s_wireless.set_property('ssid', ap.get_ssid())
 -                s_wireless.set_property('mode', 'infrastructure')
--                log.debug("network: adding connection for WPA-Enterprise AP %s", ssid_target)
+-                log.debug("adding connection for WPA-Enterprise AP %s", ssid_target)
 -                con.add_setting(s_con)
 -                con.add_setting(s_wireless)
 -                persistent = True
@@ -628,7 +656,7 @@ index a15a07ccb..000000000
 -            ssid = self.selected_ap.get_ssid().get_data()
 -            con = self._find_first_ap_setting(device, self.selected_ap)
 -            if not con:
--                log.debug("network: on_edit_connection: connection for ap %s not found", self.selected_ap)
+-                log.debug("on_edit_connection: connection for ap %s not found", self.selected_ap)
 -                return
 -            # 871132 auto activate wireless connection after editing if it is not
 -            # already activated (assume entering secrets)
@@ -636,12 +664,12 @@ index a15a07ccb..000000000
 -            activate = (con, device, condition)
 -        else:
 -            if not con:
--                log.debug("network: on_edit_connection: connection for device %s not found", device.get_iface())
+-                log.debug("on_edit_connection: connection for device %s not found", device.get_iface())
 -                if dev_cfg.get_device_type() == NM.DeviceType.ETHERNET:
 -                    # Create default connection for the device and run nm-c-e on it
 -                    default_con = self._default_eth_con(device.get_iface(), autoconnect=False)
 -                    persistent = False
--                    log.info("network: creating new connection for %s device", dev_cfg.get_iface())
+-                    log.info("creating new connection for %s device", dev_cfg.get_iface())
 -                    self.client.add_connection_async(default_con, persistent, None,
 -                            self._default_connection_added_cb, activate)
 -                return
@@ -652,14 +680,14 @@ index a15a07ccb..000000000
 -                settings_changed = lambda: settings != con.to_dbus(NM.ConnectionSerializationFlags.ALL)
 -                activate = (con, device, settings_changed)
 -
--        log.info("network: configuring connection %s device %s ssid %s",
+-        log.info("configuring connection %s device %s ssid %s",
 -                 con.get_uuid(), dev_cfg.get_iface(), ssid)
 -        self._run_nmce(con.get_uuid(), activate)
 -
 -    def _default_connection_added_cb(self, client, result, activate):
 -        con = client.add_connection_finish(result)
 -        uuid = con.get_setting_connection().get_uuid()
--        log.info("network: configuring new connection %s", uuid)
+-        log.info("configuring new connection %s", uuid)
 -        self._run_nmce(uuid, activate)
 -
 -    def _run_nmce(self, uuid, activate):
@@ -667,7 +695,7 @@ index a15a07ccb..000000000
 -        proc = startProgram(["nm-connection-editor", "--keep-above", "--edit", "%s" % uuid], reset_lang=False)
 -        self._running_nmce = proc
 -
--        GLib.child_watch_add(proc.pid, self.on_nmce_exited, activate)
+-        PidWatcher().watch_process(proc.pid, self.on_nmce_exited, activate)
 -
 -    def _default_eth_con(self, iface, autoconnect):
 -        con = NM.SimpleConnection.new()
@@ -686,7 +714,7 @@ index a15a07ccb..000000000
 -        if not self._running_nmce:
 -            return False
 -
--        log.debug("network: killing running nm-c-e %s: %s", self._running_nmce.pid, msg)
+-        log.debug("killing running nm-c-e %s: %s", self._running_nmce.pid, msg)
 -        self._running_nmce.kill()
 -        self._running_nmce = None
 -        return True
@@ -727,21 +755,21 @@ index a15a07ccb..000000000
 -        device = dev_cfg.device
 -        con = dev_cfg.con
 -
--        log.info("network: device %s switched %s", dev_cfg.get_iface(), "on" if active else "off")
+-        log.info("device %s switched %s", dev_cfg.get_iface(), "on" if active else "off")
 -
 -        if dev_cfg.get_device_type() == NM.DeviceType.WIFI:
 -            self.client.wireless_set_enabled(active)
 -        else:
 -            if active:
 -                if not con:
--                    log.debug("network: on_device_off_toggled: no connection for %s",
+-                    log.debug("on_device_off_toggled: no connection for %s",
 -                               dev_cfg.get_iface())
 -                    return
 -
 -                self.client.activate_connection_async(con, device, None, None)
 -            else:
 -                if not device:
--                    log.debug("network: on_device_off_toggled: no device for %s", dev_cfg.get_iface())
+-                    log.debug("on_device_off_toggled: no device for %s", dev_cfg.get_iface())
 -                    return
 -                device.disconnect(None)
 -
@@ -773,12 +801,12 @@ index a15a07ccb..000000000
 -        self.emit("apply-hostname")
 -
 -    def add_device(self, ty):
--        log.info("network: adding device of type %s", ty)
+-        log.info("adding device of type %s", ty)
 -        self.kill_nmce(msg="Add device button clicked")
 -        proc = startProgram(["nm-connection-editor", "--keep-above", "--create", "--type=%s" % ty], reset_lang=False)
 -        self._running_nmce = proc
 -
--        GLib.child_watch_add(proc.pid, self.on_nmce_exited)
+-        PidWatcher().watch_process(proc.pid, self.on_nmce_exited)
 -
 -    def selected_dev_cfg(self):
 -        selection = self.builder.get_object("treeview_devices").get_selection()
@@ -788,7 +816,7 @@ index a15a07ccb..000000000
 -        return model[itr][DEVICES_COLUMN_OBJECT]
 -
 -    def add_dev_cfg(self, dev_cfg):
--        log.debug("network: GUI, device configuration added: connection %s device %s",
+-        log.debug("device configuration added: connection %s device %s",
 -                     dev_cfg.get_uuid(), dev_cfg.get_iface())
 -        self.dev_cfg_store.append([
 -            self._dev_icon_name(dev_cfg),
@@ -801,14 +829,14 @@ index a15a07ccb..000000000
 -        if device.get_device_type() not in self.supported_device_types:
 -            return
 -        if network.is_libvirt_device(device.get_iface()):
--            log.debug("network: not adding %s", device.get_iface())
+-            log.debug("not adding %s", device.get_iface())
 -            return
 -        # ignore fcoe vlan devices
 -        # (can be chopped off to IFNAMSIZ kernel limit)
 -        if device.get_iface().endswith(('-fcoe', '-fco', '-fc', '-f', '-')):
 -            return
 -        if network.is_ibft_configured_device(device.get_iface() or ""):
--            log.debug("network: not adding connection for device %s configured from iBFT", device.get_iface())
+-            log.debug("not adding connection for device %s configured from iBFT", device.get_iface())
 -            return False
 -
 -        # Ignore devices with active read-only connections (created by NM for iBFT VLAN)
@@ -819,11 +847,11 @@ index a15a07ccb..000000000
 -            if rc:
 -                con_setting = rc.get_setting_connection()
 -                if con_setting and con_setting.get_read_only():
--                    log.debug("network: not adding read-only connection "
+-                    log.debug("not adding read-only connection "
 -                              "(assuming iBFT) for device %s", device.get_iface())
 -                    return
 -                else:
--                    log.debug("network: can't get remote connection of active connection "
+-                    log.debug("can't get remote connection of active connection "
 -                            "of device %s", device.get_iface())
 -
 -        # Find the connection for the device (assuming existence of single ifcfg actually)
@@ -831,12 +859,21 @@ index a15a07ccb..000000000
 -        # Wifi connections are stored in wifi tab combobox
 -        if device.get_device_type() != NM.DeviceType.WIFI:
 -            cons = device.get_available_connections()
+-            ifcfg_uuid = None
+-            if not cons:
+-                log.debug("no connection when adding device %s", device.get_iface())
+-            if len(cons) > 1:
+-                log.debug("%s has multiple connections: %s",
+-                          device.get_iface(), [c.get_uuid() for c in cons])
+-                # Can happen when activating device in initramfs and reconfiguring it via kickstart
+-                # without activation.
+-                # Expose the ifcfg (target system) configuration in UI.
+-                ifcfg_uuid = network.find_ifcfg_uuid_of_device(device.get_iface())
+-
 -            for c in cons:
 -                if c.get_setting_connection() and not c.get_setting_connection().get_slave_type():
--                    con = c
--            if len(cons) != 1:
--                log.warning("network: %s has unexpected number of connections: %s",
--                             device.get_iface(), [c.get_uuid() for c in cons])
+-                    if not ifcfg_uuid or c.get_uuid() == ifcfg_uuid:
+-                        con = c
 -
 -        if con and self.dev_cfg(uuid=con.get_uuid()):
 -            # If we already have a connection for the device
@@ -857,7 +894,7 @@ index a15a07ccb..000000000
 -        Register callback on properties (IP address, gateway...) of these ipX-config
 -        objects when they are created.
 -        """
--        log.debug("network: %s object changed", args[1])
+-        log.debug("%s object changed", args[1])
 -        self.on_device_config_changed(device)
 -        if args[1] == IPV4_CONFIG:
 -            config = device.props.ip4_config
@@ -914,6 +951,8 @@ index a15a07ccb..000000000
 -        return title
 -
 -    def dev_cfg(self, uuid=None, device=None, iface=None):
+-        if not any([uuid, device, iface]):
+-            return None
 -        for row in self.dev_cfg_store:
 -            dev_cfg = row[DEVICES_COLUMN_OBJECT]
 -            if uuid:
@@ -933,7 +972,7 @@ index a15a07ccb..000000000
 -    def remove_device(self, device):
 -        # This should not concern wifi and ethernet devices,
 -        # just virtual devices e.g. vpn probably
--        log.debug("network: GUI, device removed: %s", device.get_iface())
+-        log.debug("device removed: %s", device.get_iface())
 -        if self.spoke:
 -            self.spoke.networking_changed = True
 -        dev_cfg = self.dev_cfg(device=device)
@@ -1050,11 +1089,14 @@ index a15a07ccb..000000000
 -
 -    def _refresh_parent_vlanid(self, dev_cfg):
 -        if dev_cfg.get_device_type() == NM.DeviceType.VLAN:
+-            parent = ""
+-            vlanid = ""
 -            if dev_cfg.device:
 -                vlanid = dev_cfg.device.get_vlan_id()
--            else:
+-                parent = dev_cfg.device.get_parent().get_iface()
+-            elif dev_cfg.con:
 -                vlanid = dev_cfg.con.get_setting_vlan().get_id()
--            parent = dev_cfg.con.get_setting_vlan().get_parent()
+-                parent = dev_cfg.con.get_setting_vlan().get_parent()
 -            self._set_device_info_value("wired", "vlanid", str(vlanid))
 -            self._set_device_info_value("wired", "parent", parent)
 -
@@ -1336,7 +1378,7 @@ index a15a07ccb..000000000
 -        obj.disconnect_by_func(callback)
 -    except TypeError as e:
 -        if not "nothing connected" in str(e):
--            log.debug("network: %s", e)
+-            log.debug("%s", e)
 -
 -class SecretAgentDialog(GUIObject):
 -    builderObjects = ["secret_agent_dialog"]
@@ -1345,7 +1387,7 @@ index a15a07ccb..000000000
 -
 -    def __init__(self, *args, **kwargs):
 -        self._content = kwargs.pop('content', {})
--        GUIObject.__init__(self, *args, **kwargs)
+-        super().__init__(*args, **kwargs)
 -        self.builder.get_object("label_message").set_text(self._content['message'])
 -        self._connect_button = self.builder.get_object("connect_button")
 -
@@ -1413,7 +1455,7 @@ index a15a07ccb..000000000
 -    def __init__(self, spoke):
 -        self._bus = dbus.SystemBus()
 -        self.spoke = spoke
--        dbus.service.Object.__init__(self, self._bus, "/org/freedesktop/NetworkManager/SecretAgent")
+-        super().__init__(self._bus, "/org/freedesktop/NetworkManager/SecretAgent")
 -
 -    @dbus.service.method(SECRET_AGENT_IFACE,
 -                         in_signature='a{sa{sv}}osasb',
@@ -1426,7 +1468,7 @@ index a15a07ccb..000000000
 -        if uid != 0:
 -            raise NotAuthorizedException("UID %d not authorized" % uid)
 -
--        log.debug("network: secrets requested path '%s' setting '%s' hints '%s' new %d",
+-        log.debug("secrets requested path '%s' setting '%s' hints '%s' new %d",
 -                  connection_path, setting_name, str(hints), flags)
 -        if not (flags & NM_SECRET_AGENT_GET_SECRETS_FLAG_ALLOW_INTERACTION):
 -            return
@@ -1559,7 +1601,7 @@ index a15a07ccb..000000000
 -    uiFile = "spokes/network.glade"
 -    helpFile = "NetworkSpoke.xml"
 -
--    title = CN_("GUI|Spoke", "_NETWORK & HOST NAME")
+-    title = CN_("GUI|Spoke", "_Network & Host Name")
 -    icon = "network-transmit-receive-symbolic"
 -
 -    category = SystemCategory
@@ -1568,8 +1610,11 @@ index a15a07ccb..000000000
 -        NormalSpoke.__init__(self, *args, **kwargs)
 -        self.networking_changed = False
 -        self.network_control_box = NetworkControlBox(self.builder, nmclient, spoke=self)
--        self.network_control_box.hostname = self.data.network.hostname
--        self.network_control_box.current_hostname = network.current_hostname()
+-        self._network_module = NETWORK.get_observer()
+-        self._network_module.connect()
+-        self.network_control_box.hostname = self._network_module.proxy.Hostname
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
+-        self._network_module.proxy.CurrentHostnameChanged.connect(self._hostname_changed)
 -        self.network_control_box.connect("nm-state-changed",
 -                                         self.on_nm_state_changed)
 -        self.network_control_box.connect("device-state-changed",
@@ -1577,23 +1622,30 @@ index a15a07ccb..000000000
 -        self.network_control_box.connect("apply-hostname",
 -                                         self.on_apply_hostname)
 -
+-    def _hostname_changed(self, hostname):
+-        gtk_call_once(self._update_hostname)
+-
 -    def apply(self):
 -        _update_network_data(self.data, self.network_control_box)
--        log.debug("network: apply ksdata %s", self.data.network)
+-        log.debug("apply ksdata %s", self.data.network)
 -
 -        # if installation media or hdd aren't used and settings have changed
 -        # try if source is available
 -        if self.networking_changed:
--            if ANACONDA_ENVIRON in anaconda_flags.environs and self.payload.needsNetwork:
--                log.debug("network spoke (apply) refresh payload")
--                from pyanaconda.packaging import payloadMgr
--                payloadMgr.restartThread(self.storage, self.data, self.payload, self.instclass,
--                                         fallback=not anaconda_flags.automatedInstall)
+-            if self.payload and self.payload.needsNetwork:
+-                if ANACONDA_ENVIRON in anaconda_flags.environs:
+-                    log.debug("network spoke (apply), network configuration changed - restarting payload thread")
+-                    from pyanaconda.payload import payloadMgr
+-                    payloadMgr.restartThread(self.storage, self.data, self.payload, self.instclass,
+-                                             fallback=not anaconda_flags.automatedInstall, onlyOnChange=True)
+-                else:
+-                    log.debug("network spoke (apply), network configuration changed - "
+-                              "skipping restart of payload thread, outside of Anaconda environment")
 -            else:
--                log.debug("network spoke (apply), payload refresh skipped (running outside of installation environment)")
--            self.networking_changed = False
--        else:
--            log.debug("network spoke (apply), no changes detected")
+-                log.debug("network spoke (apply), network configuration changed - "
+-                          "skipping restart of payload thread, payload does not need network")
+-        self.networking_changed = False
+-
 -        self.network_control_box.kill_nmce(msg="leaving network spoke")
 -
 -    @property
@@ -1616,6 +1668,7 @@ index a15a07ccb..000000000
 -    def initialize(self):
 -        register_secret_agent(self)
 -        NormalSpoke.initialize(self)
+-        self.initialize_start()
 -        self.network_control_box.initialize()
 -        if not can_touch_runtime_system("hide hint to use network configuration in DE"):
 -            self.builder.get_object("network_config_vbox").set_no_show_all(True)
@@ -1624,16 +1677,21 @@ index a15a07ccb..000000000
 -            self.builder.get_object("live_hint_label").set_no_show_all(True)
 -            self.builder.get_object("live_hint_label").hide()
 -
--        if not self.data.network.seen:
+-        if not self._network_module.proxy.Kickstarted:
 -            _update_network_data(self.data, self.network_control_box)
+-
+-        # report that we are done
+-        self.initialize_done()
 -
 -    def refresh(self):
 -        NormalSpoke.refresh(self)
 -        self.network_control_box.refresh()
--        self.network_control_box.current_hostname = network.current_hostname()
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
 -
 -    def on_nm_state_changed(self, *args):
 -        gtk_call_once(self._update_status)
+-        # TODO MOD replace and test - will NM updating hostname from dhcp being
+-        # estabilished be propagated to module via hostnamed?
 -        gtk_call_once(self._update_hostname)
 -
 -    def on_device_state_changed(self, source, device, new_state, *args):
@@ -1653,13 +1711,12 @@ index a15a07ccb..000000000
 -        else:
 -            self.clear_info()
 -            network.set_hostname(hostname)
--            self._update_hostname()
 -
 -    def _update_status(self):
 -        hubQ.send_message(self.__class__.__name__, self.status)
 -
 -    def _update_hostname(self):
--        self.network_control_box.current_hostname = network.current_hostname()
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
 -
 -    def on_back_clicked(self, button):
 -        hostname = self.network_control_box.hostname
@@ -1694,10 +1751,15 @@ index a15a07ccb..000000000
 -    priority = 10
 -
 -    def __init__(self, *args, **kwargs):
--        StandaloneSpoke.__init__(self, *args, **kwargs)
+-        super().__init__(*args, **kwargs)
 -        self.network_control_box = NetworkControlBox(self.builder, nmclient, spoke=self)
--        self.network_control_box.hostname = self.data.network.hostname
--        self.network_control_box.current_hostname = network.current_hostname()
+-
+-        self._network_module = NETWORK.get_observer()
+-        self._network_module.connect()
+-        self.network_control_box.hostname = self._network_module.proxy.Hostname
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
+-        self._network_module.proxy.CurrentHostnameChanged.connect(self._hostname_changed)
+-
 -        parent = self.builder.get_object("AnacondaStandaloneWindow-action_area5")
 -        parent.add(self.network_control_box.vbox)
 -
@@ -1710,17 +1772,20 @@ index a15a07ccb..000000000
 -        log.debug("network standalone spoke (init): completed: %s", self._initially_available)
 -        self._now_available = False
 -
+-    def _hostname_changed(self, hostname):
+-        gtk_call_once(self._update_hostname)
+-
 -    def apply(self):
 -        _update_network_data(self.data, self.network_control_box)
 -
--        log.debug("network: apply ksdata %s", self.data.network)
+-        log.debug("apply ksdata %s", self.data.network)
 -
 -        self._now_available = self.completed
 -
 -        log.debug("network standalone spoke (apply) payload: %s completed: %s", self.payload.baseRepo, self._now_available)
 -        if (not self.payload.baseRepo and not self._initially_available
 -            and self._now_available and self.payload.needsNetwork):
--            from pyanaconda.packaging import payloadMgr
+-            from pyanaconda.payload import payloadMgr
 -            payloadMgr.restartThread(self.storage, self.data, self.payload, self.instclass,
 -                    fallback=not anaconda_flags.automatedInstall)
 -
@@ -1735,13 +1800,13 @@ index a15a07ccb..000000000
 -
 -    def initialize(self):
 -        register_secret_agent(self)
--        StandaloneSpoke.initialize(self)
+-        super().initialize()
 -        self.network_control_box.initialize()
 -
 -    def refresh(self):
--        StandaloneSpoke.refresh(self)
+-        super().refresh()
 -        self.network_control_box.refresh()
--        self.network_control_box.current_hostname = network.current_hostname()
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
 -
 -    def _on_continue_clicked(self, window, user_data=None):
 -        hostname = self.network_control_box.hostname
@@ -1757,6 +1822,8 @@ index a15a07ccb..000000000
 -
 -    # Use case: slow dhcp has connected when on spoke
 -    def on_nm_state_changed(self, *args):
+-        # TODO MOD replace and test - will NM updating hostname from dhcp being
+-        # estabilished be propagated to module via hostnamed?
 -        gtk_call_once(self._update_hostname)
 -
 -    def on_apply_hostname(self, *args):
@@ -1770,10 +1837,9 @@ index a15a07ccb..000000000
 -        else:
 -            self.clear_info()
 -            network.set_hostname(hostname)
--            self._update_hostname()
 -
 -    def _update_hostname(self):
--        self.network_control_box.current_hostname = network.current_hostname()
+-        self.network_control_box.current_hostname = self._network_module.proxy.GetCurrentHostname()
 -
 -def _update_network_data(data, ncb):
 -    data.network.network = []
@@ -1816,5 +1882,5 @@ index a15a07ccb..000000000
 -if __name__ == "__main__":
 -    test()
 -- 
-2.14.4
+2.20.1
 

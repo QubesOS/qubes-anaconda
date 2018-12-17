@@ -1,4 +1,4 @@
-From c247cc5c37932dbe1c1db85d7d948a4b83da112e Mon Sep 17 00:00:00 2001
+From 1d1eaea2763a0ef0f8e3017be4bfba13128fe5d0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
@@ -9,13 +9,13 @@ Content-Transfer-Encoding: 8bit
 
 self.storage.root_device may be None in such case. Instead, allow proper reporting that no space is available.
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/ui/lib/space.py | 14 ++++++++++----
  1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/pyanaconda/ui/lib/space.py b/pyanaconda/ui/lib/space.py
-index 3679a33eb..9b15c474f 100644
+index d3e96af7d..73d5a6b64 100644
 --- a/pyanaconda/ui/lib/space.py
 +++ b/pyanaconda/ui/lib/space.py
 @@ -75,8 +75,11 @@ class FileSystemSpaceChecker(object):
@@ -47,5 +47,5 @@ index 3679a33eb..9b15c474f 100644
  
          return self.success
 -- 
-2.14.4
+2.20.1
 

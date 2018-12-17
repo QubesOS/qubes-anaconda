@@ -1,4 +1,4 @@
-From 99ea01b31f1733910123eff96a226f1183458839 Mon Sep 17 00:00:00 2001
+From 15db1a05ce5fca309fa3f1185c830648f8ffbe25 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
@@ -16,39 +16,37 @@ by default.
 
 Fixes QubesOS/qubes-issues#3226
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
- pyanaconda/install.py   | 11 +++++++++++
- pyanaconda/kickstart.py | 12 ++++++++++++
- 2 files changed, 23 insertions(+)
+ pyanaconda/installation.py |  9 +++++++++
+ pyanaconda/kickstart.py    | 12 ++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/pyanaconda/install.py b/pyanaconda/install.py
-index a11b6b43b..324e136c7 100644
---- a/pyanaconda/install.py
-+++ b/pyanaconda/install.py
-@@ -211,6 +211,17 @@ def doInstall(storage, payload, ksdata, instClass):
-                                                             wait_for_entropy=entropy_wait_clbk)
+diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
+index 00aff85dc..70cc19a8a 100644
+--- a/pyanaconda/installation.py
++++ b/pyanaconda/installation.py
+@@ -280,6 +280,15 @@ def doInstall(storage, payload, ksdata, instClass):
+                               task_args=(storage,),
+                               task_kwargs={"mount_only": flags.flags.dirInstall, "callbacks": callbacks_reg}))
  
-     turn_on_filesystems(storage, mount_only=flags.flags.dirInstall, callbacks=callbacks_reg)
-+
 +    # For autopart, actual partition related objects (especially
 +    # blivet.format.FS objects) are created by the above call. And autopart
 +    # does not provide any way to specify default mount options (unlike manual
 +    # partitioning). Because of this, patch it now to add 'discard' option.
-+    if storage.root_device.format.options and \
-+            'discard' not in storage.root_device.format.options:
++    if storage.root_device.format.options and 'discard' not in storage.root_device.format.options:
 +        storage.root_device.format.options += ',discard'
 +    else:
 +        storage.root_device.format.options = 'defaults,discard'
 +
-     payload.writeStorageEarly()
+     early_storage.append(Task("Write early storage", payload.writeStorageEarly))
+     installation_queue.append(early_storage)
  
-     # Run %pre-install scripts with the filesystem mounted and no packages
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index c0db1b614..5cd86d5fb 100644
+index 175ed6d13..85eaec799 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -885,6 +885,10 @@ class LogVolData(commands.logvol.F23_LogVolData):
+@@ -1102,6 +1102,10 @@ class LogVolData(COMMANDS.LogVolData):
              self.mountpoint = ""
              ty = None
  
@@ -58,8 +56,8 @@ index c0db1b614..5cd86d5fb 100644
 +
          # Sanity check mountpoint
          if self.mountpoint != "" and self.mountpoint[0] != '/':
-             raise KickstartParseError(formatErrorMsg(self.lineno,
-@@ -1245,6 +1249,10 @@ class PartitionData(commands.partition.F23_PartData):
+             raise KickstartParseError(lineno=self.lineno,
+@@ -1571,6 +1575,10 @@ class PartitionData(COMMANDS.PartData):
              else:
                  ty = storage.default_fstype
  
@@ -70,7 +68,7 @@ index c0db1b614..5cd86d5fb 100644
          if not size and self.size:
              try:
                  size = Size("%d MiB" % self.size)
-@@ -1490,6 +1498,10 @@ class RaidData(commands.raid.F25_RaidData):
+@@ -1834,6 +1842,10 @@ class RaidData(COMMANDS.RaidData):
              else:
                  ty = storage.default_fstype
  
@@ -80,7 +78,7 @@ index c0db1b614..5cd86d5fb 100644
 +
          # Sanity check mountpoint
          if self.mountpoint != "" and self.mountpoint[0] != '/':
-             raise KickstartParseError(formatErrorMsg(self.lineno,
+             raise KickstartParseError(lineno=self.lineno,
 -- 
-2.14.4
+2.20.1
 

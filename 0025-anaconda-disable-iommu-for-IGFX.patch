@@ -1,4 +1,4 @@
-From bc8defc9d1f4e07685d4535ae47659aae8f29aed Mon Sep 17 00:00:00 2001
+From c540fe8fcdb6ff541c85654aa20ad1a3dda4dbd1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
@@ -17,16 +17,16 @@ hope hardware manufacturers will fix it in the meantime.
 
 Fixes QubesOS/qubes-issues#2836
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/bootloader.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 26a48fc7a..b0db4a087 100644
+index 72c50e351..d49257b4f 100644
 --- a/pyanaconda/bootloader.py
 +++ b/pyanaconda/bootloader.py
-@@ -1504,7 +1504,7 @@ class GRUB2(GRUB):
+@@ -1535,7 +1535,7 @@ class GRUB2(GRUB):
          # boot arguments
          log.info("bootloader.py: used boot args: %s ", self.boot_args)
          defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
@@ -35,7 +35,7 @@ index 26a48fc7a..b0db4a087 100644
          defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
          defaults.write("GRUB_THEME=\"/boot/grub2/themes/system/theme.txt\"\n")
          defaults.close()
-@@ -1885,7 +1885,7 @@ class XenEFI(EFIGRUB):
+@@ -1972,7 +1972,7 @@ class XenEFI(EFIGRUB):
          for image in self.images:
              config.write("\n")
              config.write("[{}]\n".format(image.version))
@@ -45,5 +45,5 @@ index 26a48fc7a..b0db4a087 100644
                  image.kernel,
                  image.device.fstab_spec,
 -- 
-2.14.4
+2.20.1
 

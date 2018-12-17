@@ -1,4 +1,4 @@
-From 5136f7c2142166360108c104fdf9244cdca91820 Mon Sep 17 00:00:00 2001
+From fd39be2e2f719cad9c83e0e9f0da33aeb623438a Mon Sep 17 00:00:00 2001
 From: Marek Marczykowski <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
 Subject: [PATCH] anaconda: avoid adding duplicated kernel entries
@@ -13,16 +13,16 @@ times and duplicated entries in xen.cfg.
 
 QubesOS/qubes-issues#3624
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
- pyanaconda/packaging/__init__.py | 2 +-
+ pyanaconda/payload/__init__.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/packaging/__init__.py b/pyanaconda/packaging/__init__.py
-index 8332ce0e5..26eb953d4 100644
---- a/pyanaconda/packaging/__init__.py
-+++ b/pyanaconda/packaging/__init__.py
-@@ -829,7 +829,7 @@ class PackagePayload(Payload):
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index 3b2cc6db6..0486df8c9 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -1113,7 +1113,7 @@ class PackagePayload(Payload):
                  if fnmatch(f, "/boot/vmlinuz-*") or
                     fnmatch(f, "/boot/efi/EFI/%s/vmlinuz-*" % self.instclass.efi_dir)))
  
@@ -32,5 +32,5 @@ index 8332ce0e5..26eb953d4 100644
      @property
      def rpmMacros(self):
 -- 
-2.14.4
+2.20.1
 

@@ -1,4 +1,4 @@
-From 8914364af4e9724852ad91ef583d425e5b0b53fa Mon Sep 17 00:00:00 2001
+From c1f6743d773f877ff8a6cd9c0a76251bde541be6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
@@ -7,7 +7,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  data/help/en-US/QubesPlaceholder.html          |  5 +++++
  data/help/en-US/QubesPlaceholderWithLinks.html | 13 +++++++++++++
@@ -46,5 +46,5 @@ index 000000000..0f7d7dcd5
 +</p>
 +</body>
 -- 
-2.14.4
+2.20.1
 

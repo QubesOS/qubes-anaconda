@@ -1,4 +1,4 @@
-From 1c37fe7581a01b93d1f46b8eb03b37f5cb09bb0e Mon Sep 17 00:00:00 2001
+From 794e104ea712d0e82a224dd92128ff55a4513ed9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
@@ -10,7 +10,7 @@ Content-Transfer-Encoding: 8bit
 Do not fail because of not present url-lib. Also 'loop' module requires manual
 loading now.
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  dracut/anaconda-diskroot         | 2 ++
  dracut/module-setup.sh           | 2 +-
@@ -31,7 +31,7 @@ index 7e52e052b..230b20418 100755
  # So if this is a CDROM drive, make a note of it, but don't mount it (yet).
  # Once we get the kickstart either the udev trigger or disk-reinsertion will
 diff --git a/dracut/module-setup.sh b/dracut/module-setup.sh
-index 184036188..9f4e9d48c 100755
+index 8b8af7a37..1b8457a5f 100755
 --- a/dracut/module-setup.sh
 +++ b/dracut/module-setup.sh
 @@ -7,7 +7,7 @@ check() {
@@ -61,5 +61,5 @@ index fa1455f8b..8fce64aed 100755
  # create the repodir and isodir that anaconda will look for
  mkdir -p $repodir $isodir
 -- 
-2.14.4
+2.20.1
 
