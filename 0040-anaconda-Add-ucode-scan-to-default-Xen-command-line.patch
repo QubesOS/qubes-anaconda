@@ -1,4 +1,4 @@
-From 93611849f490f249b7ecf5c5cdce8852c526c73d Mon Sep 17 00:00:00 2001
+From 050312b5a63e676704b1a7454bf82b6f5dc2d610 Mon Sep 17 00:00:00 2001
 From: Marek Marczykowski <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
 Subject: [PATCH] anaconda: Add ucode=scan to default Xen command line
@@ -13,16 +13,16 @@ initramfs which have microcode early cpio prepended.
 
 QubesOS/qubes-issues#3703
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/bootloader.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index c68b8b1e8..27cc480b5 100644
+index d3ef22050..ca8387d7b 100644
 --- a/pyanaconda/bootloader.py
 +++ b/pyanaconda/bootloader.py
-@@ -1504,7 +1504,7 @@ class GRUB2(GRUB):
+@@ -1535,7 +1535,7 @@ class GRUB2(GRUB):
          # boot arguments
          log.info("bootloader.py: used boot args: %s ", self.boot_args)
          defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
@@ -31,7 +31,7 @@ index c68b8b1e8..27cc480b5 100644
          defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
          defaults.write("GRUB_THEME=\"/boot/grub2/themes/system/theme.txt\"\n")
          defaults.close()
-@@ -1891,7 +1891,7 @@ class XenEFI(EFIGRUB):
+@@ -1978,7 +1978,7 @@ class XenEFI(EFIGRUB):
                  root_args += " rootflags=subvol=%s" % image.device.name
              config.write("\n")
              config.write("[{}]\n".format(image.version))
@@ -41,5 +41,5 @@ index c68b8b1e8..27cc480b5 100644
                  image.kernel,
                  root_args,
 -- 
-2.14.4
+2.19.2
 

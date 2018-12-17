@@ -1,4 +1,4 @@
-From 40992b40f344685a755f39813f0f2afd9f56e7b6 Mon Sep 17 00:00:00 2001
+From f118f88e559ec147ef291495b4b05f0c52f366f4 Mon Sep 17 00:00:00 2001
 From: "M. Vefa Bicakci" <m.v.b@runbox.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
 Subject: [PATCH] anaconda: Do not fail during initramfs start-up due to
@@ -7,7 +7,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  dracut/anaconda-ks-sendheaders.sh | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
@@ -34,5 +34,5 @@ index 7bc97393b..39fa0ce0d 100755
  # inst.ks.sendmac: send MAC addresses in HTTP headers
  if getargbool 0 kssendmac inst.ks.sendmac; then
 -- 
-2.14.4
+2.19.2
 

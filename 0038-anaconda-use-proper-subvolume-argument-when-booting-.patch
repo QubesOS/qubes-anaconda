@@ -1,4 +1,4 @@
-From bcb258acbfb3b21c44422bdd9490e5f57c1e03fe Mon Sep 17 00:00:00 2001
+From f0bf3656e53bf643d985b947387a1beb0195155c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
@@ -14,16 +14,16 @@ anaconda and 'rootflags=subvol=...' argument need to be added manually.
 
 Fixes QubesOS/qubes-issues#1871
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/bootloader.py | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 821eb2100..c68b8b1e8 100644
+index 6965d6ae2..d3ef22050 100644
 --- a/pyanaconda/bootloader.py
 +++ b/pyanaconda/bootloader.py
-@@ -1886,12 +1886,15 @@ class XenEFI(EFIGRUB):
+@@ -1973,12 +1973,15 @@ class XenEFI(EFIGRUB):
  
      def write_config_images(self, config):
          for image in self.images:
@@ -42,5 +42,5 @@ index 821eb2100..c68b8b1e8 100644
              config.write("ramdisk={}\n".format(image.initrd))
  
 -- 
-2.14.4
+2.19.2
 

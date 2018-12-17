@@ -1,4 +1,4 @@
-From f53f5fdcaf10bdd2f64bd144b78052561ae15aa6 Mon Sep 17 00:00:00 2001
+From 779e2c457c56ca471cf43dcf34b42249bc4370c9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:12 +0200
@@ -7,13 +7,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
- pyanaconda/bootloader.py | 79 +++++++++++++++++++++++++++++++++++++++++++++++-
+ pyanaconda/bootloader.py | 79 +++++++++++++++++++++++++++++++++++++++-
  1 file changed, 78 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index acdfb8322..908020ad0 100644
+index 5a36bc0b8..24a635d5d 100644
 --- a/pyanaconda/bootloader.py
 +++ b/pyanaconda/bootloader.py
 @@ -21,6 +21,7 @@
@@ -24,9 +24,9 @@ index acdfb8322..908020ad0 100644
  import blivet
  from parted import PARTITION_BIOS_GRUB
  from glob import glob
-@@ -1828,6 +1829,82 @@ class EFIGRUB(EFIBase, GRUB2):
- class Aarch64EFIGRUB(EFIGRUB):
-     _serial_consoles = ["ttyAMA", "ttyS"]
+@@ -1915,6 +1916,82 @@ class ArmEFIGRUB(EFIGRUB):
+         super().__init__()
+         self._packages64 = ["grub2-efi-arm"]
  
 +class XenEFI(EFIGRUB):
 +    packages = ["efibootmgr"]
@@ -51,29 +51,29 @@ index acdfb8322..908020ad0 100644
 +        boot_part_num = str(boot_part_num)
 +
 +        if not os.path.exists(
-+                "{}/{}".format(iutil.getSysroot() + self.config_dir, "xen.efi")):
-+            xen_efi = [x for x in os.listdir(iutil.getSysroot() + self.config_dir) if
++                "{}/{}".format(util.getSysroot() + self.config_dir, "xen.efi")):
++            xen_efi = [x for x in os.listdir(util.getSysroot() + self.config_dir) if
 +                       x.startswith('xen-') and x.endswith('.efi')][0]
-+            shutil.copy("{}/{}".format(iutil.getSysroot() + self.config_dir, xen_efi),
-+                        "{}/{}".format(iutil.getSysroot() + self.config_dir, "xen.efi"))
++            shutil.copy("{}/{}".format(util.getSysroot() + self.config_dir, xen_efi),
++                        "{}/{}".format(util.getSysroot() + self.config_dir, "xen.efi"))
 +        rc = self.efibootmgr("-c", "-w", "-L", productName,
 +                             "-d", boot_disk.path, "-p", boot_part_num,
 +                             "-l",
 +                             self.efi_dir_as_efifs_dir + "\\xen.efi",
-+                             root=iutil.getSysroot())
++                             root=util.getSysroot())
 +        if rc:
 +            raise BootLoaderError("failed to set new efi boot target")
 +
 +    def add_image(self, image):
 +        super(XenEFI, self).add_image(image)
-+        shutil.copy("{}/boot/{}".format(iutil.getSysroot(), image.kernel),
++        shutil.copy("{}/boot/{}".format(util.getSysroot(), image.kernel),
 +                    os.path.normpath(
-+                        "{}/{}".format(iutil.getSysroot() + self.config_dir,
++                        "{}/{}".format(util.getSysroot() + self.config_dir,
 +                                       image.kernel)))
 +        if image.initrd is not None:
-+            shutil.copy("{}/boot/{}".format(iutil.getSysroot(), image.initrd),
++            shutil.copy("{}/boot/{}".format(util.getSysroot(), image.initrd),
 +                        os.path.normpath(
-+                            "{}/{}".format(iutil.getSysroot() + self.config_dir,
++                            "{}/{}".format(util.getSysroot() + self.config_dir,
 +                                           image.initrd)))
 +
 +    def write_config_header(self, config):
@@ -105,9 +105,9 @@ index acdfb8322..908020ad0 100644
 +
 +
  class MacEFIGRUB(EFIGRUB):
-     def mactel_config(self):
-         if os.path.exists(iutil.getSysroot() + "/usr/libexec/mactel-boot-setup"):
-@@ -2342,7 +2419,7 @@ class EXTLINUX(BootLoader):
+     def __init__(self):
+         super().__init__()
+@@ -2430,7 +2507,7 @@ class EXTLINUX(BootLoader):
  # every platform that wants a bootloader needs to be in this dict
  bootloader_by_platform = {
      platform.X86: GRUB2,
@@ -117,5 +117,5 @@ index acdfb8322..908020ad0 100644
      platform.PPC: GRUB2,
      platform.IPSeriesPPC: IPSeriesGRUB2,
 -- 
-2.14.4
+2.19.2
 

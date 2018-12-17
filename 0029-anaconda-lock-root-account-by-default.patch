@@ -1,0 +1,40 @@
+From 6b628640bce9ea51ee5a1e462e893d6aa4d7a142 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.epitre@orange.fr>
+Date: Sat, 10 Nov 2018 19:17:45 +0100
+Subject: [PATCH] anaconda: lock root account by default
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
+---
+ pyanaconda/installclasses/qubes.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/installclasses/qubes.py b/pyanaconda/installclasses/qubes.py
+index 8fe35fe9b..f303e1f09 100644
+--- a/pyanaconda/installclasses/qubes.py
++++ b/pyanaconda/installclasses/qubes.py
+@@ -19,7 +19,7 @@
+ 
+ from pyanaconda.installclass import BaseInstallClass
+ from pyanaconda.modules.common.constants.objects import AUTO_PARTITIONING
+-from pyanaconda.modules.common.constants.services import STORAGE
++from pyanaconda.modules.common.constants.services import STORAGE, USERS
+ from pyanaconda.product import *
+ from pyanaconda.core.i18n import N_
+ import pyanaconda.platform
+@@ -56,6 +56,9 @@ class InstallClass(BaseInstallClass):
+         auto_part_proxy = STORAGE.get_proxy(AUTO_PARTITIONING)
+         auto_part_proxy.SetEncrypted(True)
+ 
++        users_proxy = USERS.get_proxy()
++        users_proxy.SetRootAccountLocked(True)
++
+     def setDefaultPartitioning(self, storage):
+         BaseInstallClass.setDefaultPartitioning(self, storage)
+         for autoreq in storage.autopart_requests:
+-- 
+2.19.2
+

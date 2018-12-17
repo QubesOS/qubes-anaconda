@@ -1,32 +1,44 @@
-From 2cdfe3b92b5997d03f22521a2d4edb1d42ea443f Mon Sep 17 00:00:00 2001
-From: Marek Marczykowski <marmarek@invisiblethingslab.com>
-Date: Fri, 19 Oct 2018 08:02:11 +0200
+From 4aa92f85d767f6ec7820a38471198801a1b16f87 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.epitre@orange.fr>
+Date: Fri, 26 Oct 2018 19:53:07 +0200
 Subject: [PATCH] anaconda: make encrypted partitions by default
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
- pyanaconda/kickstart.py | 5 +++++
- 1 file changed, 5 insertions(+)
+ pyanaconda/installclasses/qubes.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index dc58d9b65..7d67bf1a6 100644
---- a/pyanaconda/kickstart.py
-+++ b/pyanaconda/kickstart.py
-@@ -252,6 +252,11 @@ class Authconfig(commands.authconfig.FC3_Authconfig):
-             log.error("Error running %s %s: %s", cmd, args, msg)
+diff --git a/pyanaconda/installclasses/qubes.py b/pyanaconda/installclasses/qubes.py
+index e34a46678..8fe35fe9b 100644
+--- a/pyanaconda/installclasses/qubes.py
++++ b/pyanaconda/installclasses/qubes.py
+@@ -18,6 +18,8 @@
+ #
  
- class AutoPart(commands.autopart.F21_AutoPart):
-+    def __init__(self, writePriority=100, *args, **kwargs):
-+        if 'encrypted' not in kwargs:
-+            kwargs['encrypted'] = True
-+        super(AutoPart, self).__init__(writePriority=writePriority, *args, **kwargs)
+ from pyanaconda.installclass import BaseInstallClass
++from pyanaconda.modules.common.constants.objects import AUTO_PARTITIONING
++from pyanaconda.modules.common.constants.services import STORAGE
+ from pyanaconda.product import *
+ from pyanaconda.core.i18n import N_
+ import pyanaconda.platform
+@@ -51,9 +53,11 @@ class InstallClass(BaseInstallClass):
+         BaseInstallClass.configure(self, anaconda)
+         self.setDefaultPartitioning(anaconda.storage)
+ 
++        auto_part_proxy = STORAGE.get_proxy(AUTO_PARTITIONING)
++        auto_part_proxy.SetEncrypted(True)
 +
-     def parse(self, args):
-         retval = commands.autopart.F21_AutoPart.parse(self, args)
- 
+     def setDefaultPartitioning(self, storage):
+-        BaseInstallClass.setDefaultPartitioning(self,
+-                                                storage)
++        BaseInstallClass.setDefaultPartitioning(self, storage)
+         for autoreq in storage.autopart_requests:
+             if autoreq.mountpoint == "/":
+                 autoreq.max_size = None
 -- 
-2.14.4
+2.19.2
 

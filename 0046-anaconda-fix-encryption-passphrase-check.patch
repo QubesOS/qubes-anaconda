@@ -1,0 +1,33 @@
+From 7298088e0ff983b6eb6bdaf3a086c94a138c3116 Mon Sep 17 00:00:00 2001
+From: Wojtek Porczyk <woju@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] anaconda: fix encryption passphrase check
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The installer checks if there is password for autopart. It should check
+that only if autopart is actually in use.
+
+QubesOS/qubes-issues#2180
+
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
+---
+ pyanaconda/ui/gui/spokes/storage.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pyanaconda/ui/gui/spokes/storage.py b/pyanaconda/ui/gui/spokes/storage.py
+index ff185c7f4..01440bf79 100644
+--- a/pyanaconda/ui/gui/spokes/storage.py
++++ b/pyanaconda/ui/gui/spokes/storage.py
+@@ -473,6 +473,7 @@ class StorageSpoke(NormalSpoke, StorageCheckHandler):
+         hubQ.send_message(self.__class__.__name__, _("Saving storage configuration..."))
+         threadMgr.wait(constants.THREAD_STORAGE)
+         if flags.automatedInstall \
++                and self._auto_part_observer.proxy.Enabled \
+                 and self._auto_part_observer.proxy.Encrypted \
+                 and not self._auto_part_observer.proxy.Passphrase:
+             self.autopart_missing_passphrase = True
+-- 
+2.19.2
+

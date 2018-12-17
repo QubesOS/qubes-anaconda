@@ -1,4 +1,4 @@
-From 2522cc68bb55ca668ca5a71abc9497fdd0114d21 Mon Sep 17 00:00:00 2001
+From 0a6a8556e1ce39c547884e6967c0c0356af9ecf3 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:13 +0200
@@ -12,24 +12,24 @@ named as new user, so 'qubes' user name should also be avoided.
 
 Fixes QubesOS/qubes-issues#3777
 
-Signed-off-by: Frédéric Pierret <frederic.epitre@orange.fr>
+Signed-off-by: Frédéric Pierret (fepitre) <frederic.epitre@orange.fr>
 ---
  pyanaconda/users.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/users.py b/pyanaconda/users.py
-index 366d6226f..1b4424be8 100644
+index 3db06ddad..e4ded474a 100644
 --- a/pyanaconda/users.py
 +++ b/pyanaconda/users.py
-@@ -123,7 +123,7 @@ def validatePassword(pw, user="root", settings=None, minlen=None):
-     return (valid, strength, message)
+@@ -52,7 +52,7 @@ def cryptPassword(password, algo=None):
  
  def check_username(name):
+     # Check reserved names.
 -    if name in os.listdir("/") + ["root", "home", "daemon", "system"]:
 +    if name in os.listdir("/") + ["root", "home", "daemon", "system", "qubes"]:
-         return (False, _("User name is reserved for system: %s") % name)
+         return False, _("User name is reserved for system: %s") % name
  
-     if name.startswith("-"):
+     return is_valid_name(name)
 -- 
-2.14.4
+2.19.2
 
