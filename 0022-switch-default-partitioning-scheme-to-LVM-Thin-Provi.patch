@@ -1,0 +1,41 @@
+From 1b4d396c768520647b54bc74978fa58f2813e061 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.epitre@orange.fr>
+Date: Fri, 28 Dec 2018 13:35:56 +0100
+Subject: [PATCH] switch default partitioning scheme to LVM Thin Provisioning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Rework of previous work done by Marek Marczykowski-Górecki (marmarek).
+
+QubesOS/qubes-issues#2412
+---
+ pyanaconda/installclasses/qubes.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/pyanaconda/installclasses/qubes.py b/pyanaconda/installclasses/qubes.py
+index 794e2e45b..debdc0f42 100644
+--- a/pyanaconda/installclasses/qubes.py
++++ b/pyanaconda/installclasses/qubes.py
+@@ -23,6 +23,7 @@ from pyanaconda.modules.common.constants.services import NETWORK, STORAGE, TIMEZ
+ from pyanaconda.product import *
+ from pyanaconda.core.i18n import N_
+ import pyanaconda.platform
++from pykickstart.constants import AUTOPART_TYPE_LVM_THINP
+ 
+ from blivet.size import Size
+ from pyanaconda.platform import platform
+@@ -61,6 +62,9 @@ class InstallClass(BaseInstallClass):
+         auto_part_proxy = STORAGE.get_proxy(AUTO_PARTITIONING)
+         auto_part_proxy.SetEncrypted(True)
+ 
++        # Make LVM Thin the default for autopart
++        auto_part_proxy.SetType(AUTOPART_TYPE_LVM_THINP)
++
+         # Make disabled NTP by default
+         timezone_proxy = TIMEZONE.get_proxy()
+         timezone_proxy.SetNTPEnabled(False)
+-- 
+2.17.2
+

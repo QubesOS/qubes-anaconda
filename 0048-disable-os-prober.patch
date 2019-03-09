@@ -1,0 +1,26 @@
+From c582f6eed81836ff096c328cd77e710be084b810 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.epitre@orange.fr>
+Date: Sat, 20 Oct 2018 11:16:05 +0200
+Subject: [PATCH] disable os prober
+
+It tries to mount every existing block device, including VM images.
+---
+ pyanaconda/bootloader.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index ce6121912..f4deb8460 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1538,6 +1538,7 @@ class GRUB2(GRUB):
+         defaults.write("GRUB_CMDLINE_XEN_DEFAULT=\"console=none dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx ucode=scan smt=off\"\n")
+         defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
+         defaults.write("GRUB_THEME=\"/boot/grub2/themes/qubes/theme.txt\"\n")
++        defaults.write("GRUB_DISABLE_OS_PROBER=\"true\"\n")
+         defaults.close()
+ 
+     def _encrypt_password(self):
+-- 
+2.17.2
+

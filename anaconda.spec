@@ -1,9 +1,13 @@
 %define livearches %{ix86} x86_64 ppc ppc64 ppc64le
 
+# Avoid anaconda-core requiring gjs-console due to the GNOME welcome
+# screen that's shipped in it
+%global __requires_exclude_from ^%{_datadir}/anaconda/gnome/fedora-welcome.*$
+
 Summary: Graphical system installer
 Name:    anaconda
-Version: 25.20.9
-Release: 14%{?dist}
+Version: 29.24.7
+Release: 6%{?dist}
 License: GPLv2+ and MIT
 Epoch:   1000
 Group:   Applications/System
@@ -18,94 +22,86 @@ Source0: %{name}-%{version}.tar.bz2
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Patch1: 0001-anaconda-add-Qubes-installclass.patch
-Patch2: 0002-anaconda-add-Qubes-post-scripts.patch
-Patch3: 0003-anaconda-remove-other-installclasses.patch
-Patch4: 0004-anaconda-do-not-start-network-during-install-set-def.patch
-Patch5: 0005-anaconda-remove-network-setup-from-text-interface.patch
-Patch6: 0006-anaconda-fix-grub-config-setup-by-removing-non-xen-o.patch
-Patch7: 0007-anaconda-make-encrypted-partitions-by-default.patch
-Patch8: 0008-anaconda-set-default-grub-theme.patch
-Patch9: 0009-anaconda-add-options-can_dual_boot-and-can_update-to.patch
-Patch10: 0010-anaconda-efimgr-specify-root-iutil.getSysroot.patch
-Patch11: 0011-anaconda-generate-xen-efi-configuration.patch
-Patch12: 0012-anaconda-fix-dracut-module-to-work-with-reduced-depe.patch
-Patch13: 0013-anaconda-use-installer-kernel-parameters-as-default-.patch
-Patch14: 0014-anaconda-use-kernel-install-instead-of-grubby-to-reg.patch
-Patch15: 0015-anaconda-Fix-a-regular-expression-determining-Releas.patch
-Patch16: 0016-anaconda-Do-not-fail-during-initramfs-start-up-due-t.patch
-Patch17: 0017-anaconda-Disable-the-NTP-configuration-spoke.patch
-Patch18: 0018-anaconda-drop-useless-on-Qubes-dependencies-on-netwo.patch
-Patch19: 0019-anaconda-skip-NTP-installation-and-setup-in-dom0.patch
-Patch20: 0020-anaconda-add-skip_grub-parameter-and-allow-boot-encr.patch
-Patch21: 0021-anaconda-switch-default-partitioning-scheme-to-LVM-T.patch
-Patch22: 0022-anaconda-add-console-none-Xen-parameter.patch
-Patch23: 0023-anaconda-add-dom0_mem-min-1024M-to-default-xen-cmdli.patch
-Patch24: 0024-anaconda-limit-dom0-maxmem-to-4GB-to-limit-its-overh.patch
-Patch25: 0025-anaconda-disable-iommu-for-IGFX.patch
-Patch26: 0026-anaconda-check-for-virtualization-features.patch
-Patch27: 0027-anaconda-generate-proper-extlinux.conf.patch
-Patch28: 0028-anaconda-don-t-crash-when-no-target-disk-is-availabl.patch
-Patch29: 0029-anaconda-consider-Interrupt-Remapping-as-required-fe.patch
-Patch30: 0030-anaconda-lock-root-account-by-default.patch
-Patch31: 0031-anaconda-add-option-to-lock-root-account.patch
-Patch32: 0032-anaconda-check-add-user-to-wheel-and-qubes-groups.patch
-Patch33: 0033-anaconda-Modify-user-configuration-spoke-for-QubesOS.patch
-Patch34: 0034-anaconda-Make-sure-that-a-user-is-created-at-install.patch
-Patch35: 0035-anaconda-xen.efi-upgraded-during-each-install.patch
-Patch36: 0036-anaconda-make-sure-the-latest-version-is-placed-as-x.patch
-Patch37: 0037-anaconda-update-message-about-unusupported-hardware.patch
-Patch38: 0038-anaconda-check-also-for-message-about-AMD-interrupt-.patch
-Patch39: 0039-anaconda-Remove-in-memory-kickstart-representation-f.patch
-Patch40: 0040-anaconda-fix-default-scheme-in-custom-partitioning.patch
-Patch41: 0041-anaconda-fix-interrupt-remapping-detection.patch
-Patch42: 0042-anaconda-Fix-macOS-EFI-Installation.patch
-Patch43: 0043-anaconda-use-proper-subvolume-argument-when-booting-.patch
-Patch44: 0044-anaconda-enable-discard-option-for-dom0-filesystems-.patch
-Patch45: 0045-anaconda-Add-ucode-scan-to-default-Xen-command-line.patch
-Patch46: 0046-anaconda-avoid-adding-duplicated-kernel-entries.patch
-Patch47: 0047-anaconda-Fix-System-Requirements-URL-and-typo-in-har.patch
-Patch48: 0048-anaconda-save-keyboard-layout-to-udev.patch
-Patch49: 0049-anaconda-fix-root-password-dialog.patch
-Patch50: 0050-anaconda-mark-qubes-user-name-as-reserved.patch
-Patch51: 0051-anaconda-add-smt-off-xen-option-during-installation.patch
-Patch52: 0052-anaconda-update-Qubes-specific-code-for-Fedora-21-ve.patch
-Patch53: 0053-anaconda-require-user-password-being-set.patch
-Patch54: 0054-anaconda-abort-installation-on-X-startup-fail.patch
-Patch55: 0055-anaconda-fix-encryption-passphrase-check.patch
-Patch56: 0056-anaconda-disable-os-prober.patch
+Patch0: 0001-add-Qubes-installclass.patch
+Patch1: 0002-add-Qubes-post-scripts.patch
+Patch2: 0003-remove-other-installclasses.patch
+Patch3: 0004-Set-default-hostname-to-dom0.patch
+Patch4: 0005-Disable-network-by-ignoring-any-present-nic.patch
+Patch5: 0006-remove-network-setup-from-graphical-and-text-interfa.patch
+Patch6: 0007-fix-grub-config-setup-by-removing-non-xen-options.patch
+Patch7: 0008-make-encrypted-partitions-by-default.patch
+Patch8: 0009-set-default-grub-theme.patch
+Patch9: 0010-add-options-can_dual_boot-and-can_update-to-grub.patch
+Patch10: 0011-efimgr-specify-root-util.getSysroot.patch
+Patch11: 0012-generate-xen-efi-configuration.patch
+Patch12: 0013-fix-dracut-module-to-work-with-reduced-dependencies.patch
+Patch13: 0014-use-installer-kernel-parameters-as-default-for-insta.patch
+Patch14: 0015-use-kernel-install-instead-of-grubby-to-regenerate-i.patch
+#Patch15: 0016-Fix-a-regular-expression-determining-Release.patch
+Patch16: 0017-Do-not-fail-during-initramfs-start-up-due-to-missing.patch
+Patch17: 0018-Disable-the-NTP-configuration-spoke.patch
+Patch18: 0019-drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch19: 0020-skip-NTP-installation-and-setup-in-dom0.patch
+Patch20: 0021-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
+Patch21: 0022-switch-default-partitioning-scheme-to-LVM-Thin-Provi.patch
+Patch22: 0023-add-console-none-Xen-parameter.patch
+Patch23: 0024-add-dom0_mem-min-1024M-to-default-xen-cmdline.patch
+Patch24: 0025-limit-dom0-maxmem-to-4GB-to-limit-its-overhead-on-bi.patch
+Patch25: 0026-disable-iommu-for-IGFX.patch
+Patch26: 0027-check-for-Qubes-OS-hardware-required-features.patch
+Patch27: 0028-generate-proper-extlinux.conf.patch
+Patch28: 0029-don-t-crash-when-no-target-disk-is-available.patch
+Patch29: 0030-lock-root-account-by-default.patch
+Patch30: 0031-add-option-to-lock-root-account.patch
+Patch31: 0032-Modify-user-configuration-spoke-for-QubesOS.patch
+Patch32: 0033-Make-sure-that-a-user-is-created-at-installation-tim.patch
+Patch33: 0034-check-add-user-to-wheel-and-qubes-groups.patch
+Patch34: 0035-xen.efi-upgraded-during-each-install.patch
+Patch35: 0036-make-sure-the-latest-version-is-placed-as-xen.efi.patch
+Patch36: 0037-fix-default-scheme-in-custom-partitioning.patch
+Patch37: 0038-Fix-macOS-EFI-Installation.patch
+Patch38: 0039-use-proper-subvolume-argument-when-booting-from-btrf.patch
+Patch39: 0040-enable-discard-option-for-dom0-filesystems-by-defaul.patch
+Patch40: 0041-Add-ucode-scan-to-default-Xen-command-line.patch
+Patch41: 0042-avoid-adding-duplicated-kernel-entries.patch
+Patch42: 0043-mark-qubes-user-name-as-reserved.patch
+Patch43: 0044-add-smt-off-xen-option-during-installation.patch
+Patch44: 0045-update-Qubes-specific-code-for-Fedora-21-version.patch
+Patch45: 0046-abort-installation-on-X-startup-fail.patch
+Patch46: 0047-fix-encryption-passphrase-check.patch
+Patch47: 0048-disable-os-prober.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
 
-%define gettextver 0.19.8
-%define pykickstartver 2.32-1
-%define dnfver 0.6.4
-%define dnfmaxver 2.0.0
-%define partedver 1.8.1
-%define pypartedver 2.5-2
-%define nmver 0.9.9.0-10.git20130906
+%define blivetguiver 2.1.7-2
 %define dbusver 1.2.3
-%define mehver 0.23-1
-%define firewalldver 0.3.5-1
-%define utillinuxver 2.15.1
+%define dnfver 3.6.0
 %define dracutver 034-7
-%define isomd5sum 1.0.10
 %define fcoeutilsver 1.0.12-3.20100323git
-%define iscsiver 6.2.0.873-26
-%define rpmver 4.10.0
-%define libarchivever 3.0.4
-%define langtablever 0.0.34
-%define libxklavierver 5.4
-%define libtimezonemapver 0.4.1-2
+%define gettextver 0.19.8
+%define gtk3ver 3.22.17
 %define helpver 22.1-1
+%define isomd5sum 1.0.10
+%define langtablever 0.0.34
+%define libarchivever 3.0.4
+%define libblockdevver 2.1
+%define libtimezonemapver 0.4.1-2
+%define libxklavierver 5.4
+%define mehver 0.23-1
+%define nmver 1.0
+%define pykickstartver 3.16-1
+%define pypartedver 2.5-2
+%define rpmver 4.10.0
+%define simplelinever 1.1-1
+%define utillinuxver 2.15.1
 
 BuildRequires: audit-libs-devel
-BuildRequires: gettext >= %{gettextver}
-BuildRequires: gettext-devel
-BuildRequires: gtk3-devel
+BuildRequires: libtool
+BuildRequires: gettext-devel >= %{gettextver}
+BuildRequires: gtk3-devel >= %{gtk3ver}
 BuildRequires: gtk-doc
-BuildRequires: gtk3-devel-docs
+BuildRequires: gtk3-devel-docs >= %{gtk3ver}
 BuildRequires: glib2-doc
 BuildRequires: gobject-introspection-devel
 BuildRequires: glade-devel
@@ -113,9 +109,6 @@ BuildRequires: libgnomekbd-devel
 BuildRequires: libxklavier-devel >= %{libxklavierver}
 BuildRequires: pango-devel
 BuildRequires: python3-kickstart >= %{pykickstartver}
-%if ! 0%{?rhel}
-BuildRequires: python3-bugzilla
-%endif
 BuildRequires: python3-devel
 BuildRequires: python3-nose
 BuildRequires: systemd
@@ -137,19 +130,21 @@ BuildRequires: libxml2
 Requires: anaconda-core = %{epoch}:%{version}-%{release}
 Requires: anaconda-gui = %{epoch}:%{version}-%{release}
 Requires: anaconda-tui = %{epoch}:%{version}-%{release}
+Requires: anaconda-install-env-deps = %{epoch}:%{version}-%{release}
 
 %description
 The anaconda package is a metapackage for the Anaconda installer.
 
 %package core
 Summary: Core of the Anaconda installer
-Requires: python3-dnf >= %{dnfver}, python3-dnf < %{dnfmaxver}
-Requires: python3-blivet >= 1:2.1.6-3
+Requires: python3-libs
+Requires: python3-dnf >= %{dnfver}
+Requires: python3-blivet >= 1:3.1.0-1
+Requires: python3-blockdev >= %{libblockdevver}
 Requires: python3-meh >= %{mehver}
 Requires: libreport-anaconda >= 2.0.21-1
 Requires: libselinux-python3
 Requires: rpm-python3 >= %{rpmver}
-Requires: parted >= %{partedver}
 Requires: python3-pyparted >= %{pypartedver}
 Requires: python3-requests
 Requires: python3-requests-file
@@ -157,17 +152,19 @@ Requires: python3-requests-ftp
 Requires: python3-kickstart >= %{pykickstartver}
 Requires: langtable-data >= %{langtablever}
 Requires: langtable-python3 >= %{langtablever}
-Requires: authconfig
 Requires: util-linux >= %{utillinuxver}
+Requires: python3-gobject-base
 Requires: python3-dbus
 Requires: python3-pwquality
+Requires: python3-systemd
+Requires: python3-pydbus
+Requires: python3-productmd
 
 # pwquality only "recommends" the dictionaries it needs to do anything useful,
 # which is apparently great for containers but unhelpful for the rest of us
 Requires: cracklib-dicts
 
 Requires: python3-pytz
-Requires: realmd
 Requires: teamd
 %ifarch %livearches
 Requires: usermode
@@ -175,25 +172,15 @@ Requires: usermode
 %ifarch s390 s390x
 Requires: openssh
 %endif
-Requires: isomd5sum >= %{isomd5sum}
-Requires: createrepo_c
 Requires: NetworkManager >= %{nmver}
-Requires: NetworkManager-glib >= %{nmver}
+Requires: NetworkManager-libnm >= %{nmver}
 Requires: NetworkManager-team
 Requires: dhclient
 Requires: kbd
 Requires: python3-ntplib
-Requires: rsync
 Requires: systemd
-%ifarch %{ix86} x86_64
-%if ! 0%{?rhel}
-Requires: hfsplus-tools
-%endif
-%endif
 Requires: python3-pid
 Requires: python3-ordered-set >= 2.0.0
-Requires: python3-wrapt
-Requires: dmidecode
 
 Requires: python3-coverage >= 4.0-0.12.b3
 
@@ -216,13 +203,42 @@ Obsoletes: booty <= 0.107-1
 The anaconda-core package contains the program which was used to install your
 system.
 
+%package install-env-deps
+Summary: Installation environment specific dependencies
+Requires: udisks2-iscsi
+Requires: libblockdev-plugins-all >= %{libblockdevver}
+# active directory/freeipa join support
+Requires: realmd
+Requires: isomd5sum >= %{isomd5sum}
+%ifarch %{ix86} x86_64
+Requires: fcoe-utils >= %{fcoeutilsver}
+%endif
+# likely HFS+ resize support
+%ifarch %{ix86} x86_64
+%if ! 0%{?rhel}
+Requires: hfsplus-tools
+%endif
+%endif
+# kexec support
+Requires: kexec-tools
+Requires: createrepo_c
+# run's on TTY1 in install env
+Requires: tmux
+# install time crash handling
+Requires: gdb
+Requires: rsync
+
+%description install-env-deps
+The anaconda-install-env-deps metapackage lists all installation environment dependencies.
+This makes it possible for packages (such as Initial Setup) to depend on the main Anaconda package without
+pulling in all the install time dependencies as well.
+
 %package gui
 Summary: Graphical user interface for the Anaconda installer
 Requires: anaconda-core = %{epoch}:%{version}-%{release}
 Requires: anaconda-widgets = %{epoch}:%{version}-%{release}
 Requires: python3-meh-gui >= %{mehver}
 Requires: adwaita-icon-theme
-Requires: system-logos
 Requires: tigervnc-server-minimal
 Requires: libxklavier >= %{libxklavierver}
 Requires: libgnomekbd
@@ -237,7 +253,8 @@ Requires: NetworkManager-wifi
 %endif
 Requires: anaconda-user-help >= %{helpver}
 Requires: yelp
-Requires: python3-gobject-base
+Requires: blivet-gui-runtime >= %{blivetguiver}
+Requires: system-logos
 
 # Needed to compile the gsettings files
 BuildRequires: gsettings-desktop-schemas
@@ -249,6 +266,7 @@ This package contains graphical user interface for the Anaconda installer.
 %package tui
 Summary: Textual user interface for the Anaconda installer
 Requires: anaconda-core = %{epoch}:%{version}-%{release}
+Requires: python3-simpleline >= %{simplelinever}
 
 %description tui
 This package contains textual user interface for the Anaconda installer.
@@ -290,7 +308,7 @@ runtime on NFS/HTTP/FTP servers or local disks.
 
 %build
 autoreconf -v --install .
-%configure
+%configure ANACONDA_RELEASE=%{release}
 %{__make} %{?_smp_mflags}
 
 %install
@@ -301,7 +319,7 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 mkdir %{buildroot}%{_datadir}/anaconda/addons
 
 %ifarch %livearches
-desktop-file-install ---dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
 %endif
 # NOTE: If you see "error: Installed (but unpackaged) file(s) found" that include liveinst files,
 #       check the IS_LIVEINST_ARCH in configure.ac to make sure your architecture is properly defined
@@ -323,7 +341,10 @@ update-desktop-database &> /dev/null || :
 update-desktop-database &> /dev/null || :
 %endif
 
+# main package and install-env-deps are metapackages
 %files
+
+%files install-env-deps
 
 # Allow the lang file to be empty
 %define _empty_manifest_terminate_build 0
@@ -339,7 +360,7 @@ update-desktop-database &> /dev/null || :
 %{_datadir}/anaconda
 %{_prefix}/libexec/anaconda
 %exclude %{_prefix}/libexec/anaconda/dd_*
-%{python3_sitearch}/pyanaconda/*
+%{python3_sitearch}/pyanaconda
 %exclude %{python3_sitearch}/pyanaconda/rescue.py*
 %exclude %{python3_sitearch}/pyanaconda/__pycache__/rescue.*
 %exclude %{python3_sitearch}/pyanaconda/ui/gui/*
@@ -358,7 +379,6 @@ update-desktop-database &> /dev/null || :
 
 %files gui
 %{python3_sitearch}/pyanaconda/ui/gui/*
-%{_datadir}/themes/Anaconda/*
 
 %files tui
 %{python3_sitearch}/pyanaconda/rescue.py
@@ -382,121 +402,1275 @@ update-desktop-database &> /dev/null || :
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
-* Wed Dec 14 2016 Martin Kolman <mkolman@redhat.com> - 25.20.9-1
-- rpmostreepayload: Rework binds to be recursive (walters)
-- Merge pull request #876 from jkonecny12/f25-dev-fix-can-touch-runtime-call
+* Fri Oct 19 2018 Martin Kolman <mkolman@redhat.com> - 29.24.7-1
+- Fix local repo files aren't enabled (#1636739) (jkonecny)
+
+* Thu Oct 18 2018 Martin Kolman <mkolman@redhat.com> - 29.24.6-1
+- installclass: fix variant string for Atomic Host (#1640409) (dusty)
+
+* Mon Oct 15 2018 Martin Kolman <mkolman@redhat.com> - 29.24.5-1
+- nvdimm: update ks data for actions in UI (rvykydal)
+- nvdimm: use pykickstart constant for setting reconfigure mode (rvykydal)
+- Revert "Don't allow booting from nvdimm devices" (rvykydal)
+
+* Mon Oct 08 2018 Martin Kolman <mkolman@redhat.com> - 29.24.4-1
+- Adjust to some DNF 3.6 changes (#1637021) (mkolman)
+- Ignore errors when trying to activate unsupported swaps (#1635252) (vtrefny)
+- Add option to set kernel.hung_task_timeout_secs option (rvykydal)
+- Fix strings not marked for translation (jkonecny)
+- Drop attempt to add 'nocrypto' to tsflags (awilliam)
+- Fix librepo logging with new DNF (jkonecny)
+- Revert "Remove librepo imports from Anaconda (#1626609)" (jkonecny)
+- Set the VNC password directly (#1592686) (vponcova)
+- Update the spoke for unsupported hardware in TUI (#1601545) (vponcova)
+- Update the dialog for unsupported hardware in GUI (#1601545) (vponcova)
+- Support detection of kernel taints (vponcova)
+- Fix the rescue mode (#1631749) (vponcova)
+- Fix the sanity check verify_gpt_biosboot (#1593446) (vponcova)
+- Flags shouldn't process the kernel options (vponcova)
+- Fully support the inst.gpt option (vponcova)
+- Don't set Anaconda-specific flags in Blivet (vponcova)
+- Remove the class for kernel arguments from pyanaconda.flags (vponcova)
+- Remove unused false positives (vponcova)
+- Don't connect to signals of the Network Manager DBus objects (#1582233)
+  (vponcova)
+- Fix documentation for setting Pykickstart command version (mkolman)
+- Don't try to get hostnamed proxy in non-installer-image environments
+  (#1616214) (rvykydal)
+- Use realm data in UI (vponcova)
+- Use realm data in the DBus module (vponcova)
+- Create a DBus structure for realm data (vponcova)
+- Add support for DBus structures (vponcova)
+- Add Silverblue InstallClass (jkonecny)
+
+* Thu Sep 13 2018 Martin Kolman <mkolman@redhat.com> - 29.24.3-1
+- Save lsblk output to the Anaconda traceback file (vtrefny)
+- Remove librepo imports from Anaconda (#1626609) (jkonecny)
+- DNF 3.5 compatibility (mkolman)
+- Use the default LUKS version for auto partitioning (#1624680) (vponcova)
+- Remove the testing flag (vponcova)
+- Detect that there is not enough space on a device (#1613232) (vponcova)
+
+* Thu Aug 30 2018 Martin Kolman <mkolman@redhat.com> - 29.24.2-1
+- Set kickstart version for Fedora 29 (mkolman)
+- Add initial 32-bit ARMv7 EFI support (pbrobinson)
+- Drop legacy get_arm_machine pieces (pbrobinson)
+- arch: arm: drop omap checks and specifics (pbrobinson)
+
+* Mon Aug 27 2018 Martin Kolman <mkolman@redhat.com> - 29.24.1-1
+- Fix the processing of the live CD source (#1622248) (vponcova)
+
+* Wed Aug 22 2018 Martin Kolman <mkolman@redhat.com> - 29.24-1
+- Fix crash in tui when default partitioning scheme is not supported.
+  (rvykydal)
+- Fix pylint errors (vponcova)
+- Add libtool build dependency (jkonecny)
+- Remove shebang from DUD test (jkonecny)
+- Add inst.addrepo documentation for HD variant (jkonecny)
+- Warn when repo names are not unique (jkonecny)
+- HD addon repos have mount directories permanent (jkonecny)
+- Unmount hard drive additional repositories (jkonecny)
+- Move RepoData copy creation to the RepoData class (jkonecny)
+- Show empty file protocol on HD addon repo fail (jkonecny)
+- Mount and use HDD additional repositories (jkonecny)
+- Separate _find_and_mount_iso from _setup_media (jkonecny)
+- Load hard drive repo type from inst.addrepo (jkonecny)
+- Do not fail if .discinfo file can't be read (jkonecny)
+- Use productmd to parse .discinfo file (jkonecny)
+- Add payload sources tests (jkonecny)
+- Cleanup payload tests source file (jkonecny)
+- Add documentation for inst.addrepo boot option (jkonecny)
+- Add additional repositories to KS data (jkonecny)
+- Use new source solution (jkonecny)
+- Add payload sources implementation (jkonecny)
+- Don't resize a device if the size is same as the old size (#1572828)
+  (vponcova)
+- Mark disks with additional repos as protected (jkonecny)
+- Support boot args parsing to list (jkonecny)
+- Add inst.addrepo new options (jkonecny)
+- Make parenthesis consistent (jkonecny)
+- Remove unused parameter from live_startup method (jkonecny)
+- Disable treeinfo based repos only once (jkonecny)
+- Disable treeinfo repos when base repo change (jkonecny)
+- Treeinfo repos can't be changed nor removed (jkonecny)
+- Add all repositories from the treeinfo file (jkonecny)
+- Load base repository location from treeinfo (jkonecny)
+- Add limited file:// protocol to GUI Source spoke (jkonecny)
+- Add BaseOS between default base repositories (jkonecny)
+- Split _setupInstallDevice method in payload (jkonecny)
+- Check the LUKS2 memory requirements (vponcova)
+- Add an option for choosing version of LUKS in GUI (vponcova)
+- Add tests for LUKS2 in the auto partitioning module (vponcova)
+- Apply the LUKS2 options from the auto partitioning module (vponcova)
+- Support LUKS2 options in the auto partitioning module (vponcova)
+- Support LUKS2 options in logvol, part and raid commands (vponcova)
+- Enable to set a default version of LUKS (vponcova)
+- Update dependencies and kickstart commands to support LUKS2 (#1547908)
+  (vponcova)
+- Revert back to running DNF in a subprocess (mkolman)
+- Use SimpleConfigFile to get PLATFORM_ID from /etc/os-release (mkolman)
+- Fix a 5 year old typo in the spec file (mkolman)
+- Use wwn attr instead of removed wwid. (#1565693) (dlehman)
+
+* Tue Aug 07 2018 Martin Kolman <mkolman@redhat.com> - 29.23-1
+- Bump required DNF version (mkolman)
+- Fix some small issues with the platform id patch (mkolman)
+- Set platform id for DNF (mkolman)
+- Fix crash when software environment is False (jkonecny)
+- Allow to delete all file systems used by Unknown (#1597199) (vponcova)
+- DD: Use text mode when calling tools with subprocess (rvykydal)
+- Update RHEL placeholder names (mkolman)
+- Typo fixup (rvykydal)
+- Define if blivet-gui is supported via installclasses (rvykydal)
+- Offer Blivet-GUI partitioning only if supported (rvykydal)
+- Only show the "closest mirror" source option where appropriate (mkolman)
+- Starting from 3.0 DNF expects strings in comps queries (mkolman)
+- Use the manual partitioning module in TUI (vponcova)
+- Use the manual partitioning module in UI (vponcova)
+- Add tests for the manual partitioning module (vponcova)
+- Create the manual partitioning module (vponcova)
+- Reserve enough static space for 2 lines in spoke status on hub (#1584160)
+  (rvykydal)
+- Fix disable additional repositories (jkonecny)
+- Show better messages for NoSuchPackage and NoSuchGroup (#1599190) (vponcova)
+- Bootloader stage2 can't be on btrfs on rhel (#1533904) (rvykydal)
+
+* Fri Jul 27 2018 Martin Kolman <mkolman@redhat.com> - 29.22-1
+- Handle new module specific error states (mkolman)
+- Handle missing package errors reported by the install_specs() function
+  (mkolman)
+- Initial module enablement and installation support (mkolman)
+- Use productmd library to parse .treeinfo (#1411673) (jkonecny)
+- Import kickstart classes as version-less in the dracut script (vponcova)
+- Use only version-less kickstart classes (vponcova)
+- Define version-less variants of kickstart classes (vponcova)
+
+* Wed Jul 25 2018 Martin Kolman <mkolman@redhat.com> - 29.21-1
+- Pylint should skip the file livepayload.py (vponcova)
+- Fix pylint errors (vponcova)
+- Change the pop-up text with the pre-release warning (#1542998) (vpodzime)
+- Sort categories on the hub by defined order (#1584160) (rvykydal)
+- Show a note about EULA where relevant (mkolman)
+- Change message log level to INFO when adding repo (jkonecny)
+- Set packaging log level to DEBUG by default (jkonecny)
+- Remove the python-wrapt dependency (vponcova)
+- Do not use capitals for spoke names (#1584160) (rvykydal)
+- Wrap category label and add space between columns (#1584160) (rvykydal)
+- Use 32 px icons (instead of 16 px) on hubs (#1584160) (rvykydal)
+- Replace deprecated dracut options for booting with ibft. (rvykydal)
+- Improve handling of unsupported filesystems in UI. (rvykydal)
+- Reserve two lines for status message (#1584160) (rvykydal)
+- Use three spoke columns on hub for better scaling (#1584160) (rvykydal)
+
+* Wed Jul 18 2018 Martin Kolman <mkolman@redhat.com> - 29.20-1
+- Make pyanaconda.dbus.typing work with Python 3.7 (#1598574) (awilliam)
+- Protected devices might be hidden (#1561766) (vponcova)
+- fstab: include a note about systemctl daemon-reload (zbyszek)
+- Access the ZFCP module only on s390x (vponcova)
+- Tell libreport if it is a final release or not (#1596392) (vpodzime)
+- bootloader: GRUB2: Set menu_auto_hide when enabled by the instClass
+  (hdegoede)
+- installclass: Add bootloader_menu_autohide property (hdegoede)
+- Add tests for the zFCP module (vponcova)
+- Handle the zfcp command in the zFCP module (vponcova)
+- Use the zFCP discovery task in UI (vponcova)
+- Create the zFCP discovery task (vponcova)
+- Create the zFCP module (vponcova)
+
+* Wed Jun 27 2018 Martin Kolman <mkolman@redhat.com> - 29.19-1
+- DNF 3: progress callback constants moved to dnf.transaction (awilliam)
+- DNF 3: Update size calculations for transaction item changes (awilliam)
+- DNF 3: config substitutions moved from dnf to libdnf (awilliam)
+
+* Mon Jun 25 2018 Martin Kolman <mkolman@redhat.com> - 29.18-1
+- Add tests for the DASD module (vponcova)
+- Run the DASD formatting task in UI (vponcova)
+- Extend the sync_run_task method with a callback (vponcova)
+- Create a task for formatting DASDs (vponcova)
+- Run the DASD discovery task from UI (vponcova)
+- Create a task for discovering DASDs (vponcova)
+- Create the DASD module (vponcova)
+- Add tests for the language installation task (vponcova)
+- Run an installation task to install a language (vponcova)
+- nvdimm: fix crash on non-block devices (rvykydal)
+
+* Tue Jun 12 2018 Martin Kolman <mkolman@redhat.com> - 29.17-1
+- Wait for kickstart modules to quit (vponcova)
+- Ask for a default passphrase if required (vponcova)
+- Add support for setting different types of passwords in TUI (vponcova)
+
+* Thu Jun 07 2018 Martin Kolman <mkolman@redhat.com> - 29.16-1
+- Add tests for changes in tasks and the install manager (vponcova)
+- Add a simple installation task in the Baz module (vponcova)
+- Update the boss classes (vponcova)
+- Update the base clases for modules (vponcova)
+- Use the system installation task in the install manager (vponcova)
+- Add the system installation task (vponcova)
+- Add methods for running remote DBus tasks (vponcova)
+- Improved base clases for DBus tasks (vponcova)
+- Do not manually create LUKSDevice when unlocking a LUKS format (vtrefny)
+- Fix pylint errors (vponcova)
+- Skip the pylint check for the bootloader.py (vponcova)
+- Enable DNF depsolver debugging in debug mode (mkolman)
+- Don't reset locale of our DBus daemon (vponcova)
+- Close the DNF base later (#1571299) (vponcova)
+- Add 10%% for storage metadata to the total required space (#1578395)
+  (vponcova)
+- Add hook to prevent mistake upstream pushes (jkonecny)
+- Revert "WIP" (vponcova)
+- WIP (vponcova)
+- Set locale to en_US.UTF-8 in every module (#1575415) (vponcova)
+- Move initial module configuration to the init function (vponcova)
+- Fix the mount command (vponcova)
+- Use the auto partitioning module in UI (vponcova)
+- Only check space during a tui kickstart if ksprompt is enabled (bcl)
+- Fix can't exit TUI storage spoke (jkonecny)
+- Use PROCESSED_AND_CLOSE and PROCESSED_AND_REDRAW (jkonecny)
+- Remove not required PROCESSED return (jkonecny)
+- Remove PROCESSED from refresh method (jkonecny)
+
+* Wed May 16 2018 Martin Kolman <mkolman@redhat.com> - 29.15-1
+- nvdimm: make debug messages more clear (rvykydal)
+- nvdimm: use libblockdev enum to check namespace mode (rvykydal)
+- Add data loss warning to nvdimm reconfigure dialog. (rvykydal)
+- Add UI feedback for disk repopulating after nvdimm reconfiguration.
+  (rvykydal)
+- Fix ignoring of nvdimm devices (rvykydal)
+- Don't allow booting from nvdimm devices (rvykydal)
+- Improve UI feedback for invalid boot on non-iBFT iSCSI devices. (rvykydal)
+- Add inst.nonibftiscsiboot boot option. (rvykydal)
+- Use only devices specified by nvdimm command for installation. (rvykydal)
+- Add option to reconfigure nvdimm devices into sector mode. (rvykydal)
+- Allow only devices in sector mode to be selected. (rvykydal)
+- Add nvdimm devices to Advanced Storage spoke. (rvykydal)
+- Add kickstart support for nvdimm reconfiguration to sector mode. (rvykydal)
+- Ignore nvdimm disks which are not in sector mode. (rvykydal)
+- Do not ignore nvdimm (pmemX) devices (rvykydal)
+- Update the pykickstart commands (vponcova)
+- Fix firewall DBUS module API usage (#1577405) (mkolman)
+- Fix formatting in the TUI storage spoke (jkonecny)
+- Fix TUI crash in mountpoint assignment (#1564067) (jkonecny)
+- Fix KS logvol metadata and chunksize parameters (#1572511) (jkonecny)
+- Show correct bootloader error on the MacEFI platform (vponcova)
+- Revert "Fix broken kickstart command test" (rvykydal)
+- Support fcoe --autovlan option (#1564096) (rvykydal)
+
+* Fri May 04 2018 Martin Kolman <mkolman@redhat.com> - 29.14-1
+- Increase module startup timeout to 600 seconds (mkolman)
+- Fix name of the Zanata Python client package (mkolman)
+- Add tests for the auto partitioning module (vponcova)
+- Create the auto partitioning module (vponcova)
+- Add the firewall submodule (mkolman)
+- Once again fix cmdline error handling. (#1360223) (sbueno+anaconda)
+- Extend the timeout period to 180s in the case of cmdline error. (#1360223)
+  (sbueno+anaconda)
+- Fix the clearpart test with disklabel option (vponcova)
+- The specified nosetests failed to run (vponcova)
+
+* Tue Apr 24 2018 Martin Kolman <mkolman@redhat.com> - 29.13-1
+- Show correct root account locked status in reconfig mode (#1507940) (mkolman)
+- Add missing lines and modularization only log to test coverage (jkonecny)
+- Remove makebumpver dependency from spec file (jkonecny)
+- network module: use connectivity checking in anaconda (rvykydal)
+- network module: add connectivity checking (rvykydal)
+- Permit adding disabled external repos to installation. (riehecky)
+- Handle empty active attribute for consoles (#1569045) (mkolman)
+- Support temporary kickstart generating (vponcova)
+- Create the dynamic module User (vponcova)
+- Select Workstation install class for Workstation live (#1569083) (awilliam)
+- Rename the main module User to Users (vponcova)
+
+* Thu Apr 19 2018 Martin Kolman <mkolman@redhat.com> - 29.12-1
+- Save logs to result folder after rpm-tests (jkonecny)
+- Add Installed pyanaconda tests (jkonecny)
+- Fix name of the RPM test (jkonecny)
+- Support running just chosen rpm test (jkonecny)
+- Add test cache files to gitignore (jkonecny)
+- Move test install test from Makefile to rpm tests (jkonecny)
+- Create structure to run rpm tests (jkonecny)
+- Move all nosetests to separate directory (jkonecny)
+- Fix broken kickstart command test (jkonecny)
+- Fix broken kickstart command test (jkonecny)
+- localization: use LanguageKickstarted module property (#1568119) (rvykydal)
+- Start only the specified kickstart modules (#1566621) (vponcova)
+- Use the Bootloader module in UI (vponcova)
+- Add tests for the bootloader module (vponcova)
+- Create the bootloader module (vponcova)
+- rpmostreepayload: do not require network for dvd installation (#1565369)
+  (rvykydal)
+- Fix double logging to stdout (vponcova)
+- Don't try to create required partitions if there are none (vponcova)
+
+* Thu Apr 12 2018 Martin Kolman <mkolman@redhat.com> - 29.11-1
+- Add anaconda-install-env-deps as dependency of the anaconda package (mkolman)
+- Add %%files for install-env-deps so it actually exists (awilliam)
+
+* Tue Apr 10 2018 Martin Kolman <mkolman@redhat.com> - 29.10-1
+- Bump simpleline version (mkolman)
+- Do not redraw screen after text YesNo dialog (#1557951)(jkonecny)
+- Revert "Adapt to a new simpleline changes (#1557472)(jkonecny)
+- authselect: enable silent last log (pbrezina)
+- authselect: fix typo to enable fingerprint authentication (pbrezina)
+
+* Mon Apr 09 2018 Martin Kolman <mkolman@redhat.com> - 29.9-1
+- Move install time dependencies to a metapackage (mkolman)
+
+* Thu Apr 05 2018 Martin Kolman <mkolman@redhat.com> - 29.8-1
+- Fix forgotten usage of the selinux kickstart command (vponcova)
+- Fix tests for the storage module (vponcova)
+- Use the disk selection and initialization modules in UI (vponcova)
+- Enable to use object identifiers instead of object paths (vponcova)
+
+* Thu Mar 29 2018 Martin Kolman <mkolman@redhat.com> - 29.7-1
+- Add Makefiles for disk initialization and selection modules (vponcova)
+- Remove the invalid self argument (vponcova)
+- Run all unit tests (vponcova)
+
+* Tue Mar 27 2018 Martin Kolman <mkolman@redhat.com> - 29.6-1
+- Create the disk initialization and disk selection modules (vponcova)
+- Use watch_property to watch changes of DBus properties (vponcova)
+- Better organize the base classes for modules (vponcova)
+- Fixed KS forcing zerombr onto RO disk (japokorn)
+- Add tests for the kickstart specifications (vponcova)
+- Standardize calls to parent via super() (riehecky)
+- Fix 'isDisk' property name (#1558906) (vtrefny)
+- Make the class for removed kickstart commands more strict (vponcova)
+- Fix the progress bar steps (vponcova)
+- Use enum for the first boot action (vponcova)
+- Use enum for the SELinux modes (vponcova)
+- datetime spoke: still pass ksdata to NTPconfigDialog (UIObject) (rvykydal)
+
+* Mon Mar 19 2018 Martin Kolman <mkolman@redhat.com> - 29.5-1
+- Write rootpw command to kickstart (#1557529) (mkolman)
+- Don't make safe to observe services on buses that don't run (vponcova)
+- Add the LanguageKickstarted property (vponcova)
+- Don't autoquit by default if the last hub is empty (#1553935) (mkolman)
+- Use the Services module in UI (vponcova)
+- Create the Services module (vponcova)
+- Enable hibernation only on x86 (#1554345) (vponcova)
+- Add the Storage module with no API (vponcova)
+- Add the Payload module with no API (vponcova)
+- Remove DBus modules Foo and Bar (vponcova)
+- network module: fix accessing org.freedesktop.hostname1 for current hostname
+  (rvykydal)
+
+* Mon Mar 12 2018 Martin Kolman <mkolman@redhat.com> - 29.4-1
+- network module: add basic test (rvykydal)
+- Add prepare command to setup-mock-test-env script (jkonecny)
+- Mark partition live device's disk protected. (#1524700) (dlehman)
+
+* Fri Mar 09 2018 Martin Kolman <mkolman@redhat.com> - 29.3-1
+- Remove useless constants from pyanaconda.dbus.constants (vponcova)
+- Use identifiers to get observers and proxies (vponcova)
+- Remove the publish method from DBus interfaces (vponcova)
+- Replace constants in publish and register methods (vponcova)
+- Replace constants in DBus interface names (vponcova)
+- Define DBus errors with the dbus_error decorator (vponcova)
+- Use namespaces and identifiers to describe Anaconda DBus objects (vponcova)
+- Add support for identification of DBus objects and services (vponcova)
+- User module should parse only rootpw for now (#1553488) (vponcova)
+- localization module: plug localization module into keyboard GUI spoke
+  (rvykydal)
+- localization module: add KeyboardKickstarted property (rvykydal)
+- localization module: add KS support for keyboard command (rvykydal)
+- localization module: don't use Kickstarted so another command can be added
+  (rvykydal)
+- Fix release docs (mkolman)
+- network: set TYPE value in ifcfg from kickstart in initrmfs (rvykydal)
+- Make formatting consistent in AnacondaWidgets.xml (riehecky)
+
+* Mon Mar 05 2018 Martin Kolman <mkolman@redhat.com> - 29.2-1
+- Use the user DBUS module in the UI (mkolman)
+- Use the user DBUS module for the rootpw command in kickstart.py (mkolman)
+- Add initial user DBUS module (mkolman)
+- Add tests for the Security module (vponcova)
+- Use the Security module in UI (vponcova)
+- Don't send empty kickstart to DBus modules (vponcova)
+- Add the Security module (vponcova)
+- Fix makeupdates script to work with new DBus structure (jkonecny)
+- Fix Makefile of the kickstart manager (vponcova)
+- Fix check if dbus daemon quit properly (jkonecny)
+- Remove check if dbus is running (#1551096) (jkonecny)
+- Use Anaconda's special env variable for dbus address (#1551096) (jkonecny)
+- Migrate Anaconda to our private dbus session (#1551096) (jkonecny)
+- localization module: use l12 shortcut for module name in UI (rvykydal)
+- localization module: replace ksdata.lang with the module in anaconda.
+  (rvykydal)
+- localization module: add KS support for lang command (rvykydal)
+- Return restorecon utility to Fedora 28 mock (jkonecny)
+- Include dbus.log when exporting logs (mkolman)
+- Reorganize pyanaconda.modules.boss (vponcova)
+- Move all DBus errors to pyanaconda.modules.common.errors (vponcova)
+- Move common classes and functions to pyanaconda.modules.common (vponcova)
+- Close DBus log file when quitting DBus session (jkonecny)
+- Enable payload configuration for Install classes (jkonecny)
+- Rename files that provide kickstart specifications (vponcova)
+- Move the kickstart specification to pyanaconda.core.kickstart (vponcova)
+- Start and quit Boss properly (jkonecny)
+- Make class from dbus.launcher module (jkonecny)
+- Add the kernel option resume= by default (#1206936) (vponcova)
+
+* Wed Feb 28 2018 Martin Kolman <mkolman@redhat.com> - 29.1-1
+- Use observers to access the hostname service (vponcova)
+- Make safe to observe services on buses that don't have to run (vponcova)
+- DBus logs are now saved to /tmp/dbus.log (jkonecny)
+- Add tests for toplevel installclass attribs (riehecky)
+- Wait for DBus modules for longer time (vponcova)
+- Drop dependency on authselect and firewalld (vponcova)
+- Fix kickstart version test (vponcova)
+- Authconfig is replaced with authselect (#1542968) (vponcova)
+- Add support for different message buses (vponcova)
+- Fix makeupdates script (vponcova)
+- Set up basic logging for DBus modules (vponcova)
+- Remove get_dbus_module_logger (vponcova)
+- Fix logging of the DBus modules (vponcova)
+- Fix the reimport error (vponcova)
+- Fix the network module specification (vponcova)
+- network module: update_network_data test (rvykydal)
+- network module: use Module.Kickstarted instead of ksdata.seen (rvykydal)
+- network module: use for hostname in tui (rvykydal)
+- network module: handle current hostname (rvykydal)
+- network module: handle ksdata.network.hostname (rvykydal)
+- network module: add module skeleton (rvykydal)
+- Log changes in the kickstart modules. (vponcova)
+- Use the Timezone module in UI. (vponcova)
+- Start Boss from Anaconda (jkonecny)
+- Do not use System DBus (jkonecny)
+- Remove anaconda-boss.service (jkonecny)
+- Move Anaconda dbus services and confs to session dbus (jkonecny)
+- Run DBus session if not present (jkonecny)
+- Change pykickstart version (vponcova)
+- Move system-logos dependency from anaconda-core to anaconda-gui (mkolman)
+- makebumpver: fix parsing of -m option (rvykydal)
+- makebumpver: fix -i option (rvykydal)
+- Fix tests of the Timezone module (vponcova)
+- installclass: add comments to server install class (dusty)
+- Don't use deprecated formatErrorMsg (vponcova)
+- Use the KickstartError attributes (vponcova)
+- kickstart: "clearpart --list" does not work (#1410335) (marcel)
+- Use handler in the Timezone module (vponcova)
+- Fix the specification of the Bar module (vponcova)
+- Use the KickstartHandler class (vponcova)
+
+* Mon Feb 19 2018 Martin Kolman <mkolman@redhat.com> - 28.22-1
+- Prevent anaconda-core requiring gjs-console (awilliam)
+- Temporarily don't test versions of specified kickstart objects (vponcova)
+
+* Mon Feb 19 2018 Martin Kolman <mkolman@redhat.com> - 28.21-1
+- Explain when run dependency_solver without options (jkonecny)
+- Clean dd_test code (jkonecny)
+- We can't set file permission mode for .so in dd test (jkonecny)
+- Rename installclass_atomic to Fedora Atomic Host (jkonecny)
+- Support running only nosetests or only some nosetests (jkonecny)
+- Do not run tests as root (jkonecny)
+- Save start and end time for pylint run (jkonecny)
+- Separate grab-logs from ci target in Makefile (jkonecny)
+- Remove false positive but disable Pylint in makeupdates script (jkonecny)
+- Add copyright to scripts in ./scripts/testing (jkonecny)
+
+* Thu Feb 15 2018 Adam Williamson <awilliam@redhat.com> - 28.20-2
+- Prevent anaconda-core requiring gjs-console (awilliam)
+
+* Fri Feb 09 2018 Martin Kolman <mkolman@redhat.com> - 28.20-1
+- Check the proxy attribute before accessing it (vponcova)
+- Check the noverifyssl attribute before accessing it (vponcova)
+- Don't access the url attribute (#1530428) (vponcova)
+- Use Fedora Server default partitioning in Atomic (jkonecny)
+- Clean code of Atomic install class (jkonecny)
+- Migrate Atomic install class (#1491287) (jkonecny)
+- Move Atomic install class to Anaconda (#1491287) (#1536853) (jkonecny)
+- Make sure that fetch_url is defined. (vponcova)
+
+* Mon Feb 05 2018 Martin Kolman <mkolman@redhat.com> - 28.19-1
+- Change pykickstart version. (vponcova)
+- Do not deepcopy the kickstart data in the storage (vponcova)
+- Replace deepcopy of the method command (vponcova)
+- Use pykickstart 3 (vponcova)
+- Provide comprehensive log messages about the display mode (vponcova)
+- Fix missing logging in some cases of update of ONBOOT value. (rvykydal)
+- Fix tests for the timezone module. (vponcova)
+- Add the Kickstarted property to the kickstart modules. (vponcova)
+- Connect to the observed service and other stuff. (vponcova)
+- Prevent 99-copy-lgs.ks from exiting with a 1 (bcl)
+- Rename SetUTC to SetIsUTC in the timezone module. (vponcova)
+
+* Thu Jan 18 2018 Martin Kolman <mkolman@redhat.com> - 28.18-1
+- Move how to use setup-mock-test-env script to help (jkonecny)
+- Add --init as new parameter to setup-mock-test-env (jkonecny)
+- Initialize the thread manager at the first import. (vponcova)
+- Added tests for the timezone module and other. (vponcova)
+- Remove 'i' from iutil module (jkonecny)
+- Remove 'i' from isignal module (jkonecny)
+- Move isignal module to core/isignal (jkonecny)
+- Extract process watch functions to a static class (jkonecny)
+- Move regexes module to core/regexes (jkonecny)
+- Move i18n module to core/i18n (jkonecny)
+- Move constants module to core/constants (jkonecny)
+- Move iutil module to core/iutil (jkonecny)
+- Move async_utils to core/async_utils (jkonecny)
+- Replace gobject GLib by our core/glib (jkonecny)
+- Rename run_in_main_thread to run_in_loop (jkonecny)
+- Add Timer and PidWatcher abstraction above GLib (jkonecny)
+- Create abstraction above GLib event loop (jkonecny)
+- Add core/glib module for GLib access (jkonecny)
+- Ignore errors for KickstartSpecificationHandler. (vponcova)
+- Try to use the PropertiesChanged signal. (vponcova)
+- Add timezone module. (vponcova)
+- Collect properties changes before emit. (vponcova)
+- Use Ping method from the standard interface. (vponcova)
+- Recognize members of standard interfaces. (vponcova)
+- Add an object observer with cached properties (vponcova)
+- Rename modules with Fedora install classes. (vponcova)
+- Add support for Variant in .buildstamp (vponcova)
+- Fix the Bar module. (vponcova)
+- Add pykickstart version to branching policy doc (jkonecny)
+- Remove `unstable` branch from documentation (jkonecny)
+- Move system-logos to anaconda-core (#1529239) (bcl)
+
+* Fri Jan 05 2018 Martin Kolman <mkolman@redhat.com> - 28.17-1
+- Modules should use the proxy pattern. (vponcova)
+- Variants need to be instances of the Variant class (vponcova)
+- kickstart: support firewall --use-system-defaults (#1526450) (dusty)
+- Check payload is set before accessing its data (#1524785) (mkolman)
+- Do not fail when test are failing in setup-env script (jkonecny)
+- Support running multiple commands at once (jkonecny)
+- Support copy Anaconda result dir out of mock (jkonecny)
+- Remove dependencies from Makefile (jkonecny)
+- Add path to Anaconda in mock to constant (jkonecny)
+- Properly exclude packages from the install set (ngompa13)
+- Add the _prepare_command helper function to setup-test-env (jkonecny)
+- Add run-tests parameter to setup-test-env script (jkonecny)
+- Remove /anaconda in mock before copying new one (jkonecny)
+
+* Tue Jan 02 2018 Martin Kolman <mkolman@redhat.com> - 28.16-1
+- Improve password checking status and error messages (mkolman)
+- Spin kickstarts shouldn't be test dependency (jkonecny)
+
+* Wed Dec 20 2017 Martin Kolman <mkolman@redhat.com> - 28.15-1
+- Remove spurious echo call from tmux service file (#1526861) (mkolman)
+- Restore fix for RHBZ #1323012 (`set_name` not `setName`) (awilliam)
+- Fix Makefile for modules/[foo,bar]/tasks and for install_manager (rvykydal)
+- Make passing kickstart to boss more visible. (rvykydal)
+- Add tests for KickstartManager. (rvykydal)
+- Add kickstart dispatching to anaconda. (rvykydal)
+- Add kickstart dispatching to local boss run script (rvykydal)
+- Add KickstartManager for Boss. (rvykydal)
+- Add method for getting line mapping from kickstart elements to kickstart
+  (rvykydal)
+- Add info about handled kickstart commands to modules (rvykydal)
+- Add missing Makefile for kickstart_dispatcher (rvykydal)
+
+* Mon Dec 18 2017 Martin Kolman <mkolman@redhat.com> - 28.14-1
+- Use observers in the install manager (vponcova)
+- Modify readme file for tests (jkonecny)
+- Do not bump version when testing installation (jkonecny)
+- Add set up test environment script (jkonecny)
+- Add dependency solver script (jkonecny)
+- Differentiate upstream and build-time version (#1493952) (mkolman)
+- Fix bad bash '*' expansion when loading kernel modules (#1525841) (jkonecny)
+- Fix connection to a signal in the install manager (vponcova)
+- Use the InterfaceTemplate in the InstallationInterface (vponcova)
+- Use the InterfaceTemplate in the TaskInterface (vponcova)
+- Add a base class for DBus interfaces (vponcova)
+- Update module manager to use observers (vponcova)
+- Add DBus observers for better access to proxies. (vponcova)
+- Remove running CI in mock from Makefile (jkonecny)
+- Add xfsprogs and git to the test requirements (jkonecny)
+- The gettext-devel is required by autogen (jkonecny)
+- Remove kickstart-test dependencies from test requires (jkonecny)
+
+* Tue Dec 12 2017 Martin Kolman <mkolman@redhat.com> - 28.13-1
+- Unregister and unpublish all DBus services and objects (vponcova)
+- Add tests for InstallManager (jkonecny)
+- Add tests for Tasks (jkonecny)
+- Add run_in_glib decorator for tests (jkonecny)
+- Instantiate and publish InstallManager in Boss (jkonecny)
+- Add Makefile for install_manager (jkonecny)
+- Implement InstallManager with interface (jkonecny)
+- Init threading in modules (jkonecny)
+- Provide installation tasks from modules (jkonecny)
+- Remove *.Anaconda.Modules interface from Boss (jkonecny)
+- Implementing example tasks for modules (jkonecny)
+- Add Makefile for Task (jkonecny)
+- Base implementation of Task (jkonecny)
+- Add Task interface class (jkonecny)
+- Remove in-memory kickstart representation from traceback file (#1519895)
+  (mkolman)
+- Support call_when_thread_terminates in ThreadManager (jkonecny)
+- Change gtk_action_wait/nowait as general use decorators (jkonecny)
+- Add controllable loop to run_boss_locally script (jkonecny)
+- Tweak run_boss_locally script (jkonecny)
+- Enable SE/HMC file access to repo (vponcova)
+- Change string formatting to format method (jkonecny)
+- Pass handler instance, not class to SplitKickstartParser (rvykydal)
+- Add kickstart parser for splitting kickstart (rvykydal)
+
+* Thu Dec 07 2017 Martin Kolman <mkolman@redhat.com> - 28.12-1
+- Fix unit tests (mkolman)
+- Fixes in makefiles (vponcova)
+- Use the input_checking module for TUI password validation (mkolman)
+- Use the input_checking module for user checking (mkolman)
+- Use the input_checking module for root password checking (mkolman)
+- Use the input_checking module for checking the LUKS passphrase (mkolman)
+- Reflect GUISpokeInputCheckHandler changes in installation source spoke
+  (mkolman)
+- Convert the input checking helpers to use the input_checking module (mkolman)
+- Provide more robust method of using the warning message bar (mkolman)
+- Remove the validatePassword() method (mkolman)
+- Add new input checking module (mkolman)
+- fixup! Migrate Workstation InstallClass to anaconda (sgallagh)
+- Handle an invalid install class style sheet (vponcova)
+- Enhance password checking constants (mkolman)
+- Fix interactive defaults (mkolman)
+- Modify the PYTHONPATH in run_boss_locally (vponcova)
+- Replace get_bus with the class DBus (vponcova)
+- Migrate Workstation InstallClass to anaconda (sgallagh)
+- Point at new path for fedora-server.css (sgallagh)
+- Rename dbus_constants to constants (vponcova)
+- Add the boot option inst.ks.all (vponcova)
+- Add the boot option inst.stage2.all (vponcova)
+- Remove errors for mounting and unmounting (vponcova)
+- Override the right method in the task (vponcova)
+- Remove useless code (vponcova)
+- Support timeout and retries options in %%packages section (vponcova)
+- Fix device_name_is_disk to fully support raid devices (vponcova)
+- Onlyuse devices of the ignoredisk command should be only disks (vponcova)
+- Add the boot option inst.xtimeout (vponcova)
+- Do not shadow build-in module variable (jkonecny)
+- Module manager is replaceable (jkonecny)
+- Remove pyanaconda.constants_text module (vponcova)
+
+* Mon Nov 27 2017 Martin Kolman <mkolman@redhat.com> - 28.11-1
+- Bump Blivet GUI version (mkolman)
+- Change path to start-module script when running locally (mkolman)
+- Handle DBUS module related files in makeupdates (mkolman)
+- Handle DBUS_STARTER_ADDRESS not being defined (mkolman)
+- Use start-module script in DBUS service files (mkolman)
+- Add a DBUS module startup script (mkolman)
+- Add Makefile.am for DBUS modules an addons (mkolman)
+- Add the setup-updates script (mkolman)
+- Add __init__.py file to anaconda/modules (mkolman)
+- Add a unit file for Boss startup (mkolman)
+- Really install all the right packages on Mac UEFI installs (awilliam)
+- Refactor DASD formatting and support detection of LDL DASDs. (vponcova)
+- Remove unused import sys from run_boss_locally script (jkonecny)
+- Fix blivet imports in the Fedora Server install class (#1513024) (vponcova)
+- Update the use of suggest_container_name method (vponcova)
+- Devicetree doesn't have protected_dev_names (vponcova)
+- Add pyanaconda.dbus to Makefile (vponcova)
+- Add pyanaconda.storage to Makefile (#1511735) (vponcova)
+- network: GUI, be more robust when displaying vlan parent and id (#1507913)
+  (rvykydal)
+- network: GUI, fix lookup of existing device configurations (#1507913)
+  (rvykydal)
+- network: GUI, don't crash on added vlan without device name specified
+  (#1507913) (rvykydal)
+- Add a script for running Boss & modules locally (mkolman)
+- Add an example addon (mkolman)
+- Add DBUS module examples (mkolman)
+- Add Boss (mkolman)
+- Add a base class for DBUS modules (mkolman)
+- Add .service and .conf files for the DBUS modules (mkolman)
+- Add constants for DBUS module namespaces (mkolman)
+- Add support for logging from DBUS modules (mkolman)
+- Add the get_bus() method (mkolman)
+- Remove storage check for too small swap (#1466964) (vponcova)
+- Migrate fedora-server installclass into the anaconda repository (#1466967)
+  (rvykydal)
+
+* Thu Nov 09 2017 Martin Kolman <mkolman@redhat.com> - 28.10-1
+- Bump required Blivet version to 3.0 (mkolman)
+- Add modular server repo to the base repositories (#1506894) (jkonecny)
+- Split addon and environment refresh in software TUI (jkonecny)
+- Fix changing source don't erase old environment TUI (#1505090) (jkonecny)
+- Add logging to TUI software selection spoke (#1505090) (jkonecny)
+- Do not try to use protected disks for autopart (vtrefny)
+- Adapt new storage tui spoke to storage code move. (dlehman)
+- Update blivet upstream URL in testing README. (dlehman)
+- Adapt to devicefactory API change. (dlehman)
+- Adapt to removal of default rounding in blivet.size.Size. (dlehman)
+- Use anaconda's logic for ostree sys/physical root. (dlehman)
+- Adapt to removal of blivet.udev.device_is_realdisk. (dlehman)
+- Adapt to move of disklabel type logic into DiskLabel. (dlehman)
+- Move blivet.partspec into pyanaconda.storage. (dlehman)
+- Move blivet.platform to pyanaconda.platform. (dlehman)
+- Fix traceback from mocked partitions in clearpart test. (dlehman)
+- Move blivet.osinstall to pyanaconda.storage. (dlehman)
+- Move autopart from blivet to pyanaconda.storage. (dlehman)
+
+* Thu Oct 26 2017 Martin Kolman <mkolman@redhat.com> - 28.9-1
+- Mac EFI installs need grub2-tools (#1503496) (awilliam)
+- network: create default ifcfg also for missing default NM connection
+  (#1478141) (rvykydal)
+- Print screen stack next to exception in TUI (jkonecny)
+- Enable Custom GRUB2 Password Utility (#985962) (rmarshall)
+
+* Tue Oct 17 2017 Martin Kolman <mkolman@redhat.com> - 28.8-1
+- Bump simpleline version requires (jkonecny)
+- Remove DataHolder class (jkonecny)
+- Remove EditTUISpoke EditTUIDialog and EditTUISpokeEntry (jkonecny)
+- Replace EditTUI* from the TUI Storage spoke (jkonecny)
+- Replace EditTUI* from the TUI User spoke (jkonecny)
+- Replace EditTUI* from the TUI Source spoke (jkonecny)
+- Replace EditTUI* from the TUI Network spoke (jkonecny)
+- Password spoke is using PasswordDialog now (jkonecny)
+- Return default policy if nothing match (jkonecny)
+- Add Dialog and PasswordDialog TUI objects (jkonecny)
+- Remove EditTUIDialog from time_spoke (jkonecny)
+- packaging: clear downloaded packages repo cache before using it (#1480790)
+  (rvykydal)
+- Do substitutions only after translating the string (mkolman)
+- Fix a translation check error (mkolman)
+- Do not run commands in messages in Makefile (jkonecny)
+- Fix storage spoke completeness checking (#1496416) (rvykydal)
+
+* Thu Oct 12 2017 Martin Kolman <mkolman@redhat.com> - 28.7-1
+- Mark the mount point assignment in TUI as experimental (vpodzime)
+- Reset storage on change in text mode (vpodzime)
+- Only allow the supported file systems in text mode (vpodzime)
+- Textual configuration of mount points (vpodzime)
+- Add support for the new 'mount' kickstart command (vpodzime)
+- Fix dnf exception repository not set (#1495211) (jkonecny)
+- Add logging of complete spokes in GUI. (rvykydal)
+- Do not execute storage when the spoke is left with no selected disk
+  (#1496327) (rvykydal)
+- Reflect building from master branch in the release docs (mkolman)
+- Add checks for group names (#1497676) (vponcova)
+- Add new checks for user names (#1491006) (vponcova)
+
+* Fri Sep 29 2017 Martin Kolman <mkolman@redhat.com> - 28.6-1
+- Add changelog entries from the unstable branch (mkolman)
+- Log when we are executing command in chroot (jkonecny)
+- Use name instead of index in TUI env selection (#1495204) (jkonecny)
+- Fix missing container in TUI source spoke (#1494801) (jkonecny)
+- Add MOCK_EXTRA_ARGS to Makefile (jkonecny)
+- tui source spoke: initialize nfs values when switching to nfs (rvykydal)
+- Deselect encryption when switching to blivet-gui partitioning (vtrefny)
+- Add 2 spaces between functions in iutil (jkonecny)
+- rpmostreepayload: Fix logic for copying of EFI data (walters)
+- rpmostreepayload: Avoid recursing for fstab mounts (walters)
+- payload: Add handlesBootloaderConfiguration(), teach bootloader.py (walters)
+
+* Thu Sep 21 2017 Martin Kolman <mkolman@redhat.com> - 28.5-1
+- Fix missing id to name environment transition (#1491119) (jkonecny)
+- Fix test for unset TUI software environment (#1491119) (jkonecny)
+- Rename processingDone to processing_done variable (jkonecny)
+
+* Mon Sep 18 2017 Martin Kolman <mkolman@redhat.com> - 28.4-1
+- network: add support for kickstart --bindto=mac for virtual devices
+  (#1328576) (rvykydal)
+- network: support mac bound network settings as first class (#1328576)
+  (rvykydal)
+- network: add support for kickstart --bindto=mac for wired devices (#1328576)
+  (rvykydal)
+- Don't setup the hub twice (#1491333) (vponcova)
+- rpmostreepayload: Substitute ${basearch} in ostreesetup ref (walters)
+- Perform repo checks only when there are checks available. (rvykydal)
+- Add support for repo --metalink (GUI) (#1464843) (rvykydal)
+- Add support for repo --metalink (kickstart, tui) (#1464843) (rvykydal)
+- Add inst.notmux option (dusty)
+
+* Mon Sep 11 2017 Martin Kolman <mkolman@redhat.com> - 28.3-1
+- Add missing dot to the availability status message (mail)
+- Bump Simpleline version (jkonecny)
+- Make EFIGRUB._efi_binary a property, not a method (awilliam)
+- Better storing logs from build and tests (jkonecny)
+- Provide a default install class. (vponcova)
+- Do not use hidden install classes. (vponcova)
+- Make geolocation with kickstart possible (#1358331) (mkolman)
+- Run python-meh as modal in TUI (jkonecny)
+- Use GLib event loop in the simpleline (jkonecny)
+- TUI progress reporting is handled by show_all (jkonecny)
+- Add efi_dir to the BaseInstallClass (#1412391) (vponcova)
+- Use /usr/bin/python3 shebang once again (miro)
+
+* Mon Sep 04 2017 Martin Kolman <mkolman@redhat.com> - 28.2-1
+- Fix catch TUI not main thread exceptions (jkonecny)
+- Document Anaconda branching workflow (mkolman)
+- Use constants for version number bumps and additions (mkolman)
+- Fix closest mirror now needs network (jkonecny)
+- Fix restart payload thread in Network spoke GUI (#1478970) (jkonecny)
+- Network spoke freeze when testing availability (#1478970) (jkonecny)
+- Add support for adding version numbers to makebumpver (mkolman)
+- Add support for major version bump to makebumpver (mkolman)
+- Fix proxy settings badly used when testing repos (#1478970) (jkonecny)
+
+* Tue Aug 29 2017 Martin Kolman <mkolman@redhat.com> - 28.1-1
+- Remove the metacity theme. (vponcova)
+- Add the option inst.decorated to allow title bar in GUI (vponcova)
+- Move python3-gobject Requires to core (jkonecny)
+- Return simpleline removed ipmi calls back (jkonecny)
+- Use new list container from Simpleline (jkonecny)
+- Remove old simpleline from anaconda (jkonecny)
+- Ask multiple times for wrong input (jkonecny)
+- Show TUI exception only first time (jkonecny)
+- Add simpleline logger to the Anaconda (jkonecny)
+- Modify TUI to use new Simpleline package (jkonecny)
+- Make 64-bit kernel on 32-bit firmware work for x86 efi machines (pjones)
+- Add missing gtk3 required version to spec file (jkonecny)
+- Sort spec required versions alphabetically (jkonecny)
+- Fix testing of the kickstart version (vponcova)
+- Move the installclass command to the %%anaconda section. (vponcova)
+- Fix SL install class to use right efi dir (riehecky)
+- Fix accelerator key for blivet-gui partitioning (#1482438) (vtrefny)
+- Add blivet-gui logs to python-meh file list (vtrefny)
+- Remove the title bar in anaconda by default (#1468801) (vponcova)
+- Add simple script to read journal with message code source and thread info.
+  (rvykydal)
+
+* Mon Aug 14 2017 Martin Kolman <mkolman@redhat.com> - 27.20-1
+- Add support for automatic generating of DBus specification. (vponcova)
+- Add support for generating XML (vponcova)
+- Add support for DBus typing system (vponcova)
+- dnfpayload: do not try to contact disabled repo (artem.bityutskiy)
+- Add message to setup-test-env is ran (jkonecny)
+- Use SHA256 instead of MD5 for repoMDHash (#1341280) (bcl)
+- Add lorax-packages.log to bug report. (rvykydal)
+- Use SHA256 instead of MD5 for repoMDHash (#1341280) (jkonecny)
+- 80-setfilecons: Add a few paths (/var/run, /var/spool) (walters)
+- Also capture anaconda-pre logs if they exist (riehecky)
+- Don't mock modules with sys in unit tests (vponcova)
+- logging: replace SyslogHandler with JournalHandler (rvykydal)
+- Add setup-test-env target to the Makefile (jkonecny)
+- Add tests for the install class factory (vponcova)
+- Support for the installclass kickstart command (vponcova)
+- Modules with install classes should define __all__ (vponcova)
+- Refactorization of the installclass.py (vponcova)
+- docs: minor fixups of release document (rvykydal)
+- rescue: add RTD documentation (rvykydal)
+- rescue: clean up method for mounting root (rvykydal)
+- rescue: separate UI and execution logic (rvykydal)
+- Make kickstart rescue command noninteractive. (rvykydal)
+- Remove unused argument and code. (rvykydal)
+
+* Thu Jul 27 2017 Radek Vykydal <rvykydal@redhat.com> - 27.19-1
+- rpmostreepayload: Set up /var first (walters)
+- rpmostreepayload: Explicitly create /var/lib before tmpfiles (walters)
+- rpmostreepayload: Rework mount setup to support admin-defined mounts
+  (walters)
+- rpmostreepayload: try to verify local ostree repo cache (dusty)
+- rpmostreepayload: ignore <F25 location, support RHEL (dusty)
+- rpmostreepayload: use correct secondary url location (dusty)
+- Add tracking of requirements application to requirements container.
+  (rvykydal)
+- Add langpacks via payload requirements (rvykydal)
+- Add NTP_PACKAGE via installation requirements (rvykydal)
+- timezone: simplify kickstart setup metod (rvykydal)
+- Store payload (packages, groups) requirements in a container. (rvykydal)
+- Fix anaconda --help fail with traceback (#1470514) (jkonecny)
+- rpmostreepayload: Do /sysroot mount non-recursively (walters)
+- Add isolated-test makefile target (jkonecny)
+- gui: show supported locales on Atomic Host installs (jlebon)
+
+* Mon Jul 03 2017 Martin Kolman <mkolman@redhat.com> - 27.18-1
+- rpmostreepayload: Reuse the local repo as a cache (walters)
+- Document how to create Anaconda releases and package builds (mkolman)
+
+* Sat Jul 01 2017 Martin Kolman <mkolman@redhat.com> - 27.17-1
+- Require "blivet-gui-runtime" instead of "blivet-gui" (vtrefny)
+- Fix a typo in python-meh initialization (#1462825) (mkolman)
+
+* Mon Jun 26 2017 Martin Kolman <mkolman@redhat.com> - 27.16-1
+- Install class shouldn't set the default boot fstype (#1463297) (vponcova)
+- Store testing logs properly (jkonecny)
+- Fix location of the blivet-gui user help (vtrefny)
+- netowrk: fix noipv6 option check regression (#1464297) (rvykydal)
+- Refactor imports in kickstart.py (jkonecny)
+- Use context manager to check KickstartError (jkonecny)
+
+* Wed Jun 21 2017 Martin Kolman <mkolman@redhat.com> - 27.15-1
+- Honor --erroronfail kickstart option in cmdline mode (rvykydal)
+- Fix import from a renamed module (#1462538) (vponcova)
+- Fix the 'non-ASCII characters in password' checks (#1413813) (awilliam)
+- Move mock config files to slaves (jkonecny)
+
+* Thu Jun 15 2017 Martin Kolman <mkolman@redhat.com> - 27.14-1
+- Bump version of Pykickstart and Blivet (#1113207) (jkonecny)
+- Add XFS uuid changer (#1113207) (jkonecny)
+- Support --when parameter in snapshot (#1113207) (jkonecny)
+- Add snapshot support (#1113207) (jkonecny)
+
+* Wed Jun 14 2017 Martin Kolman <mkolman@redhat.com> - 27.13-1
+- Fix source.glade renaming mixup (#1461469) (mkolman)
+- Separate blivet-daily builds in mock config (jkonecny)
+- network: bind to device name (not hwaddr) when dumping connections (#1457215)
+  (rvykydal)
+
+* Tue Jun 13 2017 Martin Kolman <mkolman@redhat.com> - 27.12-1
+- Show warning if swap is smaller then recommended (#1290360) (vponcova)
+
+* Tue Jun 06 2017 Martin Kolman <mkolman@redhat.com> - 27.11-1
+- Fix renaming error (mkolman)
+- Add a getter for the Anaconda root logger (mkolman)
+- Disable test-install in Makefile (jkonecny)
+
+* Thu Jun 01 2017 Martin Kolman <mkolman@redhat.com> - 27.10-1
+- Bump Blivet version (mkolman)
+- Remove GUI logging prefixes from Network spoke (mkolman)
+- Rename TUI spokes (mkolman)
+- Rename GUI spokes (mkolman)
+- Rename anaconda_argparse.py to argument_parsing.py (mkolman)
+- Rename install_tasks.py to installation_tasks.py (mkolman)
+- Rename install.py to installation.py (mkolman)
+- Rename threads.py to threading.py (mkolman)
+- Get special purpose loggers from anaconda_loggers (mkolman)
+- Use structured logging in Anaconda modules (mkolman)
+- Use unique 3 letter log level names (mkolman)
+- Use constants for special purpose logger names (mkolman)
+- Add the anaconda_loggers module (mkolman)
+- Rename anaconda_log.py to anaconda_logging.py (mkolman)
+- Add support for structured logging to the anaconda logger (mkolman)
+- Make it possible to set filters for file handlers (mkolman)
+- Add custom filter and formatter support for the syslog handler (mkolman)
+- Add AnacondaPrefixFilter (mkolman)
+- Fixes for Pylint 1.7 (vponcova)
+- Add support for IPoIB in tui (#1366935) (rvykydal)
+- Fix pylint unused import error (jkonecny)
+- network: handle multiple connections for one device better (#1444887)
+  (rvykydal)
+- Fix setting errors and warnings in the StorageCheckHandler (vponcova)
+- Add inst.waitfornet option (#1315160) (rvykydal)
+- network: catch exception when reading in-memory connection being removed
+  (#1439220) (rvykydal)
+
+* Thu May 25 2017 Martin Kolman <mkolman@redhat.com> - 27.9-1
+- Add support for DNF-2.5.0 (jkonecny)
+- Fix simpleline_getpass related Pylint warning (mkolman)
+- Provide access to simpleline App instance (mkolman)
+- Make it possible to use a custom getpass() (mkolman)
+- Set the default filesystem type from a kickstart file (vponcova)
+- Adapt to our new daily builds of Anaconda (jkonecny)
+- Provide access to simpleline App instance (mkolman)
+- Make it possible to use a custom getpass() (mkolman)
+- Perform recursive copying of driver disk RPM repo contents (esyr)
+- network: fix setting hostname via boot options (#1441337) (rvykydal)
+- Fix a typo in an error message (esyr)
+- Use the function we already have for applying disk selection (#1412022)
+  (rvykydal)
+- Ignore disks labeled OEMDRV (#1412022) (rvykydal)
+- network: create dracut arguments for iSCSI root accessed via vlan (#1374003)
+  (rvykydal)
+- Test if Anaconda can be installed inside of mock (jkonecny)
+- Remove run_install_test test (jkonecny)
+- rpmostreepayload: Handle /var as a user-specified mountpoint (walters)
+- Fix the addon handlers for the checkbox (#1451754) (vponcova)
+- Show the text of completions in the datetime spoke. (vponcova)
+- Use new daily-blivet copr builds (jkonecny)
+- Prevent TUI from crashing with a single spoke on a hub (mkolman)
+
+* Tue May 09 2017 Martin Kolman <mkolman@redhat.com> - 27.8-1
+- Bump Pykickstart version (mkolman)
+
+* Fri May 05 2017 Martin Kolman <mkolman@redhat.com> - 27.7-1
+- Make some missed adjustments to blivet API changes. (#1440134) (dlehman)
+- Bump required version for blivet-gui (vtrefny)
+- BlivetGuiSpoke: Set keyboard shortcuts for blivet-gui (#1439608) (vtrefny)
+- BlivetGuiSpoke: Refresh blivet-gui UI after spoke is entered (vtrefny)
+- Really fix with tmux 2.4 (version comparison was busted) (awilliam)
+- Show or hide the content of the expander on Fedora (vponcova)
+- itertools.chain can be iterated only once (#1414391) (vponcova)
+
+* Fri Apr 28 2017 Martin Kolman <mkolman@redhat.com> - 27.6-1
+- Use `time.tzset()` to apply timezone changes when we can (awilliam)
+- Tweak epoch definition to fix system clock setting (#1433560) (awilliam)
+- Optimize payload thread restart on network change (jkonecny)
+- Add unit test for RepoMDMetaHash object (#1373449) (jkonecny)
+- Make the formating in payload consistent (#1373449) (jkonecny)
+- Fix Anaconda forces payload restart when network (not)change (#1373449)
   (jkonecny)
+- Catch race-condition error reading from in-memory connection being removed
+  (#1373360) (rvykydal)
+- network tui: fix changing ipv4 config from static to dhcp (#1432886)
+  (rvykydal)
+- Allow setting up bridge for fetching installer image from kickstart
+  (#1373360) (rvykydal)
+
+* Thu Apr 27 2017 Martin Kolman <mkolman@redhat.com> - 27.5-1
+- make anaconda working back again with tmux2.4 (pallotron)
+- Trigger the entered signal only once the screen is shown (#1443011) (mkolman)
+- Use constants in storage checker constraints. (vponcova)
+- Gtk: Fix creating images from resources. (vponcova)
+- Fix partial kickstart software selection in GUI (#1404158) (jkonecny)
+- Removed unused code in the Software spoke (#1404158) (jkonecny)
+- Fix selection logic in Software spoke (#1404158) (jkonecny)
+- Fix Driver Disc documentation (#1377233) (jkonecny)
+- Support DD rpm loading from local disk device (#1377233) (jkonecny)
+- Gtk: Replace deprecated get_misc_set_alignment in widgets. (vponcova)
+- Gtk: Replace deprecated Gtk.Viewport.get_v/hadjustment. (vponcova)
+- Gtk: Replace deprecated methods. (vponcova)
+- Set the info bar only once if the partitioning method changes. (vponcova)
+- Fix pylint issue Catching too general exception Exception (jkonecny)
+- Support --noboot and --noswap options in autopartitioning (#1220866)
+  (vponcova)
+- Support --nohome option in the autopartitioning (vponcova)
+
+* Tue Apr 11 2017 Martin Kolman <mkolman@redhat.com> - 27.4-1
+- Hide options based on storage configuration method (#1439519) (mkolman)
+- Catch exception when reading from in-memory connection being removed
+  (#1439051) (rvykydal)
+- docs/boot-options.rst: Fix #dhcpd anchor (mopsfelder)
+- docs/boot-options.rst: Remove trailing spaces (mopsfelder)
+- Fix logging of the storage checker report. (vponcova)
+- Fix a property name of luks devices in storage checking (#1439411) (vponcova)
+- Bump required version for blivet-gui (vtrefny)
+- Use newly created swaps after the installation (#1439729) (vtrefny)
+- docs/boot-options.rst: Fix #dhcpd anchor (mopsfelder)
+- docs/boot-options.rst: Remove trailing spaces (mopsfelder)
+- Set default FS type for blivet-gui (#1439581) (vtrefny)
+- Display progress for the post installation phase (mkolman)
+- Display progress for the post installation phase (mkolman)
+- Increase verbosity of lvmdump in pre logging script (#1255659) (jkonecny)
+
+* Thu Mar 30 2017 Martin Kolman <mkolman@redhat.com> - 27.3-1
+- Enable the install class to customize the storage checking (vponcova)
+- Replace sanity check with more advanced storage checker (vponcova)
+- Various log-capture script improvements (mkolman)
+- Rename StorageChecker to StorageCheckHandler (vponcova)
+
+* Thu Mar 16 2017 Martin Kolman <mkolman@redhat.com> - 27.2-1
+- Correction of some typographic mistakes in documentation. (rludva)
+- Fix bullet point formatting in contribution guidelines (mkolman)
+- Propagate firstboot --disable to Screen Access Manager (mkolman)
+- util: Add script to capture logs (riehecky)
+- Fix a typo (mkolman)
+- Correction of some typographic mistakes in documentation. (rludva)
+- Enhance git-find-branch script (jkonecny)
+- Improve how storage configuration settings are displayed (mkolman)
+- util: Add script to capture logs (riehecky)
+- Propagate firstboot --disable to Screen Access Manager (mkolman)
+
+* Mon Mar 06 2017 Martin Kolman <mkolman@redhat.com> - 27.1-1
+- We should not have pyanaconda submodules on PYTHONPATH (vponcova)
+- Lock empty root password during kickstart installation (#1383656) (mkolman)
+- Use system Python when running Anaconda (mkolman)
+- Remove unused false positives for pylint (vtrefny)
+- Fix pylint error in BlivetGUI spoke (vtrefny)
+- Fix tests by renaming packaging to payload (jkonecny)
+- Rescue mode should wait for the storage and luks devices (#1376638) (vponcova)
+
+* Mon Feb 27 2017 Martin Kolman <mkolman@redhat.com> - 26.21-1
+- Add blivet-gui as requirement for the GUI package (vtrefny)
+- Add a bottom bar to the Blivet GUI spoke (mkolman)
+- Hide storage config spokes marked by SAM as visited (mkolman)
+- Keep last used partitioning method selected (mkolman)
+- Rollback planned storage changes if partitioning method changes (mkolman)
+- Add blivet-gui spoke (vpodzime)
+- docs: fix formating a bit for Links (Frodox)
+- Fix a typo (mkolman)
+- Polish unsupported filesystems in the custom spoke (jkonecny)
+
+* Tue Feb 07 2017 Martin Kolman <mkolman@redhat.com> - 26.20-1
+- Update dracut test for network --ipv6gateway (rvykydal)
+- Correctly propagate --ipv6gateway to ifcfg files(#1170845) (mkolman)
+- network: respect --activate value for bridge from kickstart (rvykydal)
+- network: fix --activate for bridge slaves configured via %%pre ks (rvykydal)
+- network: activate bridge for first network command in ks via %%pre (rvykydal)
+- network: unify slave connection names for ks %%pre with ks and gui (rvykydal)
+- network: bind slave connections to DEVICE, not HWADDR (#1373360) (rvykydal)
+- Do not allow creating ntfs filesystem in custom spoke (vtrefny)
+- Various minor formatting fixes (mkolman)
+- PEP8 and refactoring for packaging (mkolman)
+- PEP8 and refactoring for vnc.py (mkolman)
+- PEP8 and refactoring for storage_utils.py (mkolman)
+- PEP8 and refactoring for network.py (mkolman)
+- PEP8 and refactoring for kickstart.py (mkolman)
+- PEP8 and refactoring for image.py (mkolman)
+- Cosmetic PEP8 and refactoring for flags.py (mkolman)
+- PEP8 and refactoring for exception.py (mkolman)
+- PEP8 and refactoring for bootloader.py (mkolman)
+- PEP8 and refactoring for anaconda_log.py (mkolman)
+- Validate dasd and zfcp user input (#1335092) (vponcova)
+- network: use introspection data from libnm instead of libnm-glib (lkundrak)
+
+* Mon Jan 16 2017 Martin Kolman <mkolman@redhat.com> - 26.19-1
+- Use initialization controller for spoke initialization (mkolman)
+- Add module initialization controller (mkolman)
+- Fix link to the documentation in the README file (jkonecny)
+- There is no thread for dasd formatting in tui. (vponcova)
+- Move the (mkolman)
+- Fix the status of the StorageSpoke for dasd formatting (#1274596) (vponcova)
+
+* Mon Jan 09 2017 Martin Kolman <mkolman@redhat.com> - 26.18-1
+- Always refresh the size of swap before autopartitioning. (vponcova)
+- Run the space check only if the spokes are complete (#1403505) (vponcova)
+- Ignore result directory with logs from tests (jkonecny)
+- Disable pylint no-member error for re.MULTILINE (jkonecny)
+- Fix nosetests to use newest python3 (jkonecny)
+- Disable the button if iscsi is not available (#1401263) (vponcova)
+- Include Python 3.6 sysconfigdata module in initramfs (#1409177) (awilliam)
+- Nicer __repr__ for hubs and spokes (mkolman)
+- Close the .treeinfo file after the retrieve. (vponcova)
+
+* Wed Jan 04 2017 Martin Kolman <mkolman@redhat.com> - 26.17-1
+- Fix a GTK Widget related deprecation warning (mkolman)
+- Fix GTK screen/display related deprecation warnings (mkolman)
+- Fix GObject and GLib deprecation warnings (mkolman)
+- Fix selection of no software environment (#1400045) (vponcova)
+- Use signals for Spoke & Hub entry/exit callbacks (mkolman)
+- Fix the name of StorageDiscoveryConfig attribute (#1395350) (vponcova)
+- Iutil PEP8 & formatting fixes (mkolman)
+- Add inst.ksstrict option to show kickstart warnings as errors. (vponcova)
+- Use the structured installation task classes (mkolman)
+- Improved password quality checking (mkolman)
+- Add unit tests for password quality checking (mkolman)
+- Use Enum for password status constants (mkolman)
+- Use a sane unified password checking policy (mkolman)
+- Add install task processing classes and unit tests (mkolman)
+- Add a signal/slot implementation (mkolman)
+- Set correctly the default partitioning. (vponcova)
+
+* Wed Dec 14 2016 Martin Kolman <mkolman@redhat.com> - 26.16-1
+- rpmostreepayload: Rework binds to be recursive (walters)
+- Let DNF do its own substitutions (riehecky)
+- Bump Blivet version due to systemd-udev dependency (mkolman)
+- Don't log "Invalid bridge option" when network has no --bridgeopts.
+  (rvykydal)
+- Fix updating of bridge slave which is bond. (rvykydal)
+
+* Mon Dec 05 2016 Martin Kolman <mkolman@redhat.com> - 26.15-1
+- Don't pass storage to firstboot.setup() (mkolman)
+- RTD fixes (mkolman)
+- Catch ValueError from LVM part in Blivet library (jkonecny)
+- Handle unexpected storage exception from blivet (jkonecny)
+- Add sudo to test requires (jkonecny)
+- network: fix network --noipv4 in %%pre (rvykydal)
+- fix typo in systemd service keyword (mail)
+- Fix pylint issue in ks_version_test (jkonecny)
+- Move Anaconda tests to mock (jkonecny)
+- Add checks to git-find-branch script (jkonecny)
+- Remove intermediate pot files in po-push (mkolman)
+- Allow install classes to set alternate states for firstboot/initial-setup
+  (riehecky)
+
+* Wed Nov 23 2016 Martin Kolman <mkolman@redhat.com> - 26.14-1
+- Changed the required version of BlockDev to 2.0. (vponcova)
+- Remove auto generated documentation (mkolman)
+- Fix generated zanata.xml from https unstable branch (jkonecny)
+- Don't crash if the UIC file can't be written (#1375702) (mkolman)
+
+* Wed Nov 23 2016 Martin Kolman <mkolman@redhat.com> - 26.13-1
 - Fix calling of can_touch_runtime_system function (jkonecny)
-- Merge pull request #864 from M4rtinK/f25-devel-no_uic_on_image_dir_install
-  (martin.kolman)
+- fix formating a bit (gitDeveloper)
+- Fix zanata.xml.in in substitution variables (mkolman)
+
+* Thu Nov 17 2016 Martin Kolman <mkolman@redhat.com> - 26.12-1
+- Mock chroot environment is chosed by a git branch (jkonecny)
+- Set Zanata branch from git-find-branch script (jkonecny)
+- Add git-find-branch script for finding parent branch (jkonecny)
+- fix pykickstart docks link (gitDeveloper)
+- aarch64 now has kexec-tools (pbrobinson)
+- Resolve directory ownership (mkolman)
 - Fix user interaction config handling in image & directory install modes
   (#1379106) (mkolman)
+- tui: Available help system (vponcova)
+- network: index team slave connection names starting with 1 (rvykydal)
 
-* Tue Nov 08 2016 Martin Kolman <mkolman@redhat.com> - 25.20.8-1
-- Merge pull request #863 from AdamWill/relax-blivet-dep (martin.kolman)
+* Thu Nov 10 2016 Martin Kolman <mkolman@redhat.com> - 26.11-1
 - Relax blivet dependency to >= 2.1.6-3 (awilliam)
-
-* Mon Nov 07 2016 Martin Kolman <mkolman@redhat.com> - 25.20.7-1
-- Merge pull request #857 from snbueno/1335046-f25 (martin.kolman)
 - Bump required Blivet version (#1378156) (mkolman)
-- Merge pull request #862 from jkonecny12/f25-dev-fix-iscsi-timeout (jkonecny)
-- Merge pull request #850 from AdamWill/iscsi-node-auth (jkonecny)
 - Fix bad exception handling from blivet in iscsi (#1378156) (jkonecny)
+- tui: New class for prompt (vponcova)
 - iSCSI: adjust to change in blivet auth info (#1378156) (awilliam)
+- Disable false positive pylint error (jkonecny)
 - Add some error checking when users don't provide input for DASD devices.
   (sbueno+anaconda)
 - Add some error checking when users don't provide input for zFCP devices.
   (sbueno+anaconda)
-- Merge pull request #846 from jkonecny12/f25-rel-fix-mock (jkonecny)
-- Merge pull request #849 from AdamWill/iscsi-singleton (jkonecny)
-- Merge pull request #848 from AdamWill/device-links (jkonecny)
+- Fix tui timezone region selection by name (vponcova)
+
+* Fri Nov 04 2016 Martin Kolman <mkolman@redhat.com> - 26.10-1
+- F26_DisplayMode was added by non-interactive mode (jkonecny)
+- Fix pyanaconda tests for display mode (jkonecny)
+- Fix parse-dracut to support new kickstart displaymode (jkonecny)
+- Add boot option inst.noninteractive to the docs (jkonecny)
+- Abort installation when Playload exc rise in a NonInteractive mode (jkonecny)
+- Support non interactive mode in standalone spokes (jkonecny)
+- Non-interactive mode support for Password and User spokes (jkonecny)
+- Raise NonInteractive exception in Hubs event loop (jkonecny)
+- Raise exception for noninteractive mode in Hub (jkonecny)
+- Add new pykickstart noninteractive mode (jkonecny)
+- Disable bad kickstart command on F25 (jkonecny)
+- Improve DNF error message to be more understandable (jkonecny)
+- tui: Add software group selection (vponcova)
 - use blivet iSCSI singleton directly in storage spoke (awilliam)
 - Correct deviceLinks to device_links (blivet renamed it) (awilliam)
-- Change mock from Rawhide to Fedora 25 (jkonecny)
-
-* Fri Oct 28 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.6-1
-- Merge pull request #847 from snbueno/1384532-v02 (snbueno)
-- Merge pull request #845 from poncovka/f25-devel-tui_software_group_selection
-  (vponcova)
-- tui: Add software group selection (vponcova)
-- Merge pull request #844 from jkonecny12/f25-dev-fix-space_check_skip
-  (jkonecny)
-- Merge pull request #839 from jkonecny12/f25-dev-improve-logging (jkonecny)
 - Instantiate the zFCP object ourselves now. (#1384532) (sbueno+anaconda)
 - Fix the way DASD list is determined. (#1384532) (sbueno+anaconda)
 - Add tests for payload location picking (#1328151) (jkonecny)
 - Fix picking mountpoint for package download (#1328151) (jkonecny)
-- Merge pull request #842 from jkonecny12/f25-dev-rm-zanata-main-extra-pot
-  (jkonecny)
+- Improve packaging logs without DEBUG logging (jkonecny)
+
+* Tue Oct 25 2016 Martin Kolman <mkolman@redhat.com> - 26.9-1
+- Move the collect() function to iutil (mkolman)
+- Update messiness level (mkolman)
+- PEP8 and general refactoring for the main anaconda.py (mkolman)
+- Move kickstart file parsing code to startup_utils (mkolman)
+- Don't directly import items from anaconda_log (mkolman)
+- Remove old useless code (mkolman)
+- Move the rescue ui startup code to the rescue module (mkolman)
+- Move set-installation-thod-from-anaconda code to startup_utils (mkolman)
+- Move the live startup code to startup_utils (mkolman)
+- Move code printing the startup note to startup_utils (mkolman)
+- Move the pstore cleanup function to startup_utils (mkolman)
+- Move the prompt_for_ssh function to startup_utils (mkolman)
+- Move logging setup to startup_utils (mkolman)
+- Move the geolocation startup code to a separate function (mkolman)
+- Unify addons path variable name (mkolman)
+- PEP 8 for startup_utils.py (mkolman)
+- PEP 8 for display.py (mkolman)
+- Move VNC startup checking to a separate function (mkolman)
+- Move imports to the top of the file in display.py (mkolman)
+- Refactor display mode handling (mkolman)
+- Move display setup & startup tasks out of anaconda.py (mkolman)
+- Remove main and extra Zanata pot files on master (jkonecny)
 - Remove main and extra pot files before zanata push (jkonecny)
 - Don't send intermediate pot files to zanata (gh#791) (awilliam)
-- Merge pull request #831 from poncovka/f25-devel-show_password_option
-  (vponcova)
-- Improve packaging logs without DEBUG logging (jkonecny)
+- Improve message to be clearer in rescue.py (jkonecny)
 - Add option to show password in password field (vponcova)
-
-* Thu Oct 13 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.5-1
-- Merge pull request #824 from snbueno/1378338 (snbueno)
 - Generate a list of DASDs in GUI storage spoke. (#1378338) (sbueno+anaconda)
-
-* Tue Oct 04 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.4-1
-- Merge pull request #817 from rvykydal/f25-devel-installation-from-live-iso-
-  to-disk-usb (rvykydal)
-- Merge pull request #813 from M4rtinK/f25-devel-no_mandatory_network_in_IS
-  (martin.kolman)
+- Echoing 4de0ec44bdf0f68545bb55bb5fea00464b65fcab May as well include the SL
+  file (riehecky)
+- Fixup class name for CentOS install class (riehecky)
+- Fix a typo in SAM file header (mkolman)
 - Skip live image on usb when checking storage for mounted partitions
   (#1369786) (rvykydal)
+
+* Mon Oct 03 2016 Martin Kolman <mkolman@redhat.com> - 26.8-1
 - Fix network spoke being incorrectly marked as mandatory (#1374864) (mkolman)
-- Merge pull request #812 from dwlehman/udev-cruft-removal (dlehman)
-- Merge pull request #811 from M4rtinK/f25-devel-improved_driver_disk_copying
-  (martin.kolman)
-- Improved driver disk copying (#1269915) (mkolman)
-- Merge pull request #810 from M4rtinK/f25-devel-fix_screenshot_taking
-  (martin.kolman)
+
+* Fri Sep 30 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 26.7-1
+- Increse python3-blivet version to 1:2.1.5 (jkonecny)
+- Fix dnf.repo.Repo now requires dnf.conf.Conf (jkonecny)
+- Provides compatibility with DNF-2.0 (jmracek)
+
+* Tue Sep 27 2016 Martin Kolman <mkolman@redhat.com> - 26.6-1
 - Don't deactivate all storage in anaconda-cleanup. (#1225184) (dlehman)
 - Stop setting ANACONDA udev environment variable. (#1225184) (dlehman)
+
+* Tue Sep 27 2016 Martin Kolman <mkolman@redhat.com> - 26.5-1
+- Improved driver disk copying (#1269915) (mkolman)
 - Fix screenshot taking logic (#1327456) (mkolman)
-- Merge pull request #807 from jkonecny12/master-add-mod-reload-dependencies
-  (jkonecny)
 - Change blank lines to pep8 for Dracut DUD test (jkonecny)
 - Tweak lambda use in Dracut test (jkonecny)
 - Add Dracut test for reloading mod dependencies (jkonecny)
 
-* Wed Sep 21 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.3-1
-- Merge pull request #806 from M4rtinK/f25-devel-fix_tui_ntp_server_listing
-  (martin.kolman)
+* Wed Sep 21 2016 Martin Kolman <mkolman@redhat.com> - 26.4-1
 - Fix NTP server list fetching when running in IS (#1374810) (mkolman)
-- Merge pull request #804 from rvykydal/f25-devel-cgwalters-rpmostree-fix-
-  remote (rvykydal)
 - rpmostreepayload: Clean up use of sysroot files a bit (walters)
 - rpmostreepayload: Fix remote handling to use correct sysroot (walters)
 
-* Mon Sep 19 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.2-1
-- Merge pull request #801 from rvykydal/f25-devel-rhbz-1309661 (rvykydal)
-- Merge pull request #802 from rvykydal/f25-devel-rhbz-1234849 (rvykydal)
-- Merge pull request #797 from jkonecny12/f25-dev-fix-text-repo-option-checker
-  (jkonecny)
-- Merge pull request #796 from jkonecny12/f25-dev-fix-net-when-dud-unload
-  (jkonecny)
-- Merge pull request #798 from rvykydal/f25-devel-rhbz-1371188 (rvykydal)
+* Mon Sep 19 2016 Martin Kolman <mkolman@redhat.com> - 26.3-1
 - network: set onboot correctly for vlan on bond device in ks (#1234849)
   (rvykydal)
 - network: don't show ibft configured devices in UI (#1309661) (rvykydal)
-- Merge pull request #765 from rvykydal/f25-devel-port-rhel-1325134-1252879
-  (rvykydal)
 - iscsi: don't generate kickstart iscsi commands for offload devices (#1252879)
   (rvykydal)
 - iscsi: allow installing bootloader on offload iscsi disks (qla4xxx)
   (#1325134) (rvykydal)
 - network: adapt to changed NM ibft plugin enablement configuration (#1371188)
   (rvykydal)
-- Merge pull request #795 from rvykydal/f25-devel-rhbz-1268792 (rvykydal)
-- Merge pull request #794 from rvykydal/f25-devel-rhbz-1321288 (rvykydal)
-- Merge pull request #793 from rvykydal/f25-devel-rhbz-1358795 (rvykydal)
 - network: don't activate bond/team devices regardless of --activate (#1358795)
   (rvykydal)
-- Merge pull request #771 from rvykydal/f25-devel-1277975-add-network-no-
-  activate-option (rvykydal)
 - Fix traceback when payload have None as url (#1371494) (jkonecny)
 - Add new Dracut test and fix another ones (#1101653) (jkonecny)
 - Fix bug when we add set to list (#1101653) (jkonecny)
@@ -510,46 +1684,48 @@ update-desktop-database &> /dev/null || :
 - network: update kickstart data also with bond bridge slaves (#1321288)
   (rvykydal)
 - network: add support for bridge bond slaves (#1321288) (rvykydal)
-- Merge pull request #790 from cgwalters/sam-evaluation (martin.kolman)
 - screen_access: Ensure we write config to real sysroot (walters)
+- Add release commit support to makebumpver (mkolman)
+- Makefile improvents for separate release commits & tarball creation
+  (mkolman)
 - network: add support for --no-activate kickstart opton (#1277975) (rvykydal)
+- fixup! Add base.close() after base.do_transaction (RhBug:1313240) (jmracek)
+- Add base.close() after base.do_transaction (RhBug:1313240) (jmracek)
 
-* Thu Sep 08 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 25.20.1-1
-- Update zanata.xml file for f25. (sbueno+anaconda)
-- Fix a small typo in makebumpver script. (sbueno+anaconda)
-- Merge pull request #778 from M4rtinK/f25-release-zanata_branch_hotfix
-  (martin.kolman)
-- Fix the git branch name/Zanata branch name mismatch (mkolman)
-- Merge pull request #769 from rvykydal/f25-devel-port-1370099 (rvykydal)
-- Merge pull request #743 from M4rtinK/f25-devel-how_to_merge (martin.kolman)
+* Tue Sep 06 2016 Martin Kolman <mkolman@redhat.com> - 26.2-1
 - Add git merging examples to the contribution guidelines (mkolman)
 - network: don't stumble upon new Device.Statistics NM dbus iface (#1370099)
   (rvykydal)
-- Merge pull request #760 from jkonecny12/f25-reaplly-dev-fix-dnf-change
-  (jkonecny)
 - Current Anaconda is not compatible with DNF 2.0.0 (jkonecny)
+- Filter out all merge commits from the changelog (mkolman)
+- Make it possible to override Zanata branch name (mkolman)
+- Switch to argparse & autodetect name, version and bug email address (mkolman)
+- Fix multi-inheritance (phil)
 - Fix replacement of deprecated DNF method (jkonecny)
 - Replace deprecated method of DNF (jmracek)
-- Merge pull request #751 from M4rtinK/f25-devel-fix_systemd_sysroot
-  (martin.kolman)
+- Static checker recommended improvements (mkolman)
+- Fix replacement of deprecated DNF method (jkonecny)
+- Replace deprecated method of DNF (jmracek)
+
+* Mon Aug 29 2016 Samantha N. Bueno <sbueno+anaconda@redhat.com> - 26.1-1
+- Fix a pylint no-member warning (mkolman)
 - Translate press-c-to-continue correctly in TUI (#1364539) (mkolman)
-- Merge pull request #744 from jkonecny12/f25-dev-fix-bootloader-bootpart
-  (jkonecny)
 - Fix bootDrive driveorder fallback (#1355795) (jkonecny)
 - Fix bootloader when re-using existing /boot part (#1355795) (jkonecny)
 - Add support for device specification variants (#1200833) (mkolman)
 - Revert "Update zanata.xml for f25-devel branch." (sbueno+anaconda)
 - Update zanata.xml for f25-devel branch. (sbueno+anaconda)
-- Merge pull request #736 from jkonecny12/master-fix-net-reset-payload
-  (jkonecny)
+- Add option to override efi_dir (phil)
+- efiboot: stderr= is not an option to efibootmgr (phil)
+- Fix EFI grub1 case (phil)
+- Make Fedora module not so grabby (phil)
+- Add centos module to pyanaconda (phil)
 - network: don't require gateway for static ipv4 config in TUI (#1365532)
   (rvykydal)
-- Merge pull request #732 from jkonecny12/master-fix-ana-pre-service (jkonecny)
 - Improve connection network change detection (jkonecny)
 - Revert "Revalidate source only if nm-con-ed change settings (#1270354)"
   (jkonecny)
 - Fix anaconda-pre.service wasn't properly installed (#1255659) (jkonecny)
-- Merge pull request #704 from snbueno/contributing (snbueno)
 - Rename function for better consistency (#1259284) (rvykydal)
 - Update error message for consistency (#1259284) (rvykydal)
 - Add more specific username check messages also to gui (#1360334) (rvykydal)
@@ -581,7 +1757,6 @@ update-desktop-database &> /dev/null || :
 - Make it possible to disable sshd service from running. (#1262707)
   (sbueno+anaconda)
 - Change bootloader boot drive fallback (jkonecny)
-- Merge pull request #702 from japokorn/master_quickfix (japokorn)
 - Fix of Python3x uncompatible commands (japokorn)
 - Add NTP server configuration to the TUI (#1269399) (mkolman)
 - Move the NTP server checking constants to constants.py (mkolman)

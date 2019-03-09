@@ -1,0 +1,33 @@
+From 44b4ed9fcfcd03fa8340d175c73adb79abdc8488 Mon Sep 17 00:00:00 2001
+From: "M. Vefa Bicakci" <m.v.b@runbox.com>
+Date: Fri, 19 Oct 2018 08:02:12 +0200
+Subject: [PATCH] Do not fail during initramfs start-up due to missing url-lib
+
+---
+ dracut/anaconda-ks-sendheaders.sh | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/dracut/anaconda-ks-sendheaders.sh b/dracut/anaconda-ks-sendheaders.sh
+index 7bc97393b..39fa0ce0d 100755
+--- a/dracut/anaconda-ks-sendheaders.sh
++++ b/dracut/anaconda-ks-sendheaders.sh
+@@ -2,7 +2,15 @@
+ # anaconda-ks-sendheaders.sh - set various HTTP headers for kickstarting
+ 
+ [ -f /tmp/.ks_sendheaders ] && return
+-command -v set_http_header >/dev/null || . /lib/url-lib.sh
++
++if ! command -v set_http_header >/dev/null; then
++    if ! [ -r /lib/url-lib.sh ]; then
++        alias set_http_header=:
++        return
++    fi
++
++    . /lib/url-lib.sh
++fi
+ 
+ # inst.ks.sendmac: send MAC addresses in HTTP headers
+ if getargbool 0 kssendmac inst.ks.sendmac; then
+-- 
+2.17.2
+

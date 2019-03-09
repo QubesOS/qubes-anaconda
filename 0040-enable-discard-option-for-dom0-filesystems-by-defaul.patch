@@ -1,0 +1,78 @@
+From 4467e907cc8d5c1d3d3accddddecba5164acf0bf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] enable discard option for dom0 filesystems by default
+
+This may have performance impact on some older SSD, but on the other
+hand, without this option it's pretty easy to fill the whole LVM thin
+pool even if there is plenty free space in dom0.
+Note that this doesn't enable it on LUKS layer, this is still disabled
+by default.
+
+Fixes QubesOS/qubes-issues#3226
+---
+ pyanaconda/installation.py |  9 +++++++++
+ pyanaconda/kickstart.py    | 12 ++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
+index 00aff85dc..70cc19a8a 100644
+--- a/pyanaconda/installation.py
++++ b/pyanaconda/installation.py
+@@ -280,6 +280,15 @@ def doInstall(storage, payload, ksdata, instClass):
+                               task_args=(storage,),
+                               task_kwargs={"mount_only": flags.flags.dirInstall, "callbacks": callbacks_reg}))
+ 
++    # For autopart, actual partition related objects (especially
++    # blivet.format.FS objects) are created by the above call. And autopart
++    # does not provide any way to specify default mount options (unlike manual
++    # partitioning). Because of this, patch it now to add 'discard' option.
++    if storage.root_device.format.options and 'discard' not in storage.root_device.format.options:
++        storage.root_device.format.options += ',discard'
++    else:
++        storage.root_device.format.options = 'defaults,discard'
++
+     early_storage.append(Task("Write early storage", payload.writeStorageEarly))
+     installation_queue.append(early_storage)
+ 
+diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
+index 175ed6d13..85eaec799 100644
+--- a/pyanaconda/kickstart.py
++++ b/pyanaconda/kickstart.py
+@@ -1102,6 +1102,10 @@ class LogVolData(COMMANDS.LogVolData):
+             self.mountpoint = ""
+             ty = None
+ 
++        if self.mountpoint.startswith('/') and not self.fsopts:
++            # enable discard for normal filesystems in dom0
++            self.fsopts = "defaults,discard"
++
+         # Sanity check mountpoint
+         if self.mountpoint != "" and self.mountpoint[0] != '/':
+             raise KickstartParseError(lineno=self.lineno,
+@@ -1571,6 +1575,10 @@ class PartitionData(COMMANDS.PartData):
+             else:
+                 ty = storage.default_fstype
+ 
++        if self.mountpoint.startswith('/') and not self.fsopts:
++            # enable discard for normal filesystems in dom0
++            self.fsopts = "defaults,discard"
++
+         if not size and self.size:
+             try:
+                 size = Size("%d MiB" % self.size)
+@@ -1834,6 +1842,10 @@ class RaidData(COMMANDS.RaidData):
+             else:
+                 ty = storage.default_fstype
+ 
++        if self.mountpoint.startswith('/') and not self.fsopts:
++            # enable discard for normal filesystems in dom0
++            self.fsopts = "defaults,discard"
++
+         # Sanity check mountpoint
+         if self.mountpoint != "" and self.mountpoint[0] != '/':
+             raise KickstartParseError(lineno=self.lineno,
+-- 
+2.17.2
+

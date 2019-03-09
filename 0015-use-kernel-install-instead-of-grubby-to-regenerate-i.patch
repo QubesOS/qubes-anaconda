@@ -1,0 +1,46 @@
+From a106ffa0c62485768450b160f174b7f146751199 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Sat, 10 Nov 2018 13:11:46 +0100
+Subject: [PATCH] use kernel-install instead of grubby to regenerate
+ initrd/grub.conf
+
+Since we have own hook there, it properly handles Xen. This means we no longer need post scripts in kickstart for that.
+---
+ pyanaconda/payload/__init__.py | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index cc3538142..3b2cc6db6 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -886,23 +886,19 @@ class Payload(object):
+ 
+ 
+     def recreateInitrds(self):
+-        """Recreate the initrds by calling new-kernel-pkg
++        """Recreate the initrds by calling kernel-install
+ 
+         This needs to be done after all configuration files have been
+         written, since dracut depends on some of them.
+ 
+         :returns: None
+         """
+-        if not os.path.exists(util.getSysroot() + "/usr/sbin/new-kernel-pkg"):
+-            log.error("new-kernel-pkg does not exist - grubby wasn't installed?  skipping")
+-            return
+ 
+         for kernel in self.kernelVersionList:
+             log.info("recreating initrd for %s", kernel)
+             if not flags.imageInstall:
+-                util.execInSysroot("new-kernel-pkg",
+-                                   ["--mkinitrd", "--dracut",
+-                                    "--depmod", "--update", kernel])
++                util.execInSysroot("kernel-install",
++                                    ["add", kernel, "/boot/vmlinuz-%s" % kernel])
+             else:
+                 # hostonly is not sensible for disk image installations
+                 # using /dev/disk/by-uuid/ is necessary due to disk image naming
+-- 
+2.17.2
+

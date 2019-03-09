@@ -1,0 +1,45 @@
+From 4b2817c06b1ec90ae0183a411ba3900e6d20be9d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.epitre@orange.fr>
+Date: Fri, 28 Dec 2018 13:28:26 +0100
+Subject: [PATCH] skip NTP installation and setup in dom0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Dom0 has no direct network access, to this doesn't make sense anyway.
+
+Fixes QubesOS/qubes-issues#2110
+
+Rework of previous work done by Marek Marczykowski-Górecki (marmarek).
+---
+ pyanaconda/installclasses/qubes.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/installclasses/qubes.py b/pyanaconda/installclasses/qubes.py
+index 2337dacbf..794e2e45b 100644
+--- a/pyanaconda/installclasses/qubes.py
++++ b/pyanaconda/installclasses/qubes.py
+@@ -19,7 +19,7 @@
+ 
+ from pyanaconda.installclass import BaseInstallClass
+ from pyanaconda.modules.common.constants.objects import AUTO_PARTITIONING
+-from pyanaconda.modules.common.constants.services import NETWORK, STORAGE
++from pyanaconda.modules.common.constants.services import NETWORK, STORAGE, TIMEZONE
+ from pyanaconda.product import *
+ from pyanaconda.core.i18n import N_
+ import pyanaconda.platform
+@@ -61,6 +61,10 @@ class InstallClass(BaseInstallClass):
+         auto_part_proxy = STORAGE.get_proxy(AUTO_PARTITIONING)
+         auto_part_proxy.SetEncrypted(True)
+ 
++        # Make disabled NTP by default
++        timezone_proxy = TIMEZONE.get_proxy()
++        timezone_proxy.SetNTPEnabled(False)
++
+     def setDefaultPartitioning(self, storage):
+         BaseInstallClass.setDefaultPartitioning(self, storage)
+         for autoreq in storage.autopart_requests:
+-- 
+2.17.2
+

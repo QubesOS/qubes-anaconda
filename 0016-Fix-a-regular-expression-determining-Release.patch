@@ -1,0 +1,26 @@
+From 0a146c50741a84e4bc68b4c6b703292755fc9b00 Mon Sep 17 00:00:00 2001
+From: "M. Vefa Bicakci" <m.v.b@runbox.com>
+Date: Sat, 10 Nov 2018 13:17:29 +0100
+Subject: [PATCH] Fix a regular expression determining Release
+
+Without the start-of-line matcher, other lines are matched as well, causing invalid PACKAGE_RELEASE variable substitutions within the Makefiles.
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 2c043d037..8bebe91d7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -24,6 +24,8 @@ AC_INIT([anaconda], [29.24.7], [anaconda-devel-list@redhat.com])
+ # (patch only builds, modular builds, mass-rebuilds, etc.)
+ AC_ARG_VAR(ANACONDA_RELEASE, [1])
+ 
++ANACONDA_RELEASE="`awk '/^Release:/ { split($2, r, "%"); print r[[1]] }' $srcdir/anaconda.spec`"
++
+ # default release to 1 if not set by option
+ AS_IF([test $ANACONDA_RELEASE],
+       [AC_SUBST(PACKAGE_RELEASE, $ANACONDA_RELEASE)],
+-- 
+2.17.2
+
