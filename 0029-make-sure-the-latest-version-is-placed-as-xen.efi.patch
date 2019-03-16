@@ -1,0 +1,34 @@
+From 769e58324a6508a642a3f9b0b84801922e74fe58 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:12 +0200
+Subject: [PATCH] make sure the latest version is placed as xen.efi
+
+os.listdir returns files in filesystem order, not sorted.
+
+QubesOS/qubes-issues#2990
+---
+ pyanaconda/bootloader.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index a6b461ae7..8f06088d0 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1943,10 +1943,10 @@ class XenEFI(EFIGRUB):
+         if os.path.exists(xen_efi_target):
+             os.remove(xen_efi_target)
+ 
+-        xen_efi = [x for x in os.listdir(util.getSysroot() + self.config_dir) if
+-                   x.startswith('xen-') and x.endswith('.efi')][0]
++        xen_efi = [x for x in sorted(os.listdir(util.getSysroot() + self.config_dir)) if
++                   x.startswith('xen-') and x.endswith('.efi')][-1]
+         shutil.copy("{}/{}".format(util.getSysroot() + self.config_dir, xen_efi),
+-                    "{}/{}".format(util.getSysroot() + self.config_dir, "xen.efi"))
++                    xen_efi_target)
+         rc = self.efibootmgr("-c", "-w", "-L", productName,
+                              "-d", boot_disk.path, "-p", boot_part_num,
+                              "-l",
+-- 
+2.20.1
+

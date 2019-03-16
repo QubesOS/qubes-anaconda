@@ -1,0 +1,40 @@
+From 203e8d7748da97cbbd53cd47d19a6a199f1952fa Mon Sep 17 00:00:00 2001
+From: Marek Marczykowski <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] Add ucode=scan to default Xen command line
+
+Try to update microcode as early as possible if provided.
+This option will scan all multiboot modules besides dom0 kernel. In our
+case this is perfect - there is only one other module and it is
+initramfs which have microcode early cpio prepended.
+
+QubesOS/qubes-issues#3703
+---
+ pyanaconda/bootloader.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index 8c15c8a10..784d14d24 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1535,7 +1535,7 @@ class GRUB2(GRUB):
+         # boot arguments
+         log.info("bootloader.py: used boot args: %s ", self.boot_args)
+         defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
+-        defaults.write("GRUB_CMDLINE_XEN_DEFAULT=\"console=none dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx\"\n")
++        defaults.write("GRUB_CMDLINE_XEN_DEFAULT=\"console=none dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx ucode=scan\"\n")
+         defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
+         defaults.write("GRUB_THEME=\"/boot/grub2/themes/qubes/theme.txt\"\n")
+         defaults.close()
+@@ -1978,7 +1978,7 @@ class XenEFI(EFIGRUB):
+                 root_args += " rootflags=subvol=%s" % image.device.name
+             config.write("\n")
+             config.write("[{}]\n".format(image.version))
+-            config.write("options=loglvl=all dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx\n")
++            config.write("options=loglvl=all dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx ucode=scan\n")
+             config.write("kernel={} {} {}\n".format(
+                 image.kernel,
+                 root_args,
+-- 
+2.20.1
+

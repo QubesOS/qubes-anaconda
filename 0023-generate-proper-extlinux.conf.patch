@@ -1,0 +1,43 @@
+From cfbbfb341a129b6ad9e02bec0c2af58300242986 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:12 +0200
+Subject: [PATCH] generate proper extlinux.conf
+
+Fixes QubesOS/qubes-issues#2902
+---
+ pyanaconda/bootloader.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index f5e95abdf..26426717c 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -2443,6 +2443,8 @@ class EXTLINUX(BootLoader):
+ 
+     def write_config_images(self, config):
+         self.write_config_console(config)
++        xen_gz = [x for x in os.listdir(util.getSysroot() + self.config_dir) if
++                   x.startswith('xen-') and x.endswith('.gz')][0]
+         for image in self.images:
+             args = Arguments()
+             args.update(["root=%s" % image.device.fstab_spec, "ro"])
+@@ -2455,10 +2457,12 @@ class EXTLINUX(BootLoader):
+             label = "%s(%s)" % (self.image_label(image), image.version)
+             label = label.replace(" ", "")
+             stanza = ("label %(label)s\n"
+-                      "\tkernel %(boot_prefix)s/%(kernel)s\n"
+-                      "\tinitrd %(boot_prefix)s/%(initrd)s\n"
+-                      "\tappend %(args)s\n\n"
++                      "\tkernel mboot.c32\n"
++                      "\tappend %(boot_prefix)s/%(xen)s --- "
++                      "%(boot_prefix)s/%(kernel)s %(args)s --- "
++                      "%(boot_prefix)s/%(initrd)s\n"
+                       % {"label": label,
++                         "xen": xen_gz,
+                          "kernel": image.kernel,
+                          "initrd": image.initrd,
+                          "args": args,
+-- 
+2.20.1
+

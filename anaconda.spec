@@ -19,57 +19,52 @@ URL:     http://fedoraproject.org/wiki/Anaconda
 # ./autogen.sh
 # make dist
 Source0: %{name}-%{version}.tar.bz2
+Source1: qubes.py
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Patch0: 0001-add-Qubes-installclass.patch
-Patch1: 0002-add-Qubes-post-scripts.patch
-Patch2: 0003-remove-other-installclasses.patch
-Patch3: 0004-Set-default-hostname-to-dom0.patch
-Patch4: 0005-Disable-network-by-ignoring-any-present-nic.patch
-Patch5: 0006-remove-network-setup-from-graphical-and-text-interfa.patch
-Patch6: 0007-fix-grub-config-setup-by-removing-non-xen-options.patch
-Patch7: 0008-make-encrypted-partitions-by-default.patch
-Patch8: 0009-set-default-grub-theme.patch
-Patch9: 0010-add-options-can_dual_boot-and-can_update-to-grub.patch
-Patch10: 0011-efimgr-specify-root-util.getSysroot.patch
-Patch11: 0012-generate-xen-efi-configuration.patch
-Patch12: 0013-fix-dracut-module-to-work-with-reduced-dependencies.patch
-Patch13: 0014-use-installer-kernel-parameters-as-default-for-insta.patch
-Patch14: 0015-use-kernel-install-instead-of-grubby-to-regenerate-i.patch
-#Patch15: 0016-Fix-a-regular-expression-determining-Release.patch
-Patch16: 0017-Do-not-fail-during-initramfs-start-up-due-to-missing.patch
-Patch17: 0018-Disable-the-NTP-configuration-spoke.patch
-Patch18: 0019-drop-useless-on-Qubes-dependencies-on-network-filesy.patch
-Patch19: 0020-skip-NTP-installation-and-setup-in-dom0.patch
-Patch20: 0021-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
-Patch21: 0022-switch-default-partitioning-scheme-to-LVM-Thin-Provi.patch
-Patch22: 0023-add-console-none-Xen-parameter.patch
-Patch23: 0024-add-dom0_mem-min-1024M-to-default-xen-cmdline.patch
-Patch24: 0025-limit-dom0-maxmem-to-4GB-to-limit-its-overhead-on-bi.patch
-Patch25: 0026-disable-iommu-for-IGFX.patch
-Patch26: 0027-check-for-Qubes-OS-hardware-required-features.patch
-Patch27: 0028-generate-proper-extlinux.conf.patch
-Patch28: 0029-don-t-crash-when-no-target-disk-is-available.patch
-Patch29: 0030-lock-root-account-by-default.patch
-Patch30: 0031-add-option-to-lock-root-account.patch
-Patch31: 0032-Modify-user-configuration-spoke-for-QubesOS.patch
-Patch32: 0033-Make-sure-that-a-user-is-created-at-installation-tim.patch
-Patch33: 0034-check-add-user-to-wheel-and-qubes-groups.patch
-Patch34: 0035-xen.efi-upgraded-during-each-install.patch
-Patch35: 0036-make-sure-the-latest-version-is-placed-as-xen.efi.patch
-Patch36: 0037-fix-default-scheme-in-custom-partitioning.patch
-Patch37: 0038-Fix-macOS-EFI-Installation.patch
-Patch38: 0039-use-proper-subvolume-argument-when-booting-from-btrf.patch
-Patch39: 0040-enable-discard-option-for-dom0-filesystems-by-defaul.patch
-Patch40: 0041-Add-ucode-scan-to-default-Xen-command-line.patch
-Patch41: 0042-avoid-adding-duplicated-kernel-entries.patch
-Patch42: 0043-mark-qubes-user-name-as-reserved.patch
-Patch43: 0044-add-smt-off-xen-option-during-installation.patch
-Patch44: 0045-update-Qubes-specific-code-for-Fedora-21-version.patch
-Patch45: 0046-abort-installation-on-X-startup-fail.patch
-Patch46: 0047-fix-encryption-passphrase-check.patch
-Patch47: 0048-disable-os-prober.patch
+Patch0: 0001-add-Qubes-post-scripts.patch
+Patch1: 0002-remove-other-installclasses.patch
+Patch2: 0003-Disable-network-by-ignoring-any-present-nic.patch
+Patch3: 0004-remove-network-setup-from-graphical-and-text-interfa.patch
+Patch4: 0005-fix-grub-config-setup-by-removing-non-xen-options.patch
+Patch5: 0006-set-default-grub-theme.patch
+Patch6: 0007-add-options-can_dual_boot-and-can_update-to-grub.patch
+Patch7: 0008-efimgr-specify-root-util.getSysroot.patch
+Patch8: 0009-generate-xen-efi-configuration.patch
+Patch9: 0010-fix-dracut-module-to-work-with-reduced-dependencies.patch
+Patch10: 0011-use-installer-kernel-parameters-as-default-for-insta.patch
+Patch11: 0012-use-kernel-install-instead-of-grubby-to-regenerate-i.patch
+#Patch12: 0013-Fix-a-regular-expression-determining-Release.patch
+Patch13: 0014-Do-not-fail-during-initramfs-start-up-due-to-missing.patch
+Patch14: 0015-Disable-the-NTP-configuration-spoke.patch
+Patch15: 0016-drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch16: 0017-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
+Patch17: 0018-add-console-none-Xen-parameter.patch
+Patch18: 0019-add-dom0_mem-min-1024M-to-default-xen-cmdline.patch
+Patch19: 0020-limit-dom0-maxmem-to-4GB-to-limit-its-overhead-on-bi.patch
+Patch20: 0021-disable-iommu-for-IGFX.patch
+Patch21: 0022-check-for-Qubes-OS-hardware-required-features.patch
+Patch22: 0023-generate-proper-extlinux.conf.patch
+Patch23: 0024-don-t-crash-when-no-target-disk-is-available.patch
+Patch24: 0025-Modify-user-configuration-spoke-for-QubesOS.patch
+Patch25: 0026-Make-sure-that-a-user-is-created-at-installation-tim.patch
+Patch26: 0027-check-add-user-to-wheel-and-qubes-groups.patch
+Patch27: 0028-xen.efi-upgraded-during-each-install.patch
+Patch28: 0029-make-sure-the-latest-version-is-placed-as-xen.efi.patch
+Patch29: 0030-fix-default-scheme-in-custom-partitioning.patch
+Patch30: 0031-Fix-macOS-EFI-Installation.patch
+Patch31: 0032-use-proper-subvolume-argument-when-booting-from-btrf.patch
+Patch32: 0033-enable-discard-option-for-dom0-filesystems-by-defaul.patch
+Patch33: 0034-Add-ucode-scan-to-default-Xen-command-line.patch
+Patch34: 0035-avoid-adding-duplicated-kernel-entries.patch
+Patch35: 0036-mark-qubes-user-name-as-reserved.patch
+Patch36: 0037-add-smt-off-xen-option-during-installation.patch
+Patch37: 0038-update-Qubes-specific-code-for-Fedora-21-version.patch
+Patch38: 0039-abort-installation-on-X-startup-fail.patch
+Patch39: 0040-fix-encryption-passphrase-check.patch
+Patch40: 0041-disable-os-prober.patch
+Patch41: 0042-add-option-to-lock-root-account.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
@@ -305,6 +300,7 @@ runtime on NFS/HTTP/FTP servers or local disks.
 
 %prep
 %autosetup -p1
+cp %{SOURCE1} pyanaconda/installclasses/
 
 %build
 autoreconf -v --install .

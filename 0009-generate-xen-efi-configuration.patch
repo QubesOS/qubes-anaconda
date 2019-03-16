@@ -1,0 +1,117 @@
+From 4988f1e62822b1ac1df84c5e5640e34e6f9c988a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:12 +0200
+Subject: [PATCH] generate xen efi configuration
+
+---
+ pyanaconda/bootloader.py | 79 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 78 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index 69f5c6595..1c01bfe4c 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -21,6 +21,7 @@
+ import collections
+ import os
+ import re
++import shutil
+ import blivet
+ from parted import PARTITION_BIOS_GRUB
+ from glob import glob
+@@ -1915,6 +1916,82 @@ class ArmEFIGRUB(EFIGRUB):
+         super().__init__()
+         self._packages64 = ["grub2-efi-arm"]
+ 
++class XenEFI(EFIGRUB):
++    packages = ["efibootmgr"]
++    _config_file = 'xen.cfg'
++
++    # stage2 not used at all, so allow any type
++    stage2_device_types = ["partition", "mdarray", "lvmlv"]
++
++    def __init__(self):
++        super(XenEFI, self).__init__()
++        self.efi_dir = 'qubes'
++
++    def add_efi_boot_target(self):
++        if self.stage1_device.type == "partition":
++            boot_disk = self.stage1_device.disk
++            boot_part_num = self.stage1_device.parted_partition.number
++        elif self.stage1_device.type == "mdarray":
++            # FIXME: I'm just guessing here. This probably needs the full
++            #        treatment, ie: multiple targets for each member.
++            boot_disk = self.stage1_device.parents[0].disk
++            boot_part_num = self.stage1_device.parents[0].parted_partition.number
++        boot_part_num = str(boot_part_num)
++
++        if not os.path.exists(
++                "{}/{}".format(util.getSysroot() + self.config_dir, "xen.efi")):
++            xen_efi = [x for x in os.listdir(util.getSysroot() + self.config_dir) if
++                       x.startswith('xen-') and x.endswith('.efi')][0]
++            shutil.copy("{}/{}".format(util.getSysroot() + self.config_dir, xen_efi),
++                        "{}/{}".format(util.getSysroot() + self.config_dir, "xen.efi"))
++        rc = self.efibootmgr("-c", "-w", "-L", productName,
++                             "-d", boot_disk.path, "-p", boot_part_num,
++                             "-l",
++                             self.efi_dir_as_efifs_dir + "\\xen.efi",
++                             root=util.getSysroot())
++        if rc:
++            raise BootLoaderError("failed to set new efi boot target")
++
++    def add_image(self, image):
++        super(XenEFI, self).add_image(image)
++        shutil.copy("{}/boot/{}".format(util.getSysroot(), image.kernel),
++                    os.path.normpath(
++                        "{}/{}".format(util.getSysroot() + self.config_dir,
++                                       image.kernel)))
++        if image.initrd is not None:
++            shutil.copy("{}/boot/{}".format(util.getSysroot(), image.initrd),
++                        os.path.normpath(
++                            "{}/{}".format(util.getSysroot() + self.config_dir,
++                                           image.initrd)))
++
++    def write_config_header(self, config):
++        config.write("[global]\n")
++        config.write("default={}\n".format(self.default.version))
++
++    def write_config_images(self, config):
++        for image in self.images:
++            config.write("\n")
++            config.write("[{}]\n".format(image.version))
++            config.write("options=loglvl=all dom0_mem=min:1024M dom0_mem=max:4096M\n")
++            config.write("kernel={} root={} {}\n".format(
++                image.kernel,
++                image.device.fstab_spec,
++                self.boot_args))
++            config.write("ramdisk={}\n".format(image.initrd))
++
++    def write_config_console(self, config):
++        pass
++
++    def write_config_post(self):
++        pass
++
++    def is_valid_stage2_device(self, device, linux=True, non_linux=False):
++        """ XenEFI doesn't use stage2 at all, so allow anything here """
++        return True
++
++    write_config = BootLoader.write_config
++
++
+ class MacEFIGRUB(EFIGRUB):
+     def __init__(self):
+         super().__init__()
+@@ -2430,7 +2507,7 @@ class EXTLINUX(BootLoader):
+ # every platform that wants a bootloader needs to be in this dict
+ bootloader_by_platform = {
+     platform.X86: GRUB2,
+-    platform.EFI: EFIGRUB,
++    platform.EFI: XenEFI,
+     platform.MacEFI: MacEFIGRUB,
+     platform.PPC: GRUB2,
+     platform.IPSeriesPPC: IPSeriesGRUB2,
+-- 
+2.20.1
+

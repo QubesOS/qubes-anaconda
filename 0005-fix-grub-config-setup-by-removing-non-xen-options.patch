@@ -1,0 +1,26 @@
+From e69c3148caf82cdc4ef736348c2aea39200ce40e Mon Sep 17 00:00:00 2001
+From: Marek Marczykowski <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:11 +0200
+Subject: [PATCH] fix grub config setup by removing non-xen options
+
+---
+ pyanaconda/bootloader.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index c6f67976e..16116d4df 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1584,6 +1584,9 @@ class GRUB2(GRUB):
+         except (BootLoaderError, OSError, RuntimeError) as e:
+             log.error("boot loader password setup failed: %s", e)
+ 
++        # disable non-xen entries
++        os.chmod("%s/etc/grub.d/10_linux" % util.getSysroot(), 0o644)
++
+         # make sure the default entry is the OS we are installing
+         if self.default is not None:
+             # find the index of the default image
+-- 
+2.20.1
+
