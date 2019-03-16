@@ -1,0 +1,30 @@
+From 7a60d316ea32df7f9a0c25669b20a0b608a2e384 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] mark 'qubes' user name as reserved
+
+'qubes' group is used internally, but useradd want to create a new group
+named as new user, so 'qubes' user name should also be avoided.
+
+Fixes QubesOS/qubes-issues#3777
+---
+ pyanaconda/users.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/users.py b/pyanaconda/users.py
+index 3db06ddad..e4ded474a 100644
+--- a/pyanaconda/users.py
++++ b/pyanaconda/users.py
+@@ -52,7 +52,7 @@ def cryptPassword(password, algo=None):
+ 
+ def check_username(name):
+     # Check reserved names.
+-    if name in os.listdir("/") + ["root", "home", "daemon", "system"]:
++    if name in os.listdir("/") + ["root", "home", "daemon", "system", "qubes"]:
+         return False, _("User name is reserved for system: %s") % name
+ 
+     return is_valid_name(name)
+-- 
+2.20.1
+

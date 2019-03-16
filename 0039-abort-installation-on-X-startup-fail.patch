@@ -1,0 +1,48 @@
+From 2607fb80f18ab63e94c786937d2850834b7d4b48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] abort installation on X startup fail
+
+Do not fallback to text mode, which cannot property install the system
+without kickstart file (missing LUKS passphrase prompt).
+
+Fixes QubesOS/qubes-issues#2996
+---
+ pyanaconda/display.py | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/pyanaconda/display.py b/pyanaconda/display.py
+index 6fddb2e3a..983bbe0ba 100644
+--- a/pyanaconda/display.py
++++ b/pyanaconda/display.py
+@@ -23,6 +23,7 @@ import os
+ import subprocess
+ import time
+ import pkgutil
++import sys
+ 
+ from pyanaconda.core.process_watchers import WatchProcesses
+ from pyanaconda import isys
+@@ -312,11 +313,13 @@ def setup_display(anaconda, options, addon_paths=None):
+             start_x11(xtimeout)
+             do_startup_x11_actions()
+         except (OSError, RuntimeError) as e:
+-            log.warning("X startup failed: %s", e)
+-            stdout_log.warning("X startup failed, falling back to text mode")
+-            anaconda.display_mode = constants.DisplayModes.TUI
+-            anaconda.gui_startup_failed = True
+-            time.sleep(2)
++            log.warning("X startup failed, aborting installation")
++            stdout_log.error("X startup failed, aborting installation")
++            print(_("The installation cannot continue and the system will be rebooted"))
++            print(_("Press ENTER to continue"))
++            input()
++            util.ipmi_report(constants.IPMI_ABORTED)
++            sys.exit(1)
+ 
+         if not anaconda.gui_startup_failed:
+             do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
+-- 
+2.20.1
+
