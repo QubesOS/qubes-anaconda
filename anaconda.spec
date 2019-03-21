@@ -65,6 +65,7 @@ Patch38: 0039-abort-installation-on-X-startup-fail.patch
 Patch39: 0040-fix-encryption-passphrase-check.patch
 Patch40: 0041-disable-os-prober.patch
 Patch41: 0042-add-option-to-lock-root-account.patch
+Patch42: 0043-Don-t-acquire-the-imp-s-lock-1644936.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
@@ -398,6 +399,9 @@ update-desktop-database &> /dev/null || :
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
+* Wed Jan 16 2019 Martin Kolman <mkolman@redhat.com> - 29.24.7-2
+- Backport compatibility fix for latest Python 3.7 (#1644936) (vponcova)
+
 * Fri Oct 19 2018 Martin Kolman <mkolman@redhat.com> - 29.24.7-1
 - Fix local repo files aren't enabled (#1636739) (jkonecny)
 
