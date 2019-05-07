@@ -82,12 +82,6 @@ class InstallClass(BaseInstallClass):
                 autoreq.required_space = Size("10GiB")
             if autoreq.mountpoint == "/home":
                 storage.autopart_requests.remove(autoreq)
-            if autoreq.mountpoint == "/boot/efi":
-                autoreq.max_size = Size("500MiB")
-            if autoreq.mountpoint == "/boot" and \
-                    isinstance(platform, pyanaconda.platform.EFI):
-                # xen.efi don't need /boot
-                storage.autopart_requests.remove(autoreq)
 
     def __init__(self):
         BaseInstallClass.__init__(self)
