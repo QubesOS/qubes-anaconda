@@ -1,4 +1,4 @@
-From 4f640ed09a9c66562f26e4d315699161aad426b0 Mon Sep 17 00:00:00 2001
+From 158ecacce2cf46919f98f97e76601cbd6ceac172 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.epitre@orange.fr>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
@@ -23,5 +23,5 @@ index 8ecdc7a2f..69f5c6595 100644
                      raise BootLoaderError("failed to remove old efi boot entry.  This is most likely a kernel or firmware bug.")
  
 -- 
-2.20.1
+2.17.2
 

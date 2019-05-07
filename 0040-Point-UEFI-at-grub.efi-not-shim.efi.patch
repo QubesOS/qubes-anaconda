@@ -1,0 +1,49 @@
+From 579f21f0e3988aeeb755c23ce9463526e13cdf56 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Tue, 7 May 2019 02:08:15 +0200
+Subject: [PATCH] Point UEFI at grub.efi, not shim.efi
+
+We don't have SecureBoot support yet.
+
+QubesOS/qubes-issues#4902
+---
+ pyanaconda/bootloader.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index 68f10fdd7..6860c9d7a 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1864,7 +1864,7 @@ class EFIGRUB1(EFIBase, GRUB):
+ 
+ 
+ class EFIGRUB(EFIBase, GRUB2):
+-    _packages32 = [ "grub2-efi-ia32", "shim-ia32" ]
++    _packages32 = [ "grub2-efi-ia32" ]
+     _packages_common = [ "efibootmgr" ]
+     can_dual_boot = False
+     stage2_is_valid_stage1 = False
+@@ -1875,7 +1875,7 @@ class EFIGRUB(EFIBase, GRUB2):
+     def __init__(self):
+         super().__init__()
+         self.efi_dir = 'BOOT'
+-        self._packages64 = [ "grub2-efi-x64", "shim-x64" ]
++        self._packages64 = [ "grub2-efi-x64" ]
+ 
+         try:
+             f = open("/sys/firmware/efi/fw_platform_size", "r")
+@@ -1889,8 +1889,8 @@ class EFIGRUB(EFIBase, GRUB2):
+     @property
+     def _efi_binary(self):
+         if self._is_32bit_firmware:
+-            return "\\shimia32.efi"
+-        return "\\shimx64.efi"
++            return "\\grubia32.efi"
++        return "\\grubx64.efi"
+ 
+     @property
+     def packages(self):
+-- 
+2.17.2
+

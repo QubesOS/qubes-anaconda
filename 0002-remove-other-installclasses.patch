@@ -1,4 +1,4 @@
-From e964308da024c6d2a1d80fc9d776d46ffd7d96c4 Mon Sep 17 00:00:00 2001
+From 90d2a42d45da0bd397922e744628c9753269134e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.epitre@orange.fr>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
@@ -604,5 +604,5 @@ index 152e8efe2..000000000
 -
 -        super().configurePayload(payload)
 -- 
-2.20.1
+2.17.2
 

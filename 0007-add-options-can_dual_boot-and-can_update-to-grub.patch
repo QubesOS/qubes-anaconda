@@ -1,4 +1,4 @@
-From 4457a283f9cb54db9e96ea99b9028f02d884fa8a Mon Sep 17 00:00:00 2001
+From 1f45e93d2aafd9ff1db519340169936739495c14 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.epitre@orange.fr>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
@@ -22,5 +22,5 @@ index 2a4167913..8ecdc7a2f 100644
      # requirements for boot devices
      stage2_device_types = ["partition", "mdarray", "lvmlv"]
 -- 
-2.20.1
+2.17.2
 

@@ -1,0 +1,30 @@
+From 563416add2827f7c2ad9cc630995b980f76d8197 Mon Sep 17 00:00:00 2001
+From: Marek Marczykowski <marmarek@invisiblethingslab.com>
+Date: Fri, 19 Oct 2018 08:02:13 +0200
+Subject: [PATCH] add smt=off xen option during installation
+
+Defaults set during package installation do not apply, as booloader
+configuration doesn't exist at that stage yet.
+
+Reported by @rustybird
+QubesOS/qubes-issues#4252
+---
+ pyanaconda/bootloader.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index 89faca045..fea459ad0 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1534,7 +1534,7 @@ class GRUB2(GRUB):
+         # boot arguments
+         log.info("bootloader.py: used boot args: %s ", self.boot_args)
+         defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
+-        defaults.write("GRUB_CMDLINE_XEN_DEFAULT=\"console=none dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx ucode=scan\"\n")
++        defaults.write("GRUB_CMDLINE_XEN_DEFAULT=\"console=none dom0_mem=min:1024M dom0_mem=max:4096M iommu=no-igfx ucode=scan smt=off\"\n")
+         defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
+         defaults.write("GRUB_THEME=\"/boot/grub2/themes/qubes/theme.txt\"\n")
+         defaults.close()
+-- 
+2.17.2
+

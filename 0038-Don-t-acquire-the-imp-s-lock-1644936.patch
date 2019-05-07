@@ -1,0 +1,38 @@
+From 7738434eabdae0eba1e568c071bd8170f06af4a9 Mon Sep 17 00:00:00 2001
+From: Vendula Poncova <vponcova@redhat.com>
+Date: Tue, 11 Dec 2018 18:09:30 +0100
+Subject: [PATCH] Don't acquire the imp's lock (#1644936)
+
+The installer might freeze during the __import__ call with
+the acquired lock. This is only a workaround. We should replace
+the library imp with the importlib library in the future.
+
+Resolves: rhbz#1644936
+---
+ pyanaconda/core/util.py | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
+index 7043bcc24..b8ffad073 100644
+--- a/pyanaconda/core/util.py
++++ b/pyanaconda/core/util.py
+@@ -1375,7 +1375,6 @@ def collect(module_pattern, path, pred):
+         module_path = None
+ 
+         try:
+-            imp.acquire_lock()
+             (fo, module_path, module_flags) = imp.find_module(mod_name, [path])
+             module = sys.modules.get(module_pattern % mod_name)
+ 
+@@ -1448,8 +1447,6 @@ def collect(module_pattern, path, pred):
+             log.error("Failed to import module %s from path %s in collect: %s", mod_name, module_path, imperr)
+             continue
+         finally:
+-            imp.release_lock()
+-
+             if mod_info and mod_info[0]:  # pylint: disable=unsubscriptable-object
+                 mod_info[0].close()  # pylint: disable=unsubscriptable-object
+ 
+-- 
+2.17.2
+

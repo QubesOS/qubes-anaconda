@@ -1,4 +1,4 @@
-From baf1fa8ed259a138f3fd84a0c7fcca60734158fc Mon Sep 17 00:00:00 2001
+From e937847243f33b32e2fde7081d8f8d72ab7ebae2 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
@@ -31,5 +31,5 @@ index 16116d4df..2a4167913 100644
  
      def _encrypt_password(self):
 -- 
-2.20.1
+2.17.2
 

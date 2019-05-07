@@ -1,4 +1,4 @@
-From 630658cdf824acb218012e7a403ebf356596cd90 Mon Sep 17 00:00:00 2001
+From fa2da0ddbbd8bde52fd0e9380f8768c39a9669ec Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 3 Feb 2019 18:52:38 +0100
@@ -2264,5 +2264,5 @@ index ece87a00d..000000000
 -        # save this back to network data, this will be applied in upper layer
 -        pass
 -- 
-2.20.1
+2.17.2
 

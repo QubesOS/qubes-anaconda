@@ -1,4 +1,4 @@
-From 91358bb7092f3c6d7ddbe5a2f22d87be96da0d5c Mon Sep 17 00:00:00 2001
+From d4c0e96869bf57475132b6305d720bfcbeec62e8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 3 Feb 2019 18:42:58 +0100
@@ -32,5 +32,5 @@ index ede89427b..203cd418d 100644
  
  def nm_activated_devices():
 -- 
-2.20.1
+2.17.2
 
