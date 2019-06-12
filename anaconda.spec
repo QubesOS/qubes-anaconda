@@ -66,6 +66,7 @@ Patch39: 0040-fix-encryption-passphrase-check.patch
 Patch40: 0041-disable-os-prober.patch
 Patch41: 0042-add-option-to-lock-root-account.patch
 Patch42: 0043-Don-t-acquire-the-imp-s-lock-1644936.patch
+Patch43: 0044-Do-not-add-resume-kernel-option.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
