@@ -44,6 +44,7 @@ class InstallClass(BaseInstallClass):
     installUpdates = False
 
     bootloaderTimeoutDefault = 5
+    bootloaderExtraArgs = ["plymouth.ignore-serial-consoles"]
 
     tasks = [(N_("Minimal"), ["base", "base-x", "qubes"])]
 
