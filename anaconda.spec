@@ -63,6 +63,8 @@ Patch0037: 0037-add-option-to-lock-root-account.patch
 Patch0038: 0038-Don-t-acquire-the-imp-s-lock-1644936.patch
 Patch0039: 0039-Do-not-add-resume-kernel-option.patch
 Patch0040: 0040-Point-UEFI-at-grub.efi-not-shim.efi.patch
+Patch0041: 0041-Remove-the-Blivet-s-gpt-flag.patch
+Patch0042: 0042-Move-attributes-from-the-Blivet-class-to-Anaconda.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).

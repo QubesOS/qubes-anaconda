@@ -1,0 +1,58 @@
+From d5a8fd7f06cb86d4714c9c2086c0ab6883f29d5a Mon Sep 17 00:00:00 2001
+From: Vendula Poncova <vponcova@redhat.com>
+Date: Wed, 9 Jan 2019 14:11:22 +0100
+Subject: [PATCH] Remove the Blivet's gpt flag
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Organization: Invisible Things Lab
+Cc: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+
+Blivet doesn't use this flag, so let's use our config instead.
+
+(modified for f29 code base)
+Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/platform.py          | 4 ++--
+ pyanaconda/storage/osinstall.py | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/platform.py b/pyanaconda/platform.py
+index c46c91ad1..efdac54ec 100644
+--- a/pyanaconda/platform.py
++++ b/pyanaconda/platform.py
+@@ -25,9 +25,9 @@ log = logging.getLogger("anaconda.storage")
+ from blivet import arch
+ from blivet.devicelibs import raid
+ from blivet.formats import get_device_format_class
+-from blivet.flags import flags
+ from blivet.size import Size
+ from pyanaconda.core.i18n import _, N_
++from pyanaconda.flags import flags as anaconda_flags
+ from pyanaconda.storage.partspec import PartSpec
+ 
+ 
+@@ -66,7 +66,7 @@ class Platform(object):
+         self.update_from_flags()
+ 
+     def update_from_flags(self):
+-        if flags.gpt:
++        if anaconda_flags.gpt:
+             disklabel_class = get_device_format_class("disklabel")
+             disklabel_types = disklabel_class.get_platform_label_types()
+             if "gpt" not in disklabel_types:
+diff --git a/pyanaconda/storage/osinstall.py b/pyanaconda/storage/osinstall.py
+index 92c4bd222..4256d76cf 100644
+--- a/pyanaconda/storage/osinstall.py
++++ b/pyanaconda/storage/osinstall.py
+@@ -118,7 +118,6 @@ def update_blivet_flags(blivet_flags, anaconda_flags):  # pylint: disable=redefi
+     blivet_flags.selinux = anaconda_flags.selinux
+ 
+     blivet_flags.arm_platform = anaconda_flags.armPlatform
+-    blivet_flags.gpt = anaconda_flags.gpt
+ 
+     blivet_flags.multipath_friendly_names = anaconda_flags.mpathFriendlyNames
+     blivet_flags.allow_imperfect_devices = anaconda_flags.rescue_mode
+-- 
+2.20.1
+
