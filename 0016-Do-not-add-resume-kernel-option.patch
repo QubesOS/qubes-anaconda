@@ -1,0 +1,37 @@
+From b34761c330896bb4f80950a359d1485945ec8271 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 17:53:14 +0100
+Subject: [PATCH] Do not add resume= kernel option
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Qubes don't support hibernation.
+
+From ea91297b2a7599937ceeefeb21a3a185db9118f2
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/bootloader/base.py | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
+index cf9a24170..84b74afed 100644
+--- a/pyanaconda/bootloader/base.py
++++ b/pyanaconda/bootloader/base.py
+@@ -727,12 +727,6 @@ class BootLoader(object):
+         swap_devices = storage.fsset.swap_devices
+         dracut_devices.extend(swap_devices)
+ 
+-        # Add resume= option to enable hibernation on x86.
+-        # Choose the largest swap device for that.
+-        if blivet.arch.is_x86() and swap_devices:
+-            resume_device = max(swap_devices, key=lambda x: x.size)
+-            self.boot_args.add("resume=%s" % resume_device.fstab_spec)
+-
+         # Does /usr have its own device? If so, we need to tell dracut
+         usr_device = storage.mountpoints.get("/usr")
+         if usr_device:
+-- 
+2.21.0
+

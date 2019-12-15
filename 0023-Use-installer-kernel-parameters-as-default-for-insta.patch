@@ -1,0 +1,36 @@
+From cf611b648a7b60cbebc2f58a357fe32a3c433d80 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 18:39:15 +0100
+Subject: [PATCH] Use installer kernel parameters as default for installed
+
+This way if any kernel parameter was need to boot Qubes on particular hardware, it will also be set to installed system
+
+Fixes QubesOS/qubes-issues#1650
+
+Adapted from a98ba275162937a56f7ca1ee5428b00de883677a
+---
+ pyanaconda/bootloader/base.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
+index 84b74afed..b0b65fd1a 100644
+--- a/pyanaconda/bootloader/base.py
++++ b/pyanaconda/bootloader/base.py
+@@ -814,8 +814,11 @@ class BootLoader(object):
+ 
+     def _preserve_some_boot_args(self):
+         """Preserve some of the boot args."""
+-        for opt in conf.bootloader.preserved_arguments:
+-            if opt not in flags.cmdline:
++        global_no_preserve_args = ["stage2", "root", "rescue", "rd.live.check",
++                                   "ip", "repo", "ks", "rd.md", "rd.luks",
++                                   "rd.dm", "rd.lvm.lv", "rd.lvm"]
++        for opt in flags.cmdline.keys():
++            if opt in global_no_preserve_args:
+                 continue
+ 
+             arg = flags.cmdline.get(opt)
+-- 
+2.21.0
+

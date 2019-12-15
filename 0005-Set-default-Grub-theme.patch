@@ -1,0 +1,37 @@
+From fab1693c1c68faf6e7f977949f95ba048ad5e38e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 10:45:59 +0100
+Subject: [PATCH] Set default Grub theme
+
+From baf1fa8ed259a138f3fd84a0c7fcca60734158fc
+By Marek Marczykowski <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/bootloader/grub2.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
+index 28d146650..79f982a06 100644
+--- a/pyanaconda/bootloader/grub2.py
++++ b/pyanaconda/bootloader/grub2.py
+@@ -103,7 +103,7 @@ class GRUB2(BootLoader):
+     _config_dir = "grub2"
+     _passwd_file = "user.cfg"
+     defaults_file = "/etc/default/grub"
+-    terminal_type = "console"
++    terminal_type = "gfxterm"
+     stage2_max_end = None
+ 
+     _device_map_file = "device.map"
+@@ -268,7 +268,7 @@ class GRUB2(BootLoader):
+         log.info("bootloader.py: used boot args: %s ", self.boot_args)
+         defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
+         defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
+-        #defaults.write("GRUB_THEME=\"/boot/grub2/themes/system/theme.txt\"\n")
++        defaults.write("GRUB_THEME=\"/boot/grub2/themes/qubes/theme.txt\"\n")
+ 
+         if self.use_bls and os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
+             log.warning("BLS support disabled due new-kernel-pkg being present")
+-- 
+2.21.0
+

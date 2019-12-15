@@ -1,0 +1,55 @@
+From 30b224696540280f875156f5ab4a5ad6f1da5f13 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 19:18:58 +0100
+Subject: [PATCH] Do not fail during initramfs start-up due to missing url-lib
+
+Based on b64c82d43d5d25fefe5fb16d3d925d356c6527a3
+---
+ dracut/anaconda-ks-sendheaders.sh | 10 +++++++++-
+ dracut/anaconda-lib.sh            |  8 +++++++-
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/dracut/anaconda-ks-sendheaders.sh b/dracut/anaconda-ks-sendheaders.sh
+index 7bc97393b..39fa0ce0d 100755
+--- a/dracut/anaconda-ks-sendheaders.sh
++++ b/dracut/anaconda-ks-sendheaders.sh
+@@ -2,7 +2,15 @@
+ # anaconda-ks-sendheaders.sh - set various HTTP headers for kickstarting
+ 
+ [ -f /tmp/.ks_sendheaders ] && return
+-command -v set_http_header >/dev/null || . /lib/url-lib.sh
++
++if ! command -v set_http_header >/dev/null; then
++    if ! [ -r /lib/url-lib.sh ]; then
++        alias set_http_header=:
++        return
++    fi
++
++    . /lib/url-lib.sh
++fi
+ 
+ # inst.ks.sendmac: send MAC addresses in HTTP headers
+ if getargbool 0 kssendmac inst.ks.sendmac; then
+diff --git a/dracut/anaconda-lib.sh b/dracut/anaconda-lib.sh
+index 868aebbe6..436384f6c 100755
+--- a/dracut/anaconda-lib.sh
++++ b/dracut/anaconda-lib.sh
+@@ -2,7 +2,13 @@
+ 
+ command -v unpack_img >/dev/null || . /lib/img-lib.sh
+ command -v getarg >/dev/null || . /lib/dracut-lib.sh
+-command -v fetch_url >/dev/null || . /lib/url-lib.sh
++if ! command -v fetch_url >/dev/null; then
++    if ! [ -r /lib/url-lib.sh ]; then
++        alias fetch_url=:
++    else
++        . /lib/url-lib.sh
++    fi
++fi
+ 
+ # config_get SECTION KEY < FILE
+ # read an .ini-style config file, find the KEY in the given SECTION, and return
+-- 
+2.21.0
+

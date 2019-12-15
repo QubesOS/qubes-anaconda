@@ -1,0 +1,49 @@
+From 77fa6e67ebbdf564a5efd1c6781faad75234aa59 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 17 Dec 2019 13:47:10 +0100
+Subject: [PATCH] Do not mount pre-existing partitions and do not detect OS
+ there
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This operation may be harmfull in many ways:
+ - may unintentionally modify a disk not selected as installation target
+   (mounting even read only replays journal for example)
+ - if previous system was compromised, it may try to exploit some of the
+   parsing code (filesystem driver etc) to survive across
+   re-installation
+
+QubesOS/qubes-issues#2835
+
+From 1ce66b58907e229e21a0012a7a36ae93e9e32054
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/storage/root.py | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/pyanaconda/storage/root.py b/pyanaconda/storage/root.py
+index cdf4d5019..d22f5e2d8 100644
+--- a/pyanaconda/storage/root.py
++++ b/pyanaconda/storage/root.py
+@@ -76,14 +76,8 @@ def find_existing_installations(devicetree, teardown_all=True):
+     :param bool teardown_all: whether to tear down all devices in the end
+     :return: roots of all found installations
+     """
+-    try:
+-        roots = _find_existing_installations(devicetree)
+-        return roots
+-    except Exception:  # pylint: disable=broad-except
+-        log_exception_info(log.info, "failure detecting existing installations")
+-    finally:
+-        if teardown_all:
+-            devicetree.teardown_all()
++    if teardown_all:
++        devicetree.teardown_all()
+ 
+     return []
+ 
+-- 
+2.21.0
+

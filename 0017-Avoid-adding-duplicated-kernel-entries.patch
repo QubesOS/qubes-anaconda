@@ -1,0 +1,38 @@
+From e4e5be10ef37fa505cee1cbc8f94a191b8f19dd2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 17:58:11 +0100
+Subject: [PATCH] Avoid adding duplicated kernel entries
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+List kernel versions without duplicates, even when there are multiple
+files related to the same kernel version.
+Duplicated kernel versions here caused regenerating initramfs multiple
+times and duplicated entries in xen.cfg.
+
+QubesOS/qubes-issues#3624
+
+From 3e43d418605666c785c5b2042a404bad828c903e
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/payload/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index 8cc45f8da..c5d0b519d 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -668,7 +668,7 @@ class PackagePayload(Payload, metaclass=ABCMeta):
+                          if fnmatch(f, "/boot/vmlinuz-*") or
+                          fnmatch(f, "/boot/efi/EFI/%s/vmlinuz-*" % conf.bootloader.efi_dir)))
+ 
+-        return sorted(files, key=functools.cmp_to_key(payload_utils.version_cmp))
++        return sorted(set(files), key=functools.cmp_to_key(payload_utils.version_cmp))
+ 
+     @property
+     def rpm_macros(self):
+-- 
+2.21.0
+

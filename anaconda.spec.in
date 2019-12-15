@@ -1,0 +1,393 @@
+# Avoid anaconda-core requiring gjs-console due to the GNOME welcome
+# screen that's shipped in it
+%global __requires_exclude_from ^%{_datadir}/anaconda/gnome/fedora-welcome.*$
+
+Summary: Graphical system installer
+Name:    anaconda
+Version: @VERSION@
+Release: @REL@%{?dist}
+License: GPLv2+ and MIT
+Epoch:   1000
+URL:     http://fedoraproject.org/wiki/Anaconda
+
+# To generate Source0 do:
+# git clone https://github.com/rhinstaller/anaconda
+# git checkout -b archive-branch anaconda-%%{version}-%%{release}
+# ./autogen.sh
+# make dist
+Source0: %{name}-%{version}.tar.bz2
+Source1: qubesos.conf
+Source2: QubesPlaceholder.txt
+Source3: QubesPlaceholder.html
+Source4: QubesPlaceholderWithLinks.html
+
+Patch0: 0001-add-Qubes-post-scripts.patch
+Patch1: 0002-Define-QUBESOS-partitionning.patch
+Patch2: 0003-check-for-Qubes-OS-hardware-required-features.patch
+Patch3: 0004-Fix-grub-config-setup-by-removing-non-xen-options.patch
+Patch4: 0005-Set-default-Grub-theme.patch
+Patch5: 0006-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
+Patch6: 0007-Add-Qubes-grub2-default-parameters.patch
+Patch7: 0008-Abort-installation-on-X-startup-fail.patch
+Patch8: 0009-Mark-qubes-user-name-as-reserved.patch
+Patch9: 0010-Check-add-user-to-wheel-and-qubes-groups.patch
+Patch10: 0011-Simplify-USER-configuration-spoke.patch
+Patch11: 0012-Make-sure-that-a-user-is-created-at-installation-tim.patch
+Patch12: 0013-Disable-network-by-ignoring-any-present-nic.patch
+Patch13: 0014-Remove-network-setup-from-graphical-and-text-interfa.patch
+Patch14: 0015-Drop-NTP-configuration-spoke.patch
+Patch15: 0016-Do-not-add-resume-kernel-option.patch
+Patch16: 0017-Avoid-adding-duplicated-kernel-entries.patch
+Patch17: 0018-Set-default-scheme-in-custom-partitioning.patch
+Patch18: 0019-fix-dracut-module-to-work-with-reduced-dependencies.patch
+Patch19: 0020-Use-kernel-install-instead-of-grubby-to-regenerate.patch
+Patch20: 0021-Do-not-fail-during-initramfs-start-up-due-to-missing.patch
+Patch21: 0022-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch22: 0023-Use-installer-kernel-parameters-as-default-for-insta.patch
+Patch23: 0024-Generate-proper-extlinux.conf.patch
+Patch24: 0025-root_password-remove-ssh-options.patch
+Patch25: 0026-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
+Patch26: 0027-Set-encrypted-partitioning-by-default.patch
+
+# Versions of required components (done so we make sure the buildrequires
+# match the requires versions of things).
+
+%define blivetguiver 2.1.7-2
+%define dbusver 1.2.3
+%define dnfver 3.6.0
+%define dracutver 034-7
+%define fcoeutilsver 1.0.12-3.20100323git
+%define gettextver 0.19.8
+%define gtk3ver 3.22.17
+%define helpver 22.1-1
+%define isomd5sum 1.0.10
+%define langtablever 0.0.44
+%define libarchivever 3.0.4
+%define libblockdevver 2.1
+%define libtimezonemapver 0.4.1-2
+%define libxklavierver 5.4
+%define mehver 0.23-1
+%define nmver 1.0
+%define pykickstartver 3.21-1
+%define pypartedver 2.5-2
+%define rpmver 4.10.0
+%define simplelinever 1.1-1
+%define utillinuxver 2.15.1
+
+BuildRequires: audit-libs-devel
+BuildRequires: libtool
+BuildRequires: gettext-devel >= %{gettextver}
+BuildRequires: gtk3-devel >= %{gtk3ver}
+BuildRequires: gtk-doc
+BuildRequires: gtk3-devel-docs >= %{gtk3ver}
+BuildRequires: glib2-doc
+BuildRequires: gobject-introspection-devel
+BuildRequires: glade-devel
+BuildRequires: libgnomekbd-devel
+BuildRequires: libxklavier-devel >= %{libxklavierver}
+BuildRequires: pango-devel
+BuildRequires: python3-kickstart >= %{pykickstartver}
+BuildRequires: python3-devel
+BuildRequires: python3-nose
+BuildRequires: systemd
+# rpm and libarchive are needed for driver disk handling
+BuildRequires: rpm-devel >= %{rpmver}
+BuildRequires: libarchive-devel >= %{libarchivever}
+%ifarch s390 s390x
+BuildRequires: s390utils-devel
+%endif
+BuildRequires: libtimezonemap-devel >= %{libtimezonemapver}
+
+# Tools used by the widgets resource bundle generation
+BuildRequires: gdk-pixbuf2-devel
+BuildRequires: libxml2
+
+Requires: anaconda-core = %{epoch}:%{version}-%{release}
+Requires: anaconda-gui = %{epoch}:%{version}-%{release}
+Requires: anaconda-tui = %{epoch}:%{version}-%{release}
+Requires: anaconda-install-env-deps = %{epoch}:%{version}-%{release}
+
+%description
+The anaconda package is a metapackage for the Anaconda installer.
+
+%package core
+Summary: Core of the Anaconda installer
+Requires: python3-libs
+Requires: python3-dnf >= %{dnfver}
+Requires: python3-blivet >= 1:3.1.5-1
+Requires: python3-blockdev >= %{libblockdevver}
+Requires: python3-meh >= %{mehver}
+Requires: libreport-anaconda >= 2.0.21-1
+Requires: libselinux-python3
+Requires: rpm-python3 >= %{rpmver}
+Requires: python3-pyparted >= %{pypartedver}
+Requires: python3-requests
+Requires: python3-requests-file
+Requires: python3-requests-ftp
+Requires: python3-kickstart >= %{pykickstartver}
+Requires: python3-langtable >= %{langtablever}
+Requires: util-linux >= %{utillinuxver}
+Requires: python3-gobject-base
+Requires: python3-dbus
+Requires: python3-pwquality
+Requires: python3-systemd
+Requires: python3-pydbus
+Requires: python3-productmd
+Requires: flatpak-libs
+
+# pwquality only "recommends" the dictionaries it needs to do anything useful,
+# which is apparently great for containers but unhelpful for the rest of us
+Requires: cracklib-dicts
+
+Requires: python3-pytz
+Requires: teamd
+%ifarch s390 s390x
+Requires: openssh
+%endif
+Requires: NetworkManager >= %{nmver}
+Requires: NetworkManager-libnm >= %{nmver}
+Requires: NetworkManager-team
+Requires: kbd
+Requires: chrony
+Requires: python3-ntplib
+Requires: systemd
+Requires: python3-pid
+Requires: python3-ordered-set >= 2.0.0
+
+# required because of the rescue mode and VNC question
+Requires: anaconda-tui = %{epoch}:%{version}-%{release}
+
+# Make sure we get the en locale one way or another
+Requires: glibc-langpack-en
+
+# check for supported hardware on Qubes OS require xl binary
+Requires: xen-runtime
+
+Obsoletes: anaconda-images <= 10
+Provides: anaconda-images = %{version}-%{release}
+Obsoletes: anaconda-runtime < %{version}-%{release}
+Provides: anaconda-runtime = %{version}-%{release}
+Obsoletes: booty <= 0.107-1
+
+%description core
+The anaconda-core package contains the program which was used to install your
+system.
+
+%package live
+Summary: Live installation specific files and dependencies
+BuildRequires: desktop-file-utils
+# live installation currently implies a graphical installation
+Requires: anaconda-gui = %{version}-%{release}
+Requires: usermode
+Requires: zenity
+
+%description live
+The anaconda-live package contains scripts, data and dependencies required
+for live installations.
+
+%package install-env-deps
+Summary: Installation environment specific dependencies
+Requires: udisks2-iscsi
+Requires: libblockdev-plugins-all >= %{libblockdevver}
+# active directory/freeipa join support
+Requires: realmd
+Requires: isomd5sum >= %{isomd5sum}
+%ifarch %{ix86} x86_64
+Requires: fcoe-utils >= %{fcoeutilsver}
+%endif
+# likely HFS+ resize support
+%ifarch %{ix86} x86_64
+%if ! 0%{?rhel}
+Requires: hfsplus-tools
+%endif
+%endif
+# kexec support
+Requires: kexec-tools
+Requires: createrepo_c
+# run's on TTY1 in install env
+Requires: tmux
+# install time crash handling
+Requires: gdb
+Requires: rsync
+
+%description install-env-deps
+The anaconda-install-env-deps metapackage lists all installation environment dependencies.
+This makes it possible for packages (such as Initial Setup) to depend on the main Anaconda package without
+pulling in all the install time dependencies as well.
+
+%package gui
+Summary: Graphical user interface for the Anaconda installer
+Requires: anaconda-core = %{epoch}:%{version}-%{release}
+Requires: anaconda-widgets = %{epoch}:%{version}-%{release}
+Requires: python3-meh-gui >= %{mehver}
+Requires: adwaita-icon-theme
+Requires: tigervnc-server-minimal
+Requires: libxklavier >= %{libxklavierver}
+Requires: libgnomekbd
+Requires: libtimezonemap >= %{libtimezonemapver}
+Requires: nm-connection-editor
+Requires: keybinder3
+%ifnarch s390 s390x
+Requires: NetworkManager-wifi
+%endif
+Requires: anaconda-user-help >= %{helpver}
+Requires: yelp
+Requires: blivet-gui-runtime >= %{blivetguiver}
+Requires: system-logos
+
+# Needed to compile the gsettings files
+BuildRequires: gsettings-desktop-schemas
+BuildRequires: metacity
+
+%description gui
+This package contains graphical user interface for the Anaconda installer.
+
+%package tui
+Summary: Textual user interface for the Anaconda installer
+Requires: anaconda-core = %{epoch}:%{version}-%{release}
+Requires: python3-simpleline >= %{simplelinever}
+
+%description tui
+This package contains textual user interface for the Anaconda installer.
+
+%package widgets
+Summary: A set of custom GTK+ widgets for use with anaconda
+Requires: python3
+
+%description widgets
+This package contains a set of custom GTK+ widgets used by the anaconda installer.
+
+%package widgets-devel
+Summary: Development files for anaconda-widgets
+Requires: glade
+Requires: %{name}-widgets%{?_isa} = %{epoch}:%{version}-%{release}
+
+%description widgets-devel
+This package contains libraries and header files needed for writing the anaconda
+installer.  It also contains Python and Glade support files, as well as
+documentation for working with this library.
+
+%package dracut
+Summary: The anaconda dracut module
+Requires: dracut >= %{dracutver}
+Requires: dracut-network
+Requires: dracut-live
+Requires: xz
+Requires: python3-kickstart
+
+%description dracut
+The 'anaconda' dracut module handles installer-specific boot tasks and
+options. This includes driver disks, kickstarts, and finding the anaconda
+runtime on NFS/HTTP/FTP servers or local disks.
+
+%prep
+%autosetup -p1
+
+# Copy QubesOS product file
+cp %{SOURCE1} data/product.d/
+
+# Inject QubesOS documentation directly
+mkdir -p %{buildroot}%{_datadir}/anaconda/help
+cp -r %{SOURCE2} %{SOURCE3} %{SOURCE4} data/product.d/
+
+%build
+#WIP: autoreconf -v --install .
+%configure ANACONDA_RELEASE=%{release}
+%{__make} %{?_smp_mflags}
+
+%install
+%{make_install}
+find %{buildroot} -type f -name "*.la" | xargs %{__rm}
+
+# Create an empty directory for addons
+mkdir %{buildroot}%{_datadir}/anaconda/addons
+
+# required for live installations
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
+
+# If no langs found, keep going
+%find_lang %{name} || :
+
+%ldconfig_scriptlets widgets
+
+
+
+# main package and install-env-deps are metapackages
+%files
+
+%files install-env-deps
+
+# Allow the lang file to be empty
+%define _empty_manifest_terminate_build 0
+
+%files core -f %{name}.lang
+%license COPYING
+%{_unitdir}/*
+%{_prefix}/lib/systemd/system-generators/*
+%{_bindir}/instperf
+%{_bindir}/anaconda-disable-nm-ibft-plugin
+%{_sbindir}/anaconda
+%{_sbindir}/handle-sshpw
+%{_datadir}/anaconda
+%{_prefix}/libexec/anaconda
+%exclude %{_datadir}/anaconda/gnome
+%exclude %{_datadir}/anaconda/pixmaps
+%exclude %{_datadir}/anaconda/ui
+%exclude %{_datadir}/anaconda/window-manager
+%exclude %{_datadir}/anaconda/anaconda-gtk.css
+%exclude %{_prefix}/libexec/anaconda/dd_*
+%{python3_sitearch}/pyanaconda
+%exclude %{python3_sitearch}/pyanaconda/rescue.py*
+%exclude %{python3_sitearch}/pyanaconda/__pycache__/rescue.*
+%exclude %{python3_sitearch}/pyanaconda/ui/gui/*
+%exclude %{python3_sitearch}/pyanaconda/ui/tui/*
+%{_bindir}/analog
+%{_bindir}/anaconda-cleanup
+%dir %{_sysconfdir}/%{name}
+%config %{_sysconfdir}/%{name}/*
+%dir %{_sysconfdir}/%{name}/conf.d
+%config %{_sysconfdir}/%{name}/conf.d/*
+%dir %{_sysconfdir}/%{name}/product.d
+%config %{_sysconfdir}/%{name}/product.d/*
+
+%files live
+%{_bindir}/liveinst
+%{_sbindir}/liveinst
+%config(noreplace) %{_sysconfdir}/pam.d/*
+%config(noreplace) %{_sysconfdir}/security/console.apps/*
+%{_libexecdir}/liveinst-setup.sh
+%{_datadir}/applications/*.desktop
+%{_datadir}/anaconda/gnome
+%{_sysconfdir}/xdg/autostart/*.desktop
+
+%files gui
+%{python3_sitearch}/pyanaconda/ui/gui/*
+%{_datadir}/anaconda/pixmaps
+%{_datadir}/anaconda/ui
+%{_datadir}/anaconda/window-manager
+%{_datadir}/anaconda/anaconda-gtk.css
+
+%files tui
+%{python3_sitearch}/pyanaconda/rescue.py
+%{python3_sitearch}/pyanaconda/__pycache__/rescue.*
+%{python3_sitearch}/pyanaconda/ui/tui/*
+
+%files widgets
+%{_libdir}/libAnacondaWidgets.so.*
+%{_libdir}/girepository*/AnacondaWidgets*typelib
+%{python3_sitearch}/gi/overrides/*
+
+%files widgets-devel
+%{_libdir}/libAnacondaWidgets.so
+%{_libdir}/glade/modules/libAnacondaWidgets.so
+%{_includedir}/*
+%{_datadir}/glade/catalogs/AnacondaWidgets.xml
+%{_datadir}/gtk-doc
+
+%files dracut
+%dir %{_prefix}/lib/dracut/modules.d/80%{name}
+%{_prefix}/lib/dracut/modules.d/80%{name}/*
+%{_prefix}/libexec/anaconda/dd_*
+
+%changelog
+@CHANGELOG@

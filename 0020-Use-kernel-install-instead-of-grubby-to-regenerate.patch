@@ -1,0 +1,61 @@
+From 714a4b237a3d88b1462c7ba4233682df1561146d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 18:17:29 +0100
+Subject: [PATCH] Use kernel-install instead of grubby to regenerate
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since we have own hook there, it properly handles Xen. This means we no longer need post scripts in kickstart for that.
+
+From 5990cce6eb095f72d62e0cc174c80cf30152021a
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/payload/__init__.py | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
+
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index c5d0b519d..210fcf80a 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -522,33 +522,18 @@ class Payload(metaclass=ABCMeta):
+         return False
+ 
+     def recreate_initrds(self):
+-        """Recreate the initrds by calling new-kernel-pkg or dracut
++        """Recreate the initrds by calling kernel-install or dracut
+ 
+         This needs to be done after all configuration files have been
+         written, since dracut depends on some of them.
+ 
+         :returns: None
+         """
+-        if os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
+-            use_dracut = False
+-        else:
+-            log.warning("new-kernel-pkg does not exist - grubby wasn't installed? "
+-                        " using dracut instead.")
+-            use_dracut = True
+-
+         for kernel in self.kernel_version_list:
+             log.info("recreating initrd for %s", kernel)
+             if not conf.target.is_image:
+-                if use_dracut:
+-                    util.execInSysroot("depmod", ["-a", kernel])
+-                    util.execInSysroot("dracut",
+-                                       ["-f",
+-                                        "/boot/initramfs-%s.img" % kernel,
+-                                        kernel])
+-                else:
+-                    util.execInSysroot("new-kernel-pkg",
+-                                       ["--mkinitrd", "--dracut", "--depmod",
+-                                        "--update", kernel])
++                util.execInSysroot("kernel-install",
++                                   ["add", kernel, "/boot/vmlinuz-%s" % kernel])
+ 
+                 # if the installation is running in fips mode then make sure
+                 # fips is also correctly enabled in the installed system
+-- 
+2.21.0
+
