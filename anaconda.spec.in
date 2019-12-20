@@ -39,15 +39,14 @@ Patch14: 0015-Drop-NTP-configuration-spoke.patch
 Patch15: 0016-Do-not-add-resume-kernel-option.patch
 Patch16: 0017-Avoid-adding-duplicated-kernel-entries.patch
 Patch17: 0018-Set-default-scheme-in-custom-partitioning.patch
-Patch18: 0019-fix-dracut-module-to-work-with-reduced-dependencies.patch
-Patch19: 0020-Use-kernel-install-instead-of-grubby-to-regenerate.patch
-Patch20: 0021-Do-not-fail-during-initramfs-start-up-due-to-missing.patch
-Patch21: 0022-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
-Patch22: 0023-Use-installer-kernel-parameters-as-default-for-insta.patch
-Patch23: 0024-Generate-proper-extlinux.conf.patch
-Patch24: 0025-root_password-remove-ssh-options.patch
-Patch25: 0026-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
-Patch26: 0027-Set-encrypted-partitioning-by-default.patch
+Patch18: 0019-Use-kernel-install-instead-of-grubby-to-regenerate.patch
+Patch19: 0020-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch20: 0021-Use-installer-kernel-parameters-as-default-for-insta.patch
+Patch21: 0022-Generate-proper-extlinux.conf.patch
+Patch22: 0023-root_password-remove-ssh-options.patch
+Patch23: 0024-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
+Patch24: 0025-Set-encrypted-partitioning-by-default.patch
+Patch25: 0026-Set-default-hostname-to-dom0.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
