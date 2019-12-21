@@ -1,6 +1,6 @@
 DIST ?= fc31
 VERSION := $(shell cat version)
-REL := $(shell cat rel)
+REL := 2
 
 SRC_RPM := anaconda-$(VERSION)-$(REL).$(DIST).src.rpm
 SRC_FILE := anaconda-$(VERSION).tar.bz2
