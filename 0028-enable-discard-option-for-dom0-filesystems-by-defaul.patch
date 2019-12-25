@@ -1,0 +1,33 @@
+From 633dc89cae0ebd597cc9069fdced3c8485ba5e46 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Wed, 25 Dec 2019 09:36:06 +0100
+Subject: [PATCH] enable discard option for dom0 filesystems by default
+
+This may have performance impact on some older SSD, but on the other
+hand, without this option it's pretty easy to fill the whole LVM thin
+pool even if there is plenty free space in dom0.
+Note that this doesn't enable it on LUKS layer, this is still disabled
+by default.
+
+Fixes QubesOS/qubes-issues#3226
+---
+ pyanaconda/storage/fsset.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pyanaconda/storage/fsset.py b/pyanaconda/storage/fsset.py
+index 8d2390ddb..6117c6d0a 100644
+--- a/pyanaconda/storage/fsset.py
++++ b/pyanaconda/storage/fsset.py
+@@ -771,6 +771,8 @@ class FSSet(object):
+                     break
+             if device.encrypted:
+                 options += ",x-systemd.device-timeout=0"
++            if mountpoint.startswith('/'):
++                options += ",discard"
+             devspec = device.fstab_spec
+             dump = device.format.dump
+             if device.format.check and mountpoint == "/":
+-- 
+2.21.0
+
