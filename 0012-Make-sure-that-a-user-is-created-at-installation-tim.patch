@@ -4,6 +4,7 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
 Date: Sun, 15 Dec 2019 17:30:10 +0100
 Subject: [PATCH] Make sure that a user is created at installation time
 
+But allow to defer it when kickstart is used.
 ---
  pyanaconda/ui/gui/spokes/user.py | 5 ++---
  pyanaconda/ui/tui/spokes/user.py | 8 ++------
@@ -35,7 +36,7 @@ index a028a556b..ea51534fc 100644
      def mandatory(self):
          """Only mandatory if no admin user has been requested."""
 -        return not self._users_module.CheckAdminUserExists()
-+        return True
++        return not flags.automatedInstall
  
      def apply(self):
          # set the password only if the user enters anything to the text entry
@@ -75,7 +76,7 @@ index ac01deb8a..b915368c6 100644
      def mandatory(self):
          """Only mandatory if no admin user has been requested."""
 -        return not self._users_module.CheckAdminUserExists()
-+        return True
++        return not flags.automatedInstall
  
      @property
      def status(self):
