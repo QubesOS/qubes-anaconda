@@ -44,7 +44,6 @@ Patch19: 0020-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
 Patch20: 0021-Use-installer-kernel-parameters-as-default-for-insta.patch
 Patch21: 0022-Generate-proper-extlinux.conf.patch
 Patch22: 0023-root_password-remove-ssh-options.patch
-Patch23: 0024-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
 Patch24: 0025-Set-encrypted-partitioning-by-default.patch
 Patch25: 0026-Set-default-hostname-to-dom0.patch
 Patch26: 0027-Setup-grubx64.efi-directly-as-a-bootloader.patch
