@@ -23,7 +23,7 @@ index 8d2390ddb..6117c6d0a 100644
                      break
              if device.encrypted:
                  options += ",x-systemd.device-timeout=0"
-+            if mountpoint.startswith('/'):
++            if fstype in ('ext4', 'btrfs', 'xfs', 'vfat'):
 +                options += ",discard"
              devspec = device.fstab_spec
              dump = device.format.dump
