@@ -1,24 +1,24 @@
 DIST ?= fc31
 VERSION := $(shell cat version)
-REL := 2
+REL := $(shell cat rel)
 
-SRC_RPM := anaconda-$(VERSION)-$(REL).$(DIST).src.rpm
+FEDORA_SOURCES := https://src.fedoraproject.org/rpms/anaconda/raw/f$(subst fc,,$(DIST))/f/sources
 SRC_FILE := anaconda-$(VERSION).tar.bz2
 
 BUILDER_DIR ?= ../..
 SRC_DIR ?= qubes-src
+
+DISTFILES_MIRROR ?= http://ftp.qubes-os.org/distfiles/
 UNTRUSTED_SUFF := .UNTRUSTED
-FETCH_CMD := $(BUILDER_DIR)/$(SRC_DIR)/builder-rpm/scripts/get_sources_from_srpm
+FETCH_CMD := wget --no-use-server-timestamps -q -O
 
 SHELL := /bin/bash
 
-%: %.sha512 %$(UNTRUSTED_SUFF)
+%: %.sha512
+	@$(FETCH_CMD) $@$(UNTRUSTED_SUFF) $(DISTFILES_MIRROR)$@
 	@sha512sum --status -c <(printf "$$(cat $<)  -\n") <$@$(UNTRUSTED_SUFF) || \
 		{ echo "Wrong SHA512 checksum on $@$(UNTRUSTED_SUFF)!"; exit 1; }
 	@mv $@$(UNTRUSTED_SUFF) $@
-
-$(SRC_FILE:%=%$(UNTRUSTED_SUFF)):
-	@$(FETCH_CMD) $(DIST) $(SRC_RPM) $(SRC_FILE)
 
 .PHONY: get-sources
 get-sources: $(SRC_FILE)
@@ -26,3 +26,7 @@ get-sources: $(SRC_FILE)
 .PHONY: verify-sources
 verify-sources:
 	@true
+
+.PHONY: update-sources
+update-sources:
+	@$(BUILDER_DIR)/$(SRC_DIR)/builder-rpm/scripts/generate-hashes-from-sources $(FEDORA_SOURCES)
