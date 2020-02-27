@@ -27,6 +27,10 @@ get-sources: $(SRC_FILE)
 verify-sources:
 	@true
 
+# This target is generating content locally from upstream project
+# 'sources' file. Sanitization is done but it is encouraged to perform
+# update of component in non-sensitive environnements to prevent
+# any possible local destructions due to shell rendering
 .PHONY: update-sources
 update-sources:
 	@$(BUILDER_DIR)/$(SRC_DIR)/builder-rpm/scripts/generate-hashes-from-sources $(FEDORA_SOURCES)
