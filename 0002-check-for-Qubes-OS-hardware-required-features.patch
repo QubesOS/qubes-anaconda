@@ -1,4 +1,4 @@
-From 77bf1b40cf0ce9c62ca2852def51b0ed90441bd5 Mon Sep 17 00:00:00 2001
+From 83ed670e0662cf73e2b38f824f4303de1f5f4fc7 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sat, 30 Nov 2019 17:36:29 +0100
@@ -70,5 +70,5 @@ index 25d01a208..841559ea8 100644
      # Check TAINT_SUPPORT_REMOVED
      if not conf.system.can_detect_support_removed:
 -- 
-2.25.1
+2.25.2
 

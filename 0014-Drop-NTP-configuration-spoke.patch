@@ -1,4 +1,4 @@
-From ac12e9eca85014280ae77b893c80dd1272b19fd9 Mon Sep 17 00:00:00 2001
+From 029406c615b6d83038e4b353e382cbee3c9115c8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:24:52 +0100
@@ -498,5 +498,5 @@ index aa7bc2ed7..a9972dfe0 100644
 -            else:
 -                self.clear_info()
 -- 
-2.25.1
+2.25.2
 

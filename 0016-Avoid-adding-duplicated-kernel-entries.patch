@@ -1,4 +1,4 @@
-From 75339d8f69e1c2803d3a461b029f0100b5de655d Mon Sep 17 00:00:00 2001
+From 906c44056bfbf8549391d0bc5b2a2181b46f4139 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:58:11 +0100
@@ -34,5 +34,5 @@ index be3530e59..853a50a8f 100644
      @property
      def rpm_macros(self):
 -- 
-2.25.1
+2.25.2
 

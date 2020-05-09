@@ -1,4 +1,4 @@
-From 1a9b116559cb887649f219d521cb79cf27145964 Mon Sep 17 00:00:00 2001
+From 301ce19d8f3e7f0525a30fa141df55bde7c83019 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:28:13 +0100
@@ -30,5 +30,5 @@ index 85bbe00a4..5dd3b1570 100644
              zfcp.startup()
  
 -- 
-2.25.1
+2.25.2
 

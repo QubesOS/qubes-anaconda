@@ -1,4 +1,4 @@
-From d98365df2f290d3557442f1cff28a721ba02df7f Mon Sep 17 00:00:00 2001
+From 42a80842b795cdf57c6406ab47d9c16536d7e713 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Fri, 20 Dec 2019 10:23:25 +0100
@@ -36,5 +36,5 @@ index f8e9b19a1..8ddb17650 100644
  network_connected = None
  network_connected_condition = threading.Condition()
 -- 
-2.25.1
+2.25.2
 

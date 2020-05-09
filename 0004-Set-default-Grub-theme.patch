@@ -1,4 +1,4 @@
-From bab95cb2526e2d6a212fa4710ee360be4f42e48b Mon Sep 17 00:00:00 2001
+From 432eda0e89b35fa61988b509c18214f0128d17eb Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 10:45:59 +0100
@@ -33,5 +33,5 @@ index ab17af31d..daf9fc53e 100644
          if self.use_bls and os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
              log.warning("BLS support disabled due new-kernel-pkg being present")
 -- 
-2.25.1
+2.25.2
 

@@ -1,4 +1,4 @@
-From 68d719b7bbd9777d1d342c399cfd8455185300cd Mon Sep 17 00:00:00 2001
+From c02c1554d55bf1840e257e7a1a6ff82e05b53df1 Mon Sep 17 00:00:00 2001
 From: Tomasz Sterna <tomek@xiaoka.com>
 Date: Fri, 19 Oct 2018 08:02:11 +0200
 Subject: [PATCH] add Qubes post-scripts
@@ -81,5 +81,5 @@ index 7d78d4bc3..ad2f6497d 100644
 +dist_postscripts_DATA = 40-qubes-alt-kernels.ks 50-qubes.ks 60-systemd-preset.ks 80-setfilecons.ks 90-copy-screenshots.ks 99-copy-logs.ks
  MAINTAINERCLEANFILES = Makefile.in
 -- 
-2.25.1
+2.25.2
 

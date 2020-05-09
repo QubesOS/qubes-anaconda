@@ -1,4 +1,4 @@
-From 38a8fba9b803df4ce757e551886a604aed117416 Mon Sep 17 00:00:00 2001
+From fcc8742d9131b6feb25e3515b3dc97458c79cd90 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Wed, 25 Dec 2019 09:36:06 +0100
@@ -29,5 +29,5 @@ index ad0dc540e..4ee391440 100644
              dump = device.format.dump
              if device.format.check and mountpoint == "/":
 -- 
-2.25.1
+2.25.2
 

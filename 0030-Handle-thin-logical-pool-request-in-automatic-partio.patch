@@ -1,0 +1,248 @@
+From eb50a488b542ce20a24121184bd83932271927bb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Wed, 25 Mar 2020 18:00:48 +0100
+Subject: [PATCH] Handle thin logical pool request in automatic partioning
+
+QUBESOS_PARITIONING is added as an example of usecase.
+---
+ pyanaconda/core/configuration/storage.py      |  2 +
+ .../automatic/automatic_partitioning.py       | 35 ++++++++++
+ .../storage/partitioning/automatic/utils.py   | 66 +++++++++++++------
+ pyanaconda/storage/partspec.py                | 17 +++--
+ 4 files changed, 94 insertions(+), 26 deletions(-)
+
+diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
+index d01bd8a89..d17e51949 100644
+--- a/pyanaconda/core/configuration/storage.py
++++ b/pyanaconda/core/configuration/storage.py
+@@ -26,6 +26,7 @@ class PartitioningType(Enum):
+     """Type of the default partitioning."""
+     SERVER = "SERVER"
+     WORKSTATION = "WORKSTATION"
++    QUBESOS = "QUBESOS"
+ 
+ 
+ class StorageSection(Section):
+@@ -82,6 +83,7 @@ class StorageSection(Section):
+ 
+           SERVER       Choose partitioning for servers.
+           WORKSTATION  Choose partitioning for workstations.
++          QUBESOS      Choose partitioning for QubesOS.
+ 
+         :return: an instance of PartitioningType
+         """
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+index aed65f1bb..9a2b5ce0a 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+@@ -81,6 +81,38 @@ WORKSTATION_PARTITIONING = [
+     )
+ ]
+ 
++QUBESOS_PARTITIONING = [
++    PartSpec(
++        fstype="swap",
++        grow=False,
++        lv=True,
++        encrypted=True
++    ),
++    PartSpec(
++        size=Size("20GiB"),
++        grow=False,
++        lv=True,
++        thin_pool=True,
++        encrypted=True
++    ),
++    PartSpec(
++        mountpoint="/",
++        size=Size("1GiB"),
++        required_space=Size("10GiB"),
++        grow=True,
++        lv=True,
++        thin_volume=True,
++        encrypted=True
++    ),
++    PartSpec(
++        size=Size("20GiB"),
++        grow=True,
++        lv=True,
++        thin_pool=True,
++        encrypted=True
++    )
++]
++
+ 
+ def get_default_partitioning(partitioning_type=None):
+     """Get the default partitioning requests.
+@@ -97,6 +129,9 @@ def get_default_partitioning(partitioning_type=None):
+     if partitioning_type is PartitioningType.WORKSTATION:
+         return platform.set_default_partitioning() + WORKSTATION_PARTITIONING
+ 
++    if partitioning_type is PartitioningType.QUBESOS:
++        return platform.set_default_partitioning() + QUBESOS_PARTITIONING
++
+     raise ValueError("Invalid partitioning type: {}".format(conf.storage.default_partitioning))
+ 
+ 
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+index 4a1253e9c..c830007df 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+@@ -369,20 +369,35 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
+     # Convert requests into Device instances and schedule them for creation.
+     #
+     # Second pass, for LVs only.
++
+     pool = None
++    request_thin_pool = False
++    request_thin_volume = False
++    for request in requests:
++        if request.thin_pool:
++            request_thin_pool = True
++
++        if request.thin_volume:
++            request_thin_volume = True
++
++    if request_thin_volume and not request_thin_pool:
++        # create only one default thin pool if no thin_pool is requested
++        pool = new_volume(parents=[container], thin_pool=True, grow=True)
++        storage.create_device(pool)
++
++    if pool or request_thin_pool:
++        # make sure VG reserves space for the pool to grow if needed
++        container.thpool_reserve = DEFAULT_THPOOL_RESERVE
++
++    # TODO: Ensure requests are properly ordered:
++    #  VG -> Static LV
++    #  VG -> Thin Pool - > Thin Volume
+     for request in requests:
+         btr = bool(scheme == AUTOPART_TYPE_BTRFS and request.btr)
+         lv = bool(scheme in (AUTOPART_TYPE_LVM, AUTOPART_TYPE_LVM_THINP) and request.lv)
++        thinlp = bool(scheme == AUTOPART_TYPE_LVM_THINP and request.lv and request.thin_pool)
+         thinlv = bool(scheme == AUTOPART_TYPE_LVM_THINP and request.lv and request.thin_volume)
+ 
+-        if thinlv and pool is None:
+-            # create a single thin pool in the vg
+-            pool = storage.new_lv(parents=[container], thin_pool=True, grow=True)
+-            storage.create_device(pool)
+-
+-            # make sure VG reserves space for the pool to grow if needed
+-            container.thpool_reserve = DEFAULT_THPOOL_RESERVE
+-
+         if not btr and not lv and not thinlv:
+             continue
+ 
+@@ -391,32 +406,43 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
+            request.required_space and request.required_space > container.size:
+             continue
+ 
+-        if request.fstype is None:
++        if request.fstype is None and not thinlp:
+             if btr:
+                 # btrfs volumes can only contain btrfs filesystems
+                 request.fstype = "btrfs"
+             else:
+                 request.fstype = storage.default_fstype
+ 
+-        kwargs = {"mountpoint": request.mountpoint,
+-                  "fmt_type": request.fstype}
+-        if lv or thinlv:
++        kwargs = {
++            "mountpoint": request.mountpoint,
++            "fmt_type": request.fstype
++        }
++        if lv or thinlp or thinlv:
+             if thinlv:
++                # A previous request should have created pool
++                # or default pool will be used
+                 parents = [pool]
+             else:
+                 parents = [container]
+ 
+-            kwargs.update({"parents": parents,
+-                           "grow": request.grow,
+-                           "maxsize": request.max_size,
+-                           "size": request.size,
+-                           "thin_volume": thinlv})
++            kwargs.update({
++                "parents": parents,
++                "grow": request.grow,
++                "maxsize": request.max_size,
++                "size": request.size,
++                "thin_pool": thinlp,
++                "thin_volume": thinlv
++            })
+         else:
+-            kwargs.update({"parents": [container],
+-                           "size": request.size,
+-                           "subvol": True})
++            kwargs.update({
++                "parents": [container],
++                "size": request.size,
++                "subvol": True
++            })
+ 
+         dev = new_volume(**kwargs)
++        if thinlp:
++            pool = dev
+ 
+         # schedule the device for creation
+         storage.create_device(dev)
+diff --git a/pyanaconda/storage/partspec.py b/pyanaconda/storage/partspec.py
+index 4ffc4fc02..2d821b4d8 100644
+--- a/pyanaconda/storage/partspec.py
++++ b/pyanaconda/storage/partspec.py
+@@ -25,8 +25,9 @@ from blivet.util import stringize, unicodeize
+ class PartSpec(object):
+ 
+     def __init__(self, mountpoint=None, fstype=None, size=None, max_size=None,
+-                 grow=False, btr=False, lv=False, thin_volume=False, weight=0,
+-                 required_space=0, encrypted=False):
++                 grow=False, btr=False, lv=False, thin_pool=False,
++                 thin_volume=False, weight=0, required_space=0,
++                 encrypted=False):
+         """ Create a new storage specification.  These are used to specify
+             the default partitioning layout as an object before we have the
+             storage system up and running.  The attributes are obvious
+@@ -36,6 +37,8 @@ class PartSpec(object):
+                    it will be allocated as a partition.
+             lv -- Should this be allocated as a logical volume?  If not,
+                   it will be allocated as a partition.
++            thin_pool -- Should this be allocated as a thin logical pool
++                  if it is being allocated as a logical volume?
+             thin_volume -- Should this be allocated as a thin logical volume
+                   if it is being allocated as a logical volume?
+             weight -- An integer that modifies the sort algorithm for partition
+@@ -63,6 +66,7 @@ class PartSpec(object):
+         self.grow = grow
+         self.lv = lv
+         self.btr = btr
++        self.thin_pool = thin_pool
+         self.thin_volume = thin_volume
+         self.weight = weight
+         self.required_space = required_space
+@@ -71,15 +75,16 @@ class PartSpec(object):
+     # Force str and unicode types in case any of the properties are unicode
+     def _to_string(self):
+         s = ("%(type)s instance (%(id)s) -- \n"
+-             "  mountpoint = %(mountpoint)s  lv = %(lv)s"
+-             "  thin_volume = %(thin_volume)s  btrfs = %(btrfs)s\n"
++             "  mountpoint = %(mountpoint)s  lv = %(lv)s btrfs = %(btrfs)s"
++             "  thin_pool = %(thin_pool)s thin_volume = %(thin_volume)s\n"
+              "  weight = %(weight)s  fstype = %(fstype)s  encrypted = %(enc)s\n"
+              "  size = %(size)s  max_size = %(max_size)s  grow = %(grow)s\n" %
+              {"type": self.__class__.__name__, "id": "%#x" % id(self),
+               "mountpoint": self.mountpoint, "lv": self.lv, "btrfs": self.btr,
+               "weight": self.weight, "fstype": self.fstype, "size": self.size,
+-              "enc": self.encrypted, "max_size": self.max_size, "grow": self.grow,
+-              "thin_volume": self.thin_volume})
++              "enc": self.encrypted, "max_size": self.max_size,
++              "grow": self.grow, "thin_volume": self.thin_volume,
++              "thin_pool": self.thin_pool})
+ 
+         return s
+ 
+-- 
+2.25.2
+

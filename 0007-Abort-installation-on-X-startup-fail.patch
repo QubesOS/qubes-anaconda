@@ -1,4 +1,4 @@
-From afd26bcd942e71bdadc1da698c997973e41e1c99 Mon Sep 17 00:00:00 2001
+From 0fea278d68f1c557bc08073297312004c8be7a9c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:30:22 +0100
@@ -47,5 +47,5 @@ index 8379d9c90..6c1672f2d 100644
          if not anaconda.gui_startup_failed:
              do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
 -- 
-2.25.1
+2.25.2
 

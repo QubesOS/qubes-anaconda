@@ -1,4 +1,4 @@
-From 0822bbfc364e162f339ad4ef8c7a273f618962a2 Mon Sep 17 00:00:00 2001
+From a88fd6206520afc3e267b54695822e257a1373e8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Tue, 7 Jan 2020 19:20:22 +0100
@@ -24,5 +24,5 @@ index f9aa02db9..642f1ace4 100644
          # try to create a device name incorporating the hostname
          hostname = self._get_hostname()
 -- 
-2.25.1
+2.25.2
 

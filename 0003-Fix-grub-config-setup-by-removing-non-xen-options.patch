@@ -1,4 +1,4 @@
-From a5caf051afdab64513132c7a59208d833a3bfcb7 Mon Sep 17 00:00:00 2001
+From 6de19052b906d213a4199cf73ce65cc5cd1c7275 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 10:43:09 +0100
@@ -25,5 +25,5 @@ index 4695c1cd4..ab17af31d 100644
          if self.default is not None:
              machine_id_path = conf.target.system_root + "/etc/machine-id"
 -- 
-2.25.1
+2.25.2
 

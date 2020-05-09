@@ -1,4 +1,4 @@
-From ed083e47eef9801e5f3a1e6d5d523da43086fea2 Mon Sep 17 00:00:00 2001
+From 3fba6e9c7bfb256cc61a8819058190d5003ad485 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:55:40 +0100
@@ -44,5 +44,5 @@ index 3c8d2a7bb..ed3733075 100644
          # during an interactive installation. This is done by setting their name
          # to "". Then during apply() we will check the user name and if it is
 -- 
-2.25.1
+2.25.2
 

@@ -1,4 +1,4 @@
-From 68b1dc7c476ccba9e831b787700be35eaaf39455 Mon Sep 17 00:00:00 2001
+From 5f91961283edce75f676e0cf79df8be84739c08d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:14:53 +0100
@@ -33,5 +33,5 @@ index 26ab4d397..ee8a235c9 100644
          return supported_devices
  
 -- 
-2.25.1
+2.25.2
 

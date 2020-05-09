@@ -1,4 +1,4 @@
-From 64a28cf8ed5f66cd744252ddcf84526f317e28d3 Mon Sep 17 00:00:00 2001
+From 6a877be2f227748fc0fc9c3ec12be33e7dbd85f4 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Thu, 19 Dec 2019 16:32:48 +0100
@@ -22,5 +22,5 @@ index b64a0e1e5..077c88497 100644
          self._cipher = ""
          self._luks_version = ""
 -- 
-2.25.1
+2.25.2
 
