@@ -51,6 +51,7 @@ Patch26: 0027-enable-discard-option-for-dom0-filesystems-by-defaul.patch
 Patch27: 0028-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
 Patch28: 0029-automatic_partitioning-rename-thin-to-thin_volume-sa.patch
 Patch29: 0030-Handle-thin-logical-pool-request-in-automatic-partio.patch
+Patch30: 0031-Add-specific-BTRFS-automatic-partitioning-scheme.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).

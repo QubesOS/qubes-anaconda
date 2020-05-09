@@ -1,4 +1,4 @@
-From c0f2a208149e2e79321539041213bb1449d98f30 Mon Sep 17 00:00:00 2001
+From bc024cdb81be2395db9890917d88f0aabbb70005 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:39:15 +0100
@@ -10,19 +10,9 @@ Fixes QubesOS/qubes-issues#1650
 
 Adapted from a98ba275162937a56f7ca1ee5428b00de883677a
 ---
- .idea/.gitignore              | 2 ++
  pyanaconda/bootloader/base.py | 8 +++++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
- create mode 100644 .idea/.gitignore
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/.idea/.gitignore b/.idea/.gitignore
-new file mode 100644
-index 000000000..e7e9d11d4
---- /dev/null
-+++ b/.idea/.gitignore
-@@ -0,0 +1,2 @@
-+# Default ignored files
-+/workspace.xml
 diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
 index 45a27bccb..edf559f68 100644
 --- a/pyanaconda/bootloader/base.py

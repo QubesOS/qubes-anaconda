@@ -1,0 +1,121 @@
+From e464120521200e429df8bde493627497ccd675f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 19 Apr 2020 12:01:27 +0200
+Subject: [PATCH] Add specific BTRFS automatic partitioning scheme
+
+---
+ .../automatic/automatic_partitioning.py       | 34 ++++++++++++++++---
+ .../storage/partitioning/automatic/utils.py   | 11 +++---
+ 2 files changed, 35 insertions(+), 10 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+index 9a2b5ce0a..8a767a020 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+@@ -30,6 +30,8 @@ from pyanaconda.modules.storage.partitioning.automatic.utils import get_candidat
+ from pyanaconda.platform import platform
+ from pyanaconda.storage.partspec import PartSpec
+ from pyanaconda.storage.utils import suggest_swap_size, get_pbkdf_args
++from pykickstart.constants import AUTOPART_TYPE_BTRFS, AUTOPART_TYPE_LVM, \
++    AUTOPART_TYPE_LVM_THINP, AUTOPART_TYPE_PLAIN
+ 
+ log = get_module_logger(__name__)
+ 
+@@ -113,11 +115,30 @@ QUBESOS_PARTITIONING = [
+     )
+ ]
+ 
++QUBESOS_BTRFS_PARTITIONING = [
++    PartSpec(
++        fstype="swap",
++        grow=False,
++        lv=True,
++        encrypted=True
++    ),
++    PartSpec(
++        mountpoint="/",
++        size=Size("10GiB"),
++        required_space=Size("10GiB"),
++        grow=True,
++        btr=True,
++        lv=True,
++        thin_volume=True,
++        encrypted=True
++    )
++]
+ 
+-def get_default_partitioning(partitioning_type=None):
++def get_default_partitioning(partitioning_type=None, scheme=None):
+     """Get the default partitioning requests.
+ 
+     :param partitioning_type: a type of the partitioning
++    :param scheme: a type of the partitioning scheme
+     :return: a list of partitioning specs
+     """
+     if not partitioning_type:
+@@ -130,7 +151,10 @@ def get_default_partitioning(partitioning_type=None):
+         return platform.set_default_partitioning() + WORKSTATION_PARTITIONING
+ 
+     if partitioning_type is PartitioningType.QUBESOS:
+-        return platform.set_default_partitioning() + QUBESOS_PARTITIONING
++        if scheme == AUTOPART_TYPE_BTRFS:
++            return platform.set_default_partitioning() + QUBESOS_BTRFS_PARTITIONING
++        else:
++            return platform.set_default_partitioning() + QUBESOS_PARTITIONING
+ 
+     raise ValueError("Invalid partitioning type: {}".format(conf.storage.default_partitioning))
+ 
+@@ -188,7 +212,7 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
+             luks_data.pbkdf_args = pbkdf_args
+ 
+         # Get the autopart requests.
+-        requests = self._get_partitioning(storage, self._request.excluded_mount_points)
++        requests = self._get_partitioning(storage, scheme, self._request.excluded_mount_points)
+ 
+         # Do the autopart.
+         self._do_autopart(storage, scheme, requests, encrypted, luks_format_args)
+@@ -225,7 +249,7 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
+         }
+ 
+     @staticmethod
+-    def _get_partitioning(storage, excluded_mount_points=()):
++    def _get_partitioning(storage, scheme, excluded_mount_points=()):
+         """Get the partitioning requests for autopart.
+ 
+         :param storage: blivet.Blivet instance
+@@ -234,7 +258,7 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
+         """
+         requests = []
+ 
+-        for request in get_default_partitioning():
++        for request in get_default_partitioning(scheme=scheme):
+             # Skip excluded mount points.
+             if (request.mountpoint or request.fstype) in excluded_mount_points:
+                 continue
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+index c830007df..5f2a21a28 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+@@ -373,12 +373,13 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
+     pool = None
+     request_thin_pool = False
+     request_thin_volume = False
+-    for request in requests:
+-        if request.thin_pool:
+-            request_thin_pool = True
++    if scheme in (AUTOPART_TYPE_LVM, AUTOPART_TYPE_LVM_THINP):
++        for request in requests:
++            if request.thin_pool:
++                request_thin_pool = True
+ 
+-        if request.thin_volume:
+-            request_thin_volume = True
++            if request.thin_volume:
++                request_thin_volume = True
+ 
+     if request_thin_volume and not request_thin_pool:
+         # create only one default thin pool if no thin_pool is requested
+-- 
+2.25.2
+
