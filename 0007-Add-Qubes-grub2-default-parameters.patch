@@ -1,4 +1,4 @@
-From 0b683209ff8270f61924c582068669e7568919dd Mon Sep 17 00:00:00 2001
+From d086bcc677f5c632ec3f3f407890f6512bc18c31 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:11:43 +0100
@@ -51,7 +51,7 @@ Based on :
  1 file changed, 2 insertions(+)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 8e20ca9f1..ae32103a2 100644
+index 5ecda9ef3..25f64c488 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
 @@ -273,6 +273,8 @@ class GRUB2(BootLoader):

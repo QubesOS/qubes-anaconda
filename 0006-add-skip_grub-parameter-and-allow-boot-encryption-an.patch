@@ -1,4 +1,4 @@
-From e0d1f61ea71b9992b11cd9d753534752c326981e Mon Sep 17 00:00:00 2001
+From 525b1d0a1dc90347351ee0c4af1faeb1f572b828 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:01:21 +0100
@@ -13,23 +13,23 @@ Based on commits bf803e7 and 62cb1ca
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 4558704a0..8e20ca9f1 100644
+index 4558704a0..5ecda9ef3 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
-@@ -26,6 +26,7 @@ from pyanaconda.core import util
+@@ -25,6 +25,7 @@ from pyanaconda.bootloader.base import BootLoader, BootLoaderError
+ from pyanaconda.core import util
  from pyanaconda.core.configuration.anaconda import conf
  from pyanaconda.core.i18n import _
++from pyanaconda.core.kernel import kernel_arguments
  from pyanaconda.product import productName
-+from pyanaconda.flags import flags
  
  from pyanaconda.anaconda_loggers import get_module_logger
- log = get_module_logger(__name__)
 @@ -130,6 +131,8 @@ class GRUB2(BootLoader):
      def __init__(self):
          super().__init__()
          self.encrypted_password = ""
 +        self.encryption_support = True
-+        self.skip_bootloader = flags.cmdline.getbool("skip_grub", False)
++        self.skip_bootloader = kernel_arguments.get("skip_grub", False)
  
      #
      # configuration
