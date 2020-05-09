@@ -20,38 +20,42 @@ Source1: qubesos.conf
 Source2: QubesPlaceholder.txt
 Source3: QubesPlaceholder.html
 Source4: QubesPlaceholderWithLinks.html
+Source5: 30-qubes-templates.ks
+Source6: 40-qubes-alt-kernels.ks
+Source7: 50-qubes.ks
+Source8: 60-systemd-preset.ks
 
-Patch0: 0001-add-Qubes-post-scripts.patch
-Patch1: 0002-check-for-Qubes-OS-hardware-required-features.patch
-Patch2: 0003-Fix-grub-config-setup-by-removing-non-xen-options.patch
-Patch3: 0004-Set-default-Grub-theme.patch
-Patch4: 0005-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
-Patch5: 0006-Add-Qubes-grub2-default-parameters.patch
-Patch6: 0007-Abort-installation-on-X-startup-fail.patch
-Patch7: 0008-Mark-qubes-user-name-as-reserved.patch
-Patch8: 0009-Check-add-user-to-wheel-and-qubes-groups.patch
-Patch9: 0010-Simplify-USER-configuration-spoke.patch
-Patch10: 0011-Make-sure-that-a-user-is-created-at-installation-tim.patch
-Patch11: 0012-Disable-network-by-ignoring-any-present-nic.patch
-Patch12: 0013-Remove-network-setup-from-graphical-and-text-interfa.patch
-Patch13: 0014-Drop-NTP-configuration-spoke.patch
-Patch14: 0015-Do-not-add-resume-kernel-option.patch
-Patch15: 0016-Avoid-adding-duplicated-kernel-entries.patch
-Patch16: 0017-Set-default-scheme-in-custom-partitioning.patch
-Patch17: 0018-Use-kernel-install-instead-of-grubby-to-regenerate.patch
-Patch18: 0019-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
-Patch19: 0020-Use-installer-kernel-parameters-as-default-for-insta.patch
-Patch20: 0021-Generate-proper-extlinux.conf.patch
-Patch21: 0022-root_password-remove-ssh-options.patch
-Patch22: 0023-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
-Patch23: 0024-Set-encrypted-partitioning-by-default.patch
-Patch24: 0025-Set-default-hostname-to-dom0.patch
-Patch25: 0026-Setup-grubx64.efi-directly-as-a-bootloader.patch
-Patch26: 0027-enable-discard-option-for-dom0-filesystems-by-defaul.patch
-Patch27: 0028-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
-Patch28: 0029-automatic_partitioning-rename-thin-to-thin_volume-sa.patch
-Patch29: 0030-Handle-thin-logical-pool-request-in-automatic-partio.patch
-Patch30: 0031-Add-specific-BTRFS-automatic-partitioning-scheme.patch
+Patch0: 0001-check-for-Qubes-OS-hardware-required-features.patch
+Patch1: 0002-Fix-grub-config-setup-by-removing-non-xen-options.patch
+Patch2: 0003-Set-default-Grub-theme.patch
+Patch3: 0004-add-skip_grub-parameter-and-allow-boot-encryption-an.patch
+Patch4: 0005-Add-Qubes-grub2-default-parameters.patch
+Patch5: 0006-Abort-installation-on-X-startup-fail.patch
+Patch6: 0007-Mark-qubes-user-name-as-reserved.patch
+Patch7: 0008-Check-add-user-to-wheel-and-qubes-groups.patch
+Patch8: 0009-Simplify-USER-configuration-spoke.patch
+Patch9: 0010-Make-sure-that-a-user-is-created-at-installation-tim.patch
+Patch10: 0011-Disable-network-by-ignoring-any-present-nic.patch
+Patch11: 0012-Remove-network-setup-from-graphical-and-text-interfa.patch
+Patch12: 0013-Drop-NTP-configuration-spoke.patch
+Patch13: 0014-Do-not-add-resume-kernel-option.patch
+Patch14: 0015-Avoid-adding-duplicated-kernel-entries.patch
+Patch15: 0016-Set-default-scheme-in-custom-partitioning.patch
+Patch16: 0017-Use-kernel-install-instead-of-grubby-to-regenerate.patch
+Patch17: 0018-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch18: 0019-Use-installer-kernel-parameters-as-default-for-insta.patch
+Patch19: 0020-Generate-proper-extlinux.conf.patch
+Patch20: 0021-root_password-remove-ssh-options.patch
+Patch21: 0022-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
+Patch22: 0023-Set-encrypted-partitioning-by-default.patch
+Patch23: 0024-Set-default-hostname-to-dom0.patch
+Patch24: 0025-Setup-grubx64.efi-directly-as-a-bootloader.patch
+Patch25: 0026-enable-discard-option-for-dom0-filesystems-by-defaul.patch
+Patch26: 0027-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
+Patch27: 0028-automatic_partitioning-rename-thin-to-thin_volume-sa.patch
+Patch28: 0029-Handle-thin-logical-pool-request-in-automatic-partio.patch
+Patch29: 0030-Add-specific-BTRFS-automatic-partitioning-scheme.patch
+Patch30: 0031-Compute-template-RPMs-needed-spaces.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
@@ -291,6 +295,10 @@ runtime on NFS/HTTP/FTP servers or local disks.
 
 %prep
 %autosetup -p1
+
+# Copy QubesOS post-install scripts
+cp -r %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE8} data/post-scripts/
+sed -i 's|dist_postscripts_DATA = \(.*\)|dist_postscripts_DATA = %{SOURCE5} %{SOURCE6} %{SOURCE7} %{SOURCE8} \1|' data/post-scripts/Makefile.am
 
 # Copy QubesOS product file
 cp %{SOURCE1} data/product.d/

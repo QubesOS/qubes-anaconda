@@ -1,0 +1,63 @@
+From a0fe68995120d8e257743f15d5f0fbad2b4f854d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Mon, 20 Apr 2020 14:57:50 +0200
+Subject: [PATCH] Compute template RPMs needed spaces
+
+---
+ pyanaconda/payload/dnfpayload.py | 13 +++++++++++++
+ pyanaconda/ui/lib/space.py       |  7 ++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/payload/dnfpayload.py b/pyanaconda/payload/dnfpayload.py
+index abb1826ed..51cae424e 100644
+--- a/pyanaconda/payload/dnfpayload.py
++++ b/pyanaconda/payload/dnfpayload.py
+@@ -807,6 +807,19 @@ class DNFPayload(payload.PackagePayload):
+             langpacks.append("langpacks-" + loc)
+         return langpacks
+ 
++    @property
++    def qubes_templates_size(self):
++        # get all available Qubes templates in repos
++        available_templates = self._base.sack.query().available() \
++            .filter(name__glob="qubes-template-*")
++        templates_size = Size()
++        for template in available_templates:
++            templates_size += Size(template.downloadsize)
++            log.debug("[Qubes OS]: Size of %s: %s", (template.name, template.downloadsize))
++
++        log.debug("[Qubes OS]: Total templates RPMs size: %s", templates_size)
++        return templates_size
++
+     def _sync_metadata(self, dnf_repo):
+         try:
+             dnf_repo.load()
+diff --git a/pyanaconda/ui/lib/space.py b/pyanaconda/ui/lib/space.py
+index 5794b57ae..c1a2a54f1 100644
+--- a/pyanaconda/ui/lib/space.py
++++ b/pyanaconda/ui/lib/space.py
+@@ -56,6 +56,10 @@ class FileSystemSpaceChecker(object):
+         """Calculate the needed space."""
+         return self.payload.space_required
+ 
++    def _calculate_needed_space_templates(self):
++        """Calculate the needed space for Qubes templates RPM."""
++        return self.payload.qubes_templates_size
++
+     def _calculate_deficit(self, needed):
+         """Calculate the deficit.
+ 
+@@ -89,7 +93,8 @@ class FileSystemSpaceChecker(object):
+                             in the info bar at the bottom of a Hub.
+         """
+         free = self._calculate_free_space()
+-        needed = self._calculate_needed_space()
++        qubes = self._calculate_needed_space_templates()
++        needed = self._calculate_needed_space() + qubes
+         log.info("fs space: %s  needed: %s", free, needed)
+ 
+         if free > needed:
+-- 
+2.25.2
+
