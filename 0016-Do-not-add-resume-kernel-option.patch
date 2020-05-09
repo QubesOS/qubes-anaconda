@@ -1,4 +1,4 @@
-From b34761c330896bb4f80950a359d1485945ec8271 Mon Sep 17 00:00:00 2001
+From 00ee5d908eb350af601c54981b66f54fee839ccb Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:53:14 +0100
@@ -16,10 +16,10 @@ By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
-index cf9a24170..84b74afed 100644
+index f1aa6acca..45a27bccb 100644
 --- a/pyanaconda/bootloader/base.py
 +++ b/pyanaconda/bootloader/base.py
-@@ -727,12 +727,6 @@ class BootLoader(object):
+@@ -730,12 +730,6 @@ class BootLoader(object):
          swap_devices = storage.fsset.swap_devices
          dracut_devices.extend(swap_devices)
  
@@ -33,5 +33,5 @@ index cf9a24170..84b74afed 100644
          usr_device = storage.mountpoints.get("/usr")
          if usr_device:
 -- 
-2.21.0
+2.25.1
 

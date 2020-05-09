@@ -1,4 +1,4 @@
-From 950d90199f1a42f460f058cf130ae7512e70b293 Mon Sep 17 00:00:00 2001
+From 40c77f961553db5475b9dbca20e44db377cb666b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:28:13 +0100
@@ -16,10 +16,10 @@ By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
  1 file changed, 3 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/reset.py b/pyanaconda/modules/storage/reset.py
-index 22112b3d9..4de7d4152 100644
+index 85bbe00a4..5dd3b1570 100644
 --- a/pyanaconda/modules/storage/reset.py
 +++ b/pyanaconda/modules/storage/reset.py
-@@ -54,9 +54,6 @@ class StorageResetTask(Task):
+@@ -71,9 +71,6 @@ class ScanDevicesTask(Task):
          if conf.target.is_image:
              return
  
@@ -30,5 +30,5 @@ index 22112b3d9..4de7d4152 100644
              zfcp.startup()
  
 -- 
-2.21.0
+2.25.1
 

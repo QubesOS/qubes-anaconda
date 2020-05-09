@@ -1,4 +1,4 @@
-From 51ec629d628456ef4a8f53781cb524e57f46b2d0 Mon Sep 17 00:00:00 2001
+From e0d1f61ea71b9992b11cd9d753534752c326981e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:01:21 +0100
@@ -13,7 +13,7 @@ Based on commits bf803e7 and 62cb1ca
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 79f982a06..1154f43d8 100644
+index 4558704a0..8e20ca9f1 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
 @@ -26,6 +26,7 @@ from pyanaconda.core import util
@@ -24,7 +24,7 @@ index 79f982a06..1154f43d8 100644
  
  from pyanaconda.anaconda_loggers import get_module_logger
  log = get_module_logger(__name__)
-@@ -129,6 +130,8 @@ class GRUB2(BootLoader):
+@@ -130,6 +131,8 @@ class GRUB2(BootLoader):
      def __init__(self):
          super().__init__()
          self.encrypted_password = ""
@@ -33,7 +33,7 @@ index 79f982a06..1154f43d8 100644
  
      #
      # configuration
-@@ -186,7 +189,7 @@ class GRUB2(BootLoader):
+@@ -187,7 +190,7 @@ class GRUB2(BootLoader):
          if productName.startswith("Red Hat "): # pylint: disable=no-member
              return ["xfs", "ext4", "ext3", "ext2"]
          else:
@@ -43,5 +43,5 @@ index 79f982a06..1154f43d8 100644
      #
      # grub-related conveniences
 -- 
-2.21.0
+2.25.1
 

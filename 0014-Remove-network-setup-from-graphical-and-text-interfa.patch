@@ -1,24 +1,24 @@
-From 542375041a38c24215f0cb44a0aad890d5a99284 Mon Sep 17 00:00:00 2001
+From 40a3cdd69c4150102e3ea86194d1a89d1c36bd59 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:16:12 +0100
 Subject: [PATCH] Remove network setup from graphical and text interfaces
 
 ---
- pyanaconda/ui/gui/spokes/network.glade | 2501 ------------------------
- pyanaconda/ui/gui/spokes/network.py    | 1663 ----------------
- pyanaconda/ui/tui/spokes/network.py    |  619 ------
- 3 files changed, 4783 deletions(-)
+ pyanaconda/ui/gui/spokes/network.glade | 2502 ------------------------
+ pyanaconda/ui/gui/spokes/network.py    | 1669 ----------------
+ pyanaconda/ui/tui/spokes/network.py    |  620 ------
+ 3 files changed, 4791 deletions(-)
  delete mode 100644 pyanaconda/ui/gui/spokes/network.glade
  delete mode 100644 pyanaconda/ui/gui/spokes/network.py
  delete mode 100644 pyanaconda/ui/tui/spokes/network.py
 
 diff --git a/pyanaconda/ui/gui/spokes/network.glade b/pyanaconda/ui/gui/spokes/network.glade
 deleted file mode 100644
-index a91dab6e7..000000000
+index bdec50d00..000000000
 --- a/pyanaconda/ui/gui/spokes/network.glade
 +++ /dev/null
-@@ -1,2501 +0,0 @@
+@@ -1,2502 +0,0 @@
 -<?xml version="1.0" encoding="UTF-8"?>
 -<!-- Generated with glade 3.19.0 -->
 -<interface>
@@ -558,6 +558,7 @@ index a91dab6e7..000000000
 -                                            <property name="can_focus">False</property>
 -                                            <property name="label">127.0.0.1</property>
 -                                            <property name="xalign">0</property>
+-                                            <property name="wrap">True</property>
 -                                            <property name="max_width_chars">2</property>
 -                                            <property name="halign">start</property>
 -                                          </object>
@@ -2522,10 +2523,10 @@ index a91dab6e7..000000000
 -</interface>
 diff --git a/pyanaconda/ui/gui/spokes/network.py b/pyanaconda/ui/gui/spokes/network.py
 deleted file mode 100644
-index 95c737fcd..000000000
+index 780b1d83f..000000000
 --- a/pyanaconda/ui/gui/spokes/network.py
 +++ /dev/null
-@@ -1,1663 +0,0 @@
+@@ -1,1669 +0,0 @@
 -# Network configuration spoke classes
 -#
 -# Copyright (C) 2011  Red Hat, Inc.
@@ -2641,7 +2642,9 @@ index 95c737fcd..000000000
 -
 -    return s
 -
+-
 -__all__ = ["NetworkSpoke", "NetworkStandaloneSpoke"]
+-
 -
 -class CellRendererSignal(Gtk.CellRendererPixbuf):
 -
@@ -2656,7 +2659,6 @@ index 95c737fcd..000000000
 -    def __init__(self):
 -        super().__init__()
 -        self.signal = 0
--
 -
 -    def do_get_property(self, prop):
 -        if prop.name == 'signal':
@@ -2696,6 +2698,7 @@ index 95c737fcd..000000000
 -NM_AP_SEC_WEP = 2
 -NM_AP_SEC_WPA = 3
 -NM_AP_SEC_WPA2 = 4
+-
 -
 -class CellRendererSecurity(Gtk.CellRendererPixbuf):
 -
@@ -2860,7 +2863,6 @@ index 95c737fcd..000000000
 -    def vbox(self):
 -        return self.builder.get_object("networkControlBox_vbox")
 -
--
 -    def _add_ap_icons(self, combobox):
 -        cell = CellRendererSecurity()
 -        cell.set_padding(4, 0)
@@ -2893,10 +2895,10 @@ index 95c737fcd..000000000
 -        self.client.connect("notify::%s" % NM.CLIENT_STATE,
 -                            self.on_nm_state_changed)
 -
--
 -        self._load_device_configurations()
--        self._dev_cfg_subscription = self._network_module.DeviceConfigurationChanged.connect(
--            self.on_device_configurations_changed)
+-        self._network_module.DeviceConfigurationChanged.connect(
+-            self.on_device_configurations_changed
+-        )
 -
 -        # select the first device
 -        treeview = self.builder.get_object("treeview_devices")
@@ -2904,7 +2906,6 @@ index 95c737fcd..000000000
 -        itr = self.dev_cfg_store.get_iter_first()
 -        if itr:
 -            selection.select_iter(itr)
--
 -
 -    def on_device_configurations_changed(self, changes):
 -        log.debug("device configurations changed: %s", changes)
@@ -3700,7 +3701,9 @@ index 95c737fcd..000000000
 -            for config in self._get_ip_configs(device):
 -                _try_disconnect(config, self.on_config_changed)
 -
--        self._dev_cfg_subscription.disconnect()
+-        self._network_module.DeviceConfigurationChanged.disconnect(
+-            self.on_device_configurations_changed
+-        )
 -
 -    def _get_ip_configs(self, device):
 -        out = []
@@ -3715,12 +3718,14 @@ index 95c737fcd..000000000
 -
 -        return out
 -
+-
 -def _try_disconnect(obj, callback):
 -    try:
 -        obj.disconnect_by_func(callback)
 -    except TypeError as e:
--        if not "nothing connected" in str(e):
+-        if "nothing connected" not in str(e):
 -            log.debug("%s", e)
+-
 -
 -class SecretAgentDialog(GUIObject):
 -    builderObjects = ["secret_agent_dialog"]
@@ -3788,10 +3793,13 @@ index 95c737fcd..000000000
 -    def _update_connect_button(self):
 -        self._connect_button.set_sensitive(self.valid)
 -
+-
 -secret_agent = None
+-
 -
 -class NotAuthorizedException(dbus.DBusException):
 -    _dbus_error_name = SECRET_AGENT_IFACE + '.NotAuthorized'
+-
 -
 -class SecretAgent(dbus.service.Object):
 -    def __init__(self, spoke):
@@ -3915,6 +3923,7 @@ index 95c737fcd..000000000
 -        else:
 -            return True
 -
+-
 -def register_secret_agent(spoke):
 -
 -    if not conf.system.can_configure_network:
@@ -3973,7 +3982,6 @@ index 95c737fcd..000000000
 -        # (persistent NM / ifcfg configuration), instead of using original kickstart.
 -        self._network_module.NetworkDeviceConfigurationChanged()
 -        self._network_module.SetHostname(self.network_control_box.hostname)
--        log.debug("apply ksdata %s", self.data.network)
 -
 -        # if installation media or hdd aren't used and settings have changed
 -        # try if source is available
@@ -4045,7 +4053,7 @@ index 95c737fcd..000000000
 -
 -    def on_apply_hostname(self, *args):
 -        hostname = self.network_control_box.hostname
--        (valid, error) = network.is_valid_hostname(hostname)
+-        (valid, error) = network.is_valid_hostname(hostname, local=True)
 -        if not valid:
 -            self.clear_info()
 -            msg = _("Host name is not valid: %s") % error
@@ -4064,7 +4072,7 @@ index 95c737fcd..000000000
 -
 -    def on_back_clicked(self, button):
 -        hostname = self.network_control_box.hostname
--        (valid, error) = network.is_valid_hostname(hostname)
+-        (valid, error) = network.is_valid_hostname(hostname, local=True)
 -        if not valid:
 -            self.clear_info()
 -            msg = _("Host name is not valid: %s") % error
@@ -4081,6 +4089,7 @@ index 95c737fcd..000000000
 -        """
 -        self.network_control_box.kill_nmce(msg="finished with network spoke")
 -        self.network_control_box.disconnect_client_callbacks()
+-
 -
 -class NetworkStandaloneSpoke(StandaloneSpoke):
 -    """
@@ -4126,8 +4135,6 @@ index 95c737fcd..000000000
 -        self._network_module.NetworkDeviceConfigurationChanged()
 -        self._network_module.SetHostname(self.network_control_box.hostname)
 -
--        log.debug("apply ksdata %s", self.data.network)
--
 -        self._now_available = self.completed
 -
 -        log.debug("network standalone spoke (apply) payload: %s completed: %s", self.payload.base_repo, self._now_available)
@@ -4158,7 +4165,7 @@ index 95c737fcd..000000000
 -
 -    def _on_continue_clicked(self, window, user_data=None):
 -        hostname = self.network_control_box.hostname
--        (valid, error) = network.is_valid_hostname(hostname)
+-        (valid, error) = network.is_valid_hostname(hostname, local=True)
 -        if not valid:
 -            self.clear_info()
 -            msg = _("Host name is not valid: %s") % error
@@ -4176,7 +4183,7 @@ index 95c737fcd..000000000
 -
 -    def on_apply_hostname(self, *args):
 -        hostname = self.network_control_box.hostname
--        (valid, error) = network.is_valid_hostname(hostname)
+-        (valid, error) = network.is_valid_hostname(hostname, local=True)
 -        if not valid:
 -            self.clear_info()
 -            msg = _("Host name is not valid: %s") % error
@@ -4191,10 +4198,10 @@ index 95c737fcd..000000000
 -        self.network_control_box.current_hostname = self._network_module.GetCurrentHostname()
 diff --git a/pyanaconda/ui/tui/spokes/network.py b/pyanaconda/ui/tui/spokes/network.py
 deleted file mode 100644
-index 86ba6e041..000000000
+index 12bda02a9..000000000
 --- a/pyanaconda/ui/tui/spokes/network.py
 +++ /dev/null
-@@ -1,619 +0,0 @@
+@@ -1,620 +0,0 @@
 -# Network configuration spoke classes
 -#
 -# Copyright (C) 2013  Red Hat, Inc.
@@ -4615,7 +4622,7 @@ index 86ba6e041..000000000
 -        # (persistent NM / ifcfg configuration), instead of using original kickstart.
 -        self._network_module.NetworkDeviceConfigurationChanged()
 -
--        (valid, error) = network.is_valid_hostname(self.hostname)
+-        (valid, error) = network.is_valid_hostname(self.hostname, local=True)
 -        if valid:
 -            self._network_module.SetHostname(self.hostname)
 -        else:
@@ -4795,6 +4802,7 @@ index 86ba6e041..000000000
 -        log.debug("updated connection %s:\n%s", connection_uuid,
 -                  connection.to_dbus(NM.ConnectionSerializationFlags.ALL))
 -
+-
 -def get_default_connection(iface, device_type):
 -    """Get default connection to be edited by the UI."""
 -    connection = NM.SimpleConnection.new()
@@ -4815,5 +4823,5 @@ index 86ba6e041..000000000
 -    connection.add_setting(s_con)
 -    return connection
 -- 
-2.21.0
+2.25.1
 

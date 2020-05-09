@@ -1,4 +1,4 @@
-From 16c74fb5df6cbf6392183274643afbe388070511 Mon Sep 17 00:00:00 2001
+From 0b683209ff8270f61924c582068669e7568919dd Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:11:43 +0100
@@ -51,10 +51,10 @@ Based on :
  1 file changed, 2 insertions(+)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 1154f43d8..604ad6649 100644
+index 8e20ca9f1..ae32103a2 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
-@@ -272,6 +272,8 @@ class GRUB2(BootLoader):
+@@ -273,6 +273,8 @@ class GRUB2(BootLoader):
          defaults.write("GRUB_CMDLINE_LINUX=\"%s\"\n" % self.boot_args)
          defaults.write("GRUB_DISABLE_RECOVERY=\"true\"\n")
          defaults.write("GRUB_THEME=\"/boot/grub2/themes/qubes/theme.txt\"\n")
@@ -64,5 +64,5 @@ index 1154f43d8..604ad6649 100644
          if self.use_bls and os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
              log.warning("BLS support disabled due new-kernel-pkg being present")
 -- 
-2.21.0
+2.25.1
 

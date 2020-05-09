@@ -1,4 +1,4 @@
-From d0a95e86ebefa9020f17fe1aff43728bf274a175 Mon Sep 17 00:00:00 2001
+From c6afd3c3f270e625fe08e90f6dd9c22578d7777b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:27:02 +0100
@@ -6,8 +6,8 @@ Subject: [PATCH] Simplify USER configuration spoke
 
 ---
  pyanaconda/ui/gui/spokes/user.glade |  94 ++-------
- pyanaconda/ui/gui/spokes/user.py    | 284 +---------------------------
- 2 files changed, 19 insertions(+), 359 deletions(-)
+ pyanaconda/ui/gui/spokes/user.py    | 286 +---------------------------
+ 2 files changed, 19 insertions(+), 361 deletions(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/user.glade b/pyanaconda/ui/gui/spokes/user.glade
 index 8f6ae9281..54f8a7ce6 100644
@@ -148,16 +148,16 @@ index 8f6ae9281..54f8a7ce6 100644
                    <packing>
                      <property name="expand">True</property>
 diff --git a/pyanaconda/ui/gui/spokes/user.py b/pyanaconda/ui/gui/spokes/user.py
-index 5d4265e9e..a028a556b 100644
+index ed3733075..a028a556b 100644
 --- a/pyanaconda/ui/gui/spokes/user.py
 +++ b/pyanaconda/ui/gui/spokes/user.py
-@@ -40,176 +40,8 @@ from pyanaconda.core.regexes import GROUPLIST_FANCY_PARSE
+@@ -40,177 +40,7 @@ from pyanaconda.core.regexes import GROUPLIST_FANCY_PARSE
  from pyanaconda.anaconda_loggers import get_module_logger
  log = get_module_logger(__name__)
  
 -__all__ = ["UserSpoke", "AdvancedUserDialog"]
-+__all__ = ["UserSpoke"]
- 
+-
+-
 -class AdvancedUserDialog(GUIObject, GUIDialogInputCheckHandler):
 -    """
 -       .. inheritance-diagram:: AdvancedUserDialog
@@ -326,10 +326,11 @@ index 5d4265e9e..a028a556b 100644
 -            return True
 -
 -        return False
++__all__ = ["UserSpoke"]
+ 
  
  class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
-     """
-@@ -219,7 +51,7 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -221,7 +51,7 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
      builderObjects = ["userCreationWindow"]
  
      mainWidgetName = "userCreationWindow"
@@ -338,7 +339,7 @@ index 5d4265e9e..a028a556b 100644
      uiFile = "spokes/user.glade"
      helpFile = "UserSpoke.xml"
  
-@@ -273,15 +105,9 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -275,15 +105,9 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          # gather references to relevant GUI objects
  
          # entry fields
@@ -354,7 +355,7 @@ index 5d4265e9e..a028a556b 100644
          # password checking status bar & label
          self._password_bar = self.builder.get_object("password_bar")
          self._password_label = self.builder.get_object("password_label")
-@@ -309,7 +135,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -311,7 +135,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
  
          # username and full name checks
          self._username_check = input_checking.UsernameCheck()
@@ -362,7 +363,7 @@ index 5d4265e9e..a028a556b 100644
          # empty username is considered a success so that the user can leave
          # the spoke without filling it in
          self._username_check.success_if_username_empty = True
-@@ -332,7 +157,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -334,7 +157,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          # 3) is the password valid according to the current password checking policy ?
          # 4) is the password free of non-ASCII characters ?
          self.checker.add_check(self._username_check)
@@ -370,7 +371,7 @@ index 5d4265e9e..a028a556b 100644
          self.checker.add_check(self._empty_check)
          self.checker.add_check(self._confirm_check)
          self.checker.add_check(self._validity_check)
-@@ -359,13 +183,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -361,13 +183,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
              # Policy is that a non-empty password is required
              self.password_required = True
  
@@ -384,7 +385,7 @@ index 5d4265e9e..a028a556b 100644
          # set the visibility of the password entries
          set_password_visibility(self.password_entry, False)
          set_password_visibility(self.password_confirmation_entry, False)
-@@ -385,30 +202,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -387,30 +202,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
      def username(self, new_username):
          self.username_entry.set_text(new_username)
  
@@ -415,7 +416,7 @@ index 5d4265e9e..a028a556b 100644
      @property
      def user(self):
          """The user that is manipulated by the User spoke.
-@@ -430,8 +223,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -432,8 +223,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          self._user_list = get_user_list(self._users_module, add_default=True, add_if_not_empty=self._requested_user_cleared)
  
          self.username = self.user.name
@@ -424,7 +425,7 @@ index 5d4265e9e..a028a556b 100644
  
          # rerun checks so that we have a correct status message, if any
          self.checker.run_checks()
-@@ -454,22 +245,13 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -456,22 +245,13 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
      def apply(self):
          # set the password only if the user enters anything to the text entry
          # this should preserve the kickstart based password
@@ -451,7 +452,7 @@ index 5d4265e9e..a028a556b 100644
  
          if "wheel" not in self.user.groups:
              self.user.groups.append("wheel")
-@@ -499,22 +281,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -501,22 +281,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
      def completed(self):
          return bool(get_user_list(self._users_module))
  
@@ -474,7 +475,7 @@ index 5d4265e9e..a028a556b 100644
      def on_password_icon_clicked(self, entry, icon_pos, event):
          """Called by Gtk callback when the icon of a password entry is clicked."""
          set_password_visibility(entry, not entry.get_visibility())
-@@ -536,12 +302,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -538,12 +302,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          """Called by Gtk on all username changes."""
          new_username = editable.get_text()
  
@@ -487,7 +488,7 @@ index 5d4265e9e..a028a556b 100644
          # update the username in checker
          self.checker.username = new_username
  
-@@ -553,37 +313,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -555,37 +313,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          # Re-run the password checks against the new username
          self.checker.run_checks()
  
@@ -525,7 +526,7 @@ index 5d4265e9e..a028a556b 100644
      def _checks_done(self, error_message):
          """Update the warning with the input validation error from the first
             error message or clear warnings if all the checks were successful.
-@@ -595,7 +324,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -597,7 +324,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          # check if an unwaivable check failed
          unwaivable_checks = [not self._confirm_check.result.success,
                               not self._username_check.result.success,
@@ -534,5 +535,5 @@ index 5d4265e9e..a028a556b 100644
          # with emptyok == False the empty password check become unwaivable
          #if not self.checker.policy.emptyok:
 -- 
-2.21.0
+2.25.1
 

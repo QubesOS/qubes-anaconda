@@ -1,4 +1,4 @@
-From 4370610b45cbf49d7c04fd298d9c8b90a080f619 Mon Sep 17 00:00:00 2001
+From b2353eb27b983e15ecb4d8ff55a952e8c0eaacf8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:42:49 +0100
@@ -45,5 +45,5 @@ index e3e0b4d7b..e34ad154c 100644
                           "initrd": image.initrd,
                           "args": args,
 -- 
-2.21.0
+2.25.1
 

@@ -1,4 +1,4 @@
-From ee6ea15a6081b87fe35fbeb13261bda7553f4022 Mon Sep 17 00:00:00 2001
+From 77bf1b40cf0ce9c62ca2852def51b0ed90441bd5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sat, 30 Nov 2019 17:36:29 +0100
@@ -13,10 +13,10 @@ Rework based on previous commits 696bd4c, 63043751a, 7489992dd, 3791fd7 and f6bf
  2 files changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index 542fc826a..c4affd108 100644
+index deb048db4..fb54c0e04 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -162,8 +162,10 @@ WARNING_SUPPORT_REMOVED = N_(
+@@ -164,8 +164,10 @@ WARNING_SUPPORT_REMOVED = N_(
  )
  
  WARNING_HARDWARE_UNSUPPORTED = N_(
@@ -30,10 +30,10 @@ index 542fc826a..c4affd108 100644
  
  # Storage messages
 diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
-index afb87ba1c..ae1e11ded 100644
+index 25d01a208..841559ea8 100644
 --- a/pyanaconda/core/util.py
 +++ b/pyanaconda/core/util.py
-@@ -973,10 +973,31 @@ def detect_unsupported_hardware():
+@@ -958,10 +958,31 @@ def detect_unsupported_hardware():
          return []
  
      # Check TAINT_HARDWARE_UNSUPPORTED
@@ -70,5 +70,5 @@ index afb87ba1c..ae1e11ded 100644
      # Check TAINT_SUPPORT_REMOVED
      if not conf.system.can_detect_support_removed:
 -- 
-2.21.0
+2.25.1
 

@@ -1,4 +1,4 @@
-From f2380e56e715f543170faa888bc914491138d95a Mon Sep 17 00:00:00 2001
+From 08a090ee3750c6f25aec23285718fb660eec7526 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Wed, 25 Dec 2019 00:50:22 +0100
@@ -44,5 +44,5 @@ index f8dd84a4f..098a69df5 100644
      @property
      def packages(self):
 -- 
-2.21.0
+2.25.1
 

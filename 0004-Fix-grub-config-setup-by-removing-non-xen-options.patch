@@ -1,4 +1,4 @@
-From 80c2869bad5fc1178189366f8f0828db77cc7869 Mon Sep 17 00:00:00 2001
+From d93ee190f4796de5752f8fa64dec39e7fe654276 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 10:43:09 +0100
@@ -11,10 +11,10 @@ By Marek Marczykowski <marmarek@invisiblethingslab.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 4e75a7288..28d146650 100644
+index 4695c1cd4..030bdb588 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
-@@ -325,6 +325,9 @@ class GRUB2(BootLoader):
+@@ -333,6 +333,9 @@ class GRUB2(BootLoader):
          except (BootLoaderError, OSError, RuntimeError) as e:
              log.error("boot loader password setup failed: %s", e)
  
@@ -25,5 +25,5 @@ index 4e75a7288..28d146650 100644
          if self.default is not None:
              machine_id_path = conf.target.system_root + "/etc/machine-id"
 -- 
-2.21.0
+2.25.1
 

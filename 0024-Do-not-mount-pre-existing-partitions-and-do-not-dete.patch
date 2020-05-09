@@ -1,4 +1,4 @@
-From 083200cffed66b922e6d137e024d53273965b263 Mon Sep 17 00:00:00 2001
+From 6a4058cbb8fccf3b7bc38c1c333105ce0508124d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Tue, 17 Dec 2019 13:47:10 +0100
@@ -57,5 +57,5 @@ index cdf4d5019..0a8d6e3fc 100644
          log_exception_info(log.info, "failure detecting existing installations")
      finally:
 -- 
-2.24.1
+2.25.1
 

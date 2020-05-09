@@ -1,4 +1,4 @@
-From 633dc89cae0ebd597cc9069fdced3c8485ba5e46 Mon Sep 17 00:00:00 2001
+From 1f460648b696338405f448449d5b4d09994c5c05 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Wed, 25 Dec 2019 09:36:06 +0100
@@ -16,10 +16,10 @@ Fixes QubesOS/qubes-issues#3226
  1 file changed, 2 insertions(+)
 
 diff --git a/pyanaconda/storage/fsset.py b/pyanaconda/storage/fsset.py
-index 8d2390ddb..6117c6d0a 100644
+index ad0dc540e..4ee391440 100644
 --- a/pyanaconda/storage/fsset.py
 +++ b/pyanaconda/storage/fsset.py
-@@ -771,6 +771,8 @@ class FSSet(object):
+@@ -764,6 +764,8 @@ class FSSet(object):
                      break
              if device.encrypted:
                  options += ",x-systemd.device-timeout=0"
@@ -29,5 +29,5 @@ index 8d2390ddb..6117c6d0a 100644
              dump = device.format.dump
              if device.format.check and mountpoint == "/":
 -- 
-2.21.0
+2.25.1
 

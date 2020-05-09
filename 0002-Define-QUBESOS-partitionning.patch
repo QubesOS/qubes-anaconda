@@ -1,4 +1,4 @@
-From 3a50b65a3ef639fef02aa708a6b5bca32d3aa3ec Mon Sep 17 00:00:00 2001
+From 48e295950e1005e25528fee5639c7229b8aea8b6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sat, 30 Nov 2019 17:30:35 +0100
@@ -6,7 +6,7 @@ Subject: [PATCH] Define QUBESOS partitionning
 
 ---
  pyanaconda/core/configuration/storage.py      |  2 ++
- .../partitioning/automatic_partitioning.py    | 22 +++++++++++++++++++
+ .../automatic/automatic_partitioning.py       | 22 +++++++++++++++++++
  2 files changed, 24 insertions(+)
 
 diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
@@ -29,10 +29,10 @@ index d01bd8a89..140c6153c 100644
  
          :return: an instance of PartitioningType
          """
-diff --git a/pyanaconda/modules/storage/partitioning/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic_partitioning.py
-index 59306585e..b057a2484 100644
---- a/pyanaconda/modules/storage/partitioning/automatic_partitioning.py
-+++ b/pyanaconda/modules/storage/partitioning/automatic_partitioning.py
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+index 02e8dfc6c..9c0a74aff 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
 @@ -81,6 +81,25 @@ WORKSTATION_PARTITIONING = [
      )
  ]
@@ -70,5 +70,5 @@ index 59306585e..b057a2484 100644
  
  
 -- 
-2.21.0
+2.25.1
 

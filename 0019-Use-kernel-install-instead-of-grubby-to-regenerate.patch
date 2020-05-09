@@ -1,4 +1,4 @@
-From 121ff650cdb62607a38a76c33d2a286458b0cb16 Mon Sep 17 00:00:00 2001
+From 73aa08a722bc74ded1e3d2572e6f55273ebb7a76 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:17:29 +0100
@@ -12,14 +12,14 @@ Since we have own hook there, it properly handles Xen. This means we no longer n
 From 5990cce6eb095f72d62e0cc174c80cf30152021a
 By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 ---
- pyanaconda/payload/__init__.py | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+ pyanaconda/payload/__init__.py | 20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
 
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index c5d0b519d..210fcf80a 100644
+index 853a50a8f..1b6cefee5 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -522,33 +522,18 @@ class Payload(metaclass=ABCMeta):
+@@ -517,32 +517,18 @@ class Payload(metaclass=ABCMeta):
          return False
  
      def recreate_initrds(self):
@@ -34,8 +34,7 @@ index c5d0b519d..210fcf80a 100644
 -        if os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
 -            use_dracut = False
 -        else:
--            log.warning("new-kernel-pkg does not exist - grubby wasn't installed? "
--                        " using dracut instead.")
+-            log.debug("new-kernel-pkg does not exist, using dracut instead.")
 -            use_dracut = True
 -
          for kernel in self.kernel_version_list:
@@ -57,5 +56,5 @@ index c5d0b519d..210fcf80a 100644
                  # if the installation is running in fips mode then make sure
                  # fips is also correctly enabled in the installed system
 -- 
-2.21.0
+2.25.1
 

@@ -1,4 +1,4 @@
-From 8866f1804fd44814a167f1e2377226fbbd3f0928 Mon Sep 17 00:00:00 2001
+From 173827cb860babf94eaff3c9184b5e6364970ea8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:47:44 +0100
@@ -16,10 +16,10 @@ By Marek Marczykowski <marmarek@invisiblethingslab.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/core/users.py b/pyanaconda/core/users.py
-index 649ba0fee..da3b90b1c 100644
+index db34444a3..3e10d9654 100644
 --- a/pyanaconda/core/users.py
 +++ b/pyanaconda/core/users.py
-@@ -61,7 +61,7 @@ def check_username(name):
+@@ -62,7 +62,7 @@ def check_username(name):
      """
  
      # Check reserved names.
@@ -29,5 +29,5 @@ index 649ba0fee..da3b90b1c 100644
  
      return is_valid_name(name)
 -- 
-2.21.0
+2.25.1
 

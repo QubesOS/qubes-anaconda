@@ -1,4 +1,4 @@
-From e62fa382f653aec39bb81ee96d35a7451e56735d Mon Sep 17 00:00:00 2001
+From d7ce7eedd887586fff1fd6a31b6dd3bea60605e8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:24:52 +0100
@@ -6,8 +6,8 @@ Subject: [PATCH] Drop NTP configuration spoke
 
 ---
  pyanaconda/ui/gui/spokes/datetime_spoke.glade |  62 +---
- pyanaconda/ui/gui/spokes/datetime_spoke.py    | 333 ------------------
- 2 files changed, 8 insertions(+), 387 deletions(-)
+ pyanaconda/ui/gui/spokes/datetime_spoke.py    | 334 ------------------
+ 2 files changed, 8 insertions(+), 388 deletions(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.glade b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 index 37c7c6edc..60e19216e 100644
@@ -114,7 +114,7 @@ index 37c7c6edc..60e19216e 100644
                                    </object>
                                  </child>
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 11f3e714e..2b0aca943 100644
+index aa7bc2ed7..a9972dfe0 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
 @@ -41,7 +41,6 @@ from pyanaconda.core import util, constants
@@ -125,9 +125,9 @@ index 11f3e714e..2b0aca943 100644
  from pyanaconda import flags
  from pyanaconda.modules.common.constants.services import TIMEZONE, NETWORK
  from pyanaconda.threading import threadMgr, AnacondaThread
-@@ -151,249 +150,6 @@ def _new_date_field_box(store):
- 
+@@ -155,250 +154,6 @@ def _new_date_field_box(store):
      return (box, combo, suffix_label)
+ 
  
 -class NTPconfigDialog(GUIObject, GUIDialogInputCheckHandler):
 -    builderObjects = ["ntpConfigDialog", "addImage", "serversStore"]
@@ -218,7 +218,6 @@ index 11f3e714e..2b0aca943 100644
 -            self._add_server(pool, True)
 -        for server in servers:
 -            self._add_server(server, False)
--
 -
 -    def _validateServer(self, inputcheck):
 -        server = self.get_input(inputcheck.input_obj)
@@ -372,10 +371,12 @@ index 11f3e714e..2b0aca943 100644
 -        self._serversStore.set_value(itr, SERVER_WORKING, constants.NTP_SERVER_QUERY)
 -
 -        self._refresh_server_working(itr)
- 
+-
+-
  class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
      """
-@@ -498,8 +254,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+        .. inheritance-diagram:: DatetimeSpoke
+@@ -502,8 +257,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          self._year_format, suffix = formats[widgets.index(year_box)]
          year_label.set_text(suffix)
  
@@ -384,7 +385,7 @@ index 11f3e714e..2b0aca943 100644
          self._regions_zones = get_all_regions_and_timezones()
  
          # Set the initial sensitivity of the AM/PM toggle based on the time-type selected
-@@ -508,9 +262,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -512,9 +265,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          if not conf.system.can_set_system_clock:
              self._hide_date_time_setting()
  
@@ -394,7 +395,7 @@ index 11f3e714e..2b0aca943 100644
          threadMgr.add(AnacondaThread(name=constants.THREAD_DATE_TIME,
                                       target=self._initialize))
  
-@@ -598,8 +349,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -602,8 +352,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
              # TODO: seen should be set from the module
              self._kickstarted = False
  
@@ -403,7 +404,7 @@ index 11f3e714e..2b0aca943 100644
      def execute(self):
          if self._update_datetime_timer is not None:
              self._update_datetime_timer.cancel()
-@@ -637,20 +386,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -641,20 +389,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
  
          self._update_datetime()
  
@@ -424,7 +425,7 @@ index 11f3e714e..2b0aca943 100644
      @async_action_wait
      def _set_timezone(self, timezone):
          """
-@@ -1109,71 +844,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -1113,71 +847,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          #contains all date/time setting widgets
          footer_alignment = self.builder.get_object("footerAlignment")
          footer_alignment.set_sensitive(sensitive)
@@ -497,5 +498,5 @@ index 11f3e714e..2b0aca943 100644
 -            else:
 -                self.clear_info()
 -- 
-2.21.0
+2.25.1
 
