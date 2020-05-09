@@ -1,4 +1,4 @@
-From 525b1d0a1dc90347351ee0c4af1faeb1f572b828 Mon Sep 17 00:00:00 2001
+From 7235051858c94adcc9c1563b53f6e07d935bef16 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:01:21 +0100
@@ -13,7 +13,7 @@ Based on commits bf803e7 and 62cb1ca
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 4558704a0..5ecda9ef3 100644
+index daf9fc53e..be332f215 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
 @@ -25,6 +25,7 @@ from pyanaconda.bootloader.base import BootLoader, BootLoaderError

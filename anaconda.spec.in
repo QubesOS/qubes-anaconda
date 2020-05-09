@@ -50,6 +50,7 @@ Patch25: 0026-Set-default-hostname-to-dom0.patch
 Patch26: 0027-Setup-grubx64.efi-directly-as-a-bootloader.patch
 Patch27: 0028-enable-discard-option-for-dom0-filesystems-by-defaul.patch
 Patch28: 0029-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
+
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
 

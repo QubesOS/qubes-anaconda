@@ -1,4 +1,4 @@
-From 25b7746c109ddf480c644e8d7e8a6d19d8273dac Mon Sep 17 00:00:00 2001
+From 799a74fc14c597327e5cd264c5e63976bb86ff60 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:42:49 +0100
@@ -16,14 +16,14 @@ By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
  1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/bootloader/extlinux.py b/pyanaconda/bootloader/extlinux.py
-index e3e0b4d7b..e34ad154c 100644
+index e3e0b4d7b..3b40f35ac 100644
 --- a/pyanaconda/bootloader/extlinux.py
 +++ b/pyanaconda/bootloader/extlinux.py
 @@ -65,6 +65,8 @@ class EXTLINUX(BootLoader):
  
      def write_config_images(self, config):
          self.write_config_console(config)
-+        xen_gz = [x for x in os.listdir(util.getSysroot() + self._config_dir)
++        xen_gz = [x for x in os.listdir(conf.target.system_root + self._config_dir)
 +                  if x.startswith('xen-') and x.endswith('.gz')][0]
          for image in self.images:
              args = Arguments()
