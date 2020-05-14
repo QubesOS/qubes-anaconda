@@ -56,6 +56,7 @@ Patch27: 0028-automatic_partitioning-rename-thin-to-thin_volume-sa.patch
 Patch28: 0029-Handle-thin-logical-pool-request-in-automatic-partio.patch
 Patch29: 0030-Add-specific-BTRFS-automatic-partitioning-scheme.patch
 Patch30: 0031-Compute-template-RPMs-needed-spaces.patch
+Patch31: 0032-dnfpayload-make-available-repos-for-post-scripts.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
