@@ -192,7 +192,7 @@ system.
 Summary: Live installation specific files and dependencies
 BuildRequires: desktop-file-utils
 # live installation currently implies a graphical installation
-Requires: anaconda-gui = %{version}-%{release}
+Requires: anaconda-gui = %{epoch}:%{version}-%{release}
 Requires: usermode
 Requires: zenity
 
