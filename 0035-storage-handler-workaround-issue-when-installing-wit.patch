@@ -1,0 +1,31 @@
+From 9b6e23f48121e5beb9ac0df68a49cf8ac9b1477d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Wed, 28 Jul 2021 22:24:04 +0200
+Subject: [PATCH] storage handler: workaround issue with iso-scan
+
+---
+ pyanaconda/modules/storage/devicetree/handler.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/devicetree/handler.py b/pyanaconda/modules/storage/devicetree/handler.py
+index 2825a43d6..24f9f52c0 100644
+--- a/pyanaconda/modules/storage/devicetree/handler.py
++++ b/pyanaconda/modules/storage/devicetree/handler.py
+@@ -92,6 +92,13 @@ class DeviceTreeHandler(ABC):
+         device = self._get_device(device_name)
+         try:
+             device.format.mount(mountpoint=mount_point)
++        except AttributeError as e:
++            msg = "Failed to mount {} at {}: {}".format(
++                device_name,
++                mount_point,
++                str(e)
++            )
++            log.critical(msg)
+         except FSError as e:
+             msg = "Failed to mount {} at {}: {}". format(
+                 device_name,
+-- 
+2.31.1
+

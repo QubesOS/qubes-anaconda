@@ -59,6 +59,7 @@ Patch30: 0031-Compute-template-RPMs-needed-spaces.patch
 Patch31: 0032-dnfpayload-make-available-repos-for-post-scripts.patch
 Patch32: 0033-Set-human-names-for-Qubes-thin-pools.patch
 Patch33: 0034-Fix-standard-partitioning-set-xfs-as-default-fs-ther.patch
+Patch34: 0035-storage-handler-workaround-issue-when-installing-wit.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
