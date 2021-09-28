@@ -153,15 +153,11 @@ Requires: flatpak-libs
 Requires: cracklib-dicts
 
 Requires: python3-pytz
-Requires: teamd
 %ifarch s390 s390x
 Requires: openssh
 %endif
-Requires: NetworkManager >= %{nmver}
 Requires: NetworkManager-libnm >= %{nmver}
-Requires: NetworkManager-team
 Requires: kbd
-Requires: chrony
 Requires: python3-ntplib
 Requires: systemd
 Requires: python3-pid
@@ -238,15 +234,10 @@ Requires: anaconda-core = %{epoch}:%{version}-%{release}
 Requires: anaconda-widgets = %{epoch}:%{version}-%{release}
 Requires: python3-meh-gui >= %{mehver}
 Requires: adwaita-icon-theme
-Requires: tigervnc-server-minimal
 Requires: libxklavier >= %{libxklavierver}
 Requires: libgnomekbd
 Requires: libtimezonemap >= %{libtimezonemapver}
-Requires: nm-connection-editor
 Requires: keybinder3
-%ifnarch s390 s390x
-Requires: NetworkManager-wifi
-%endif
 Requires: anaconda-user-help >= %{helpver}
 Requires: yelp
 Requires: blivet-gui-runtime >= %{blivetguiver}
