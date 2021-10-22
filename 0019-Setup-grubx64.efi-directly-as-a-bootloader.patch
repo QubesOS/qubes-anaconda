@@ -1,4 +1,4 @@
-From 046384fa823425bf0e2e180b90360e4c78c9bb32 Mon Sep 17 00:00:00 2001
+From 6f66e2feebf2492b1b69c4d31700306b132a17a8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Wed, 25 Dec 2019 00:50:22 +0100
@@ -7,23 +7,23 @@ Subject: [PATCH] Setup grubx64.efi directly as a bootloader
 Skip shim - we don't support SecureBoot and also Fedora's shim has
 hardcoded 'fedora' EFI vendor.
 ---
- pyanaconda/bootloader/efi.py | 8 ++++----
+ pyanaconda/modules/storage/bootloader/efi.py | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/pyanaconda/bootloader/efi.py b/pyanaconda/bootloader/efi.py
-index f8dd84a4f..098a69df5 100644
---- a/pyanaconda/bootloader/efi.py
-+++ b/pyanaconda/bootloader/efi.py
-@@ -125,7 +125,7 @@ class EFIBase(object):
+diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
+index 82f60e4c40..c18c7f146f 100644
+--- a/pyanaconda/modules/storage/bootloader/efi.py
++++ b/pyanaconda/modules/storage/bootloader/efi.py
+@@ -129,7 +129,7 @@ class EFIBase(object):
  
  class EFIGRUB(EFIBase, GRUB2):
      """EFI GRUBv2"""
 -    _packages32 = [ "grub2-efi-ia32", "shim-ia32" ]
 +    _packages32 = [ "grub2-efi-ia32" ]
      _packages_common = [ "efibootmgr", "grub2-tools" ]
-     can_dual_boot = False
      stage2_is_valid_stage1 = False
-@@ -135,7 +135,7 @@ class EFIGRUB(EFIBase, GRUB2):
+     stage2_bootable = False
+@@ -138,7 +138,7 @@ class EFIGRUB(EFIBase, GRUB2):
  
      def __init__(self):
          super().__init__()
@@ -32,7 +32,7 @@ index f8dd84a4f..098a69df5 100644
  
          try:
              f = open("/sys/firmware/efi/fw_platform_size", "r")
-@@ -150,8 +150,8 @@ class EFIGRUB(EFIBase, GRUB2):
+@@ -153,8 +153,8 @@ class EFIGRUB(EFIBase, GRUB2):
      @property
      def _efi_binary(self):
          if self._is_32bit_firmware:
@@ -44,5 +44,5 @@ index f8dd84a4f..098a69df5 100644
      @property
      def packages(self):
 -- 
-2.25.2
+2.31.1
 

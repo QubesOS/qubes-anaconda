@@ -1,0 +1,26 @@
+From bde718863c7a8c5dec0bff56d0ed0d4c66cd95d8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Fri, 20 Dec 2019 10:23:25 +0100
+Subject: [PATCH] Set default hostname to 'dom0'
+
+---
+ pyanaconda/modules/network/network.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/modules/network/network.py b/pyanaconda/modules/network/network.py
+index 2d34e3439f..9f6f0702e6 100644
+--- a/pyanaconda/modules/network/network.py
++++ b/pyanaconda/modules/network/network.py
+@@ -62,7 +62,7 @@ class NetworkService(KickstartService):
+         self._firewall_module = FirewallModule()
+ 
+         self.hostname_changed = Signal()
+-        self._hostname = ""
++        self._hostname = "dom0"
+ 
+         self.current_hostname_changed = Signal()
+         self._hostname_service_proxy = None
+-- 
+2.31.1
+

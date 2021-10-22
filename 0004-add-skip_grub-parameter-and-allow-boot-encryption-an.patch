@@ -1,4 +1,4 @@
-From dd01bcb17433b924df9536145937d055c618dbba Mon Sep 17 00:00:00 2001
+From fe1adbd542ac805301082585a4f2eeacb4b6043a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:01:21 +0100
@@ -9,14 +9,14 @@ On coreboot systems, as grub2 can be used a payload it is possible to have all t
 
 Based on commits bf803e7 and 62cb1ca
 ---
- pyanaconda/bootloader/grub2.py | 5 ++++-
+ pyanaconda/modules/storage/bootloader/grub2.py | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index daf9fc53e..be332f215 100644
---- a/pyanaconda/bootloader/grub2.py
-+++ b/pyanaconda/bootloader/grub2.py
-@@ -25,6 +25,7 @@ from pyanaconda.bootloader.base import BootLoader, BootLoaderError
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index b683d74faa..3360c48883 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -25,6 +25,7 @@ from pyanaconda.modules.storage.bootloader.base import BootLoader, BootLoaderErr
  from pyanaconda.core import util
  from pyanaconda.core.configuration.anaconda import conf
  from pyanaconda.core.i18n import _
@@ -24,7 +24,7 @@ index daf9fc53e..be332f215 100644
  from pyanaconda.product import productName
  
  from pyanaconda.anaconda_loggers import get_module_logger
-@@ -130,6 +131,8 @@ class GRUB2(BootLoader):
+@@ -129,6 +130,8 @@ class GRUB2(BootLoader):
      def __init__(self):
          super().__init__()
          self.encrypted_password = ""
@@ -33,7 +33,7 @@ index daf9fc53e..be332f215 100644
  
      #
      # configuration
-@@ -187,7 +190,7 @@ class GRUB2(BootLoader):
+@@ -186,7 +189,7 @@ class GRUB2(BootLoader):
          if productName.startswith("Red Hat "): # pylint: disable=no-member
              return ["xfs", "ext4", "ext3", "ext2"]
          else:
@@ -43,5 +43,5 @@ index daf9fc53e..be332f215 100644
      #
      # grub-related conveniences
 -- 
-2.25.2
+2.31.1
 

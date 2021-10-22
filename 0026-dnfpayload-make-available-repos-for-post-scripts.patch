@@ -1,18 +1,18 @@
-From a5a615e4cebf133e2db57c81d4fac89a0de552b0 Mon Sep 17 00:00:00 2001
+From 3ca4a13433be1bca6a51a1eeca69e1a6701a3073 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
-Date: Thu, 14 May 2020 10:42:34 +0200
+Date: Sun, 24 Oct 2021 15:57:03 +0200
 Subject: [PATCH] dnfpayload: make available repos for post-scripts
 
 ---
- pyanaconda/payload/dnfpayload.py | 4 ++++
+ pyanaconda/payload/dnf/payload.py | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/pyanaconda/payload/dnfpayload.py b/pyanaconda/payload/dnfpayload.py
-index 51cae424e..b1bbb2486 100644
---- a/pyanaconda/payload/dnfpayload.py
-+++ b/pyanaconda/payload/dnfpayload.py
-@@ -409,6 +409,10 @@ class DNFPayload(payload.PackagePayload):
+diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
+index 96d329e307..5909ec0f87 100644
+--- a/pyanaconda/payload/dnf/payload.py
++++ b/pyanaconda/payload/dnf/payload.py
+@@ -616,6 +616,10 @@ class DNFPayload(Payload):
          if not ksrepo.enabled:
              self.disable_repo(repo.id)
  
@@ -24,5 +24,5 @@ index 51cae424e..b1bbb2486 100644
  
      def _fetch_md(self, repo_name):
 -- 
-2.25.4
+2.31.1
 

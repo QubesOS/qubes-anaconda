@@ -1,4 +1,4 @@
-From 9de5c4dbb08e052e8180af12815d3e7f3d1cdf2b Mon Sep 17 00:00:00 2001
+From ed855acee4227bfddcf585cb3f583ed7ec1a8523 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 17:53:14 +0100
@@ -12,14 +12,14 @@ Qubes don't support hibernation.
 From ea91297b2a7599937ceeefeb21a3a185db9118f2
 By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 ---
- pyanaconda/bootloader/base.py | 6 ------
+ pyanaconda/modules/storage/bootloader/base.py | 6 ------
  1 file changed, 6 deletions(-)
 
-diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
-index f1aa6acca..45a27bccb 100644
---- a/pyanaconda/bootloader/base.py
-+++ b/pyanaconda/bootloader/base.py
-@@ -730,12 +730,6 @@ class BootLoader(object):
+diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
+index 71ca9c5c40..b8ab5b2a38 100644
+--- a/pyanaconda/modules/storage/bootloader/base.py
++++ b/pyanaconda/modules/storage/bootloader/base.py
+@@ -749,12 +749,6 @@ class BootLoader(object):
          swap_devices = storage.fsset.swap_devices
          dracut_devices.extend(swap_devices)
  
@@ -33,5 +33,5 @@ index f1aa6acca..45a27bccb 100644
          usr_device = storage.mountpoints.get("/usr")
          if usr_device:
 -- 
-2.25.2
+2.31.1
 

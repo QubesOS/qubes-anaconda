@@ -1,4 +1,4 @@
-From 3fba6e9c7bfb256cc61a8819058190d5003ad485 Mon Sep 17 00:00:00 2001
+From ab043b3f90a2e2ca1e6ab420e90511dac6b2b4da Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:55:40 +0100
@@ -15,10 +15,10 @@ By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
  2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/root_password.py b/pyanaconda/ui/gui/spokes/root_password.py
-index 1147b19bc..5febb64a2 100644
+index 6d7369221a..6b6ba14c8d 100644
 --- a/pyanaconda/ui/gui/spokes/root_password.py
 +++ b/pyanaconda/ui/gui/spokes/root_password.py
-@@ -176,7 +176,7 @@ class PasswordSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler)
+@@ -192,7 +192,7 @@ class PasswordSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler)
      @property
      def mandatory(self):
          """Only mandatory if no admin user has been requested."""
@@ -28,10 +28,10 @@ index 1147b19bc..5febb64a2 100644
      def apply(self):
          pw = self.password
 diff --git a/pyanaconda/ui/gui/spokes/user.py b/pyanaconda/ui/gui/spokes/user.py
-index 3c8d2a7bb..ed3733075 100644
+index ac3477ad13..becb68fc5d 100644
 --- a/pyanaconda/ui/gui/spokes/user.py
 +++ b/pyanaconda/ui/gui/spokes/user.py
-@@ -473,6 +473,11 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -482,6 +482,11 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          self.user.name = self.username
          self.user.gecos = self.fullname
  
@@ -44,5 +44,5 @@ index 3c8d2a7bb..ed3733075 100644
          # during an interactive installation. This is done by setting their name
          # to "". Then during apply() we will check the user name and if it is
 -- 
-2.25.2
+2.31.1
 

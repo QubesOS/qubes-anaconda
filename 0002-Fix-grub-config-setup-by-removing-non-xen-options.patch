@@ -1,4 +1,4 @@
-From 6de19052b906d213a4199cf73ce65cc5cd1c7275 Mon Sep 17 00:00:00 2001
+From 2fd261cd22ed43809041d18df7a1f0af2510bcb7 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 10:43:09 +0100
@@ -7,14 +7,14 @@ Subject: [PATCH] Fix grub config setup by removing non-xen options
 From e69c3148caf82cdc4ef736348c2aea39200ce40e
 By Marek Marczykowski <marmarek@invisiblethingslab.com>
 ---
- pyanaconda/bootloader/grub2.py | 3 +++
+ pyanaconda/modules/storage/bootloader/grub2.py | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 4695c1cd4..ab17af31d 100644
---- a/pyanaconda/bootloader/grub2.py
-+++ b/pyanaconda/bootloader/grub2.py
-@@ -333,6 +333,9 @@ class GRUB2(BootLoader):
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index add7dc9708..dce6be8fd3 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -332,6 +332,9 @@ class GRUB2(BootLoader):
          except (BootLoaderError, OSError, RuntimeError) as e:
              log.error("boot loader password setup failed: %s", e)
  
@@ -25,5 +25,5 @@ index 4695c1cd4..ab17af31d 100644
          if self.default is not None:
              machine_id_path = conf.target.system_root + "/etc/machine-id"
 -- 
-2.25.2
+2.31.1
 

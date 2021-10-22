@@ -1,0 +1,74 @@
+From 29d6f2b9e742a24b5d6ad0f5d64a804345b1f836 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 24 Oct 2021 13:30:43 +0200
+Subject: [PATCH] Allow to specify default thin pool name and size
+
+---
+ data/anaconda.conf                                   |  5 +++++
+ pyanaconda/core/configuration/storage.py             | 12 ++++++++++++
+ .../modules/storage/partitioning/automatic/utils.py  |  9 ++++++++-
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index 1f1fb081ac..fe478c0277 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -194,6 +194,11 @@ default_scheme = LVM
+ #
+ luks_version = luks2
+ 
++# Default thin pool name
++thin_pool_name =
++
++# Default thin pool size
++thin_pool_size =
+ 
+ [Storage Constraints]
+ 
+diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
+index fe8a0979f0..4ae052a28b 100644
+--- a/pyanaconda/core/configuration/storage.py
++++ b/pyanaconda/core/configuration/storage.py
+@@ -136,6 +136,18 @@ class StorageSection(Section):
+ 
+         return value
+ 
++    @property
++    def thin_pool_name(self):
++        """"The name of the default thin pool."""
++        return self._get_option("thin_pool_name", str) or None
++
++    @property
++    def thin_pool_size(self):
++        """"The size of the default thin pool."""
++        value = self._get_option("thin_pool_size", str) or None
++        if value:
++            return Size(value)
++
+     @property
+     def default_partitioning(self):
+         """Default partitioning.
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+index 04f10c718e..82fdd0cadd 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+@@ -484,7 +484,14 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
+ 
+         if thinlv and pool is None:
+             # create a single thin pool in the vg
+-            pool = storage.new_lv(parents=[container], thin_pool=True, grow=True)
++            kwargs = {'parents': [container], 'thin_pool': True}
++            if conf.storage.thin_pool_name:
++                kwargs['name'] = conf.storage.thin_pool_name
++            if conf.storage.thin_pool_size:
++                kwargs['size'] = conf.storage.thin_pool_size
++            else:
++                kwargs['grow'] = True
++            pool = storage.new_lv(**kwargs)
+             storage.create_device(pool)
+ 
+             # make sure VG reserves space for the pool to grow if needed
+-- 
+2.31.1
+
