@@ -1,0 +1,8 @@
+host:
+  rpm:
+    spec:
+    - anaconda.spec
+source:
+  files:
+  - url: https://ftp.qubes-os.org/distfiles/anaconda-32.24.5.tar.bz2
+    sha512: anaconda-32.24.5.tar.bz2.sha512
