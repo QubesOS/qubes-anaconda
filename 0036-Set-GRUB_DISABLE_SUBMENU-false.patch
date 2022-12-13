@@ -1,0 +1,27 @@
+From f2f7021b789b187dbbe5972b6125e0e4b5438ecb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Tue, 13 Dec 2022 05:27:46 +0100
+Subject: [PATCH] Set GRUB_DISABLE_SUBMENU=false
+
+Grub 2.06 has this setting fixed, so the config needs to be fixed too.
+---
+ pyanaconda/bootloader/grub2.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
+index e5168e55a..a90251fb5 100644
+--- a/pyanaconda/bootloader/grub2.py
++++ b/pyanaconda/bootloader/grub2.py
+@@ -259,7 +259,7 @@ class GRUB2(BootLoader):
+         defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
+         defaults.write("GRUB_DISTRIBUTOR=\"$(sed 's, release .*$,,g' /etc/system-release)\"\n")
+         defaults.write("GRUB_DEFAULT=saved\n")
+-        defaults.write("GRUB_DISABLE_SUBMENU=true\n")
++        defaults.write("GRUB_DISABLE_SUBMENU=false\n")
+         if self.console and self.has_serial_console:
+             defaults.write("GRUB_TERMINAL=\"serial console\"\n")
+             defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
+-- 
+2.37.3
+
