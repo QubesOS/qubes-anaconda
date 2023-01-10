@@ -1,0 +1,43 @@
+From 7d6a419fd4006c6a978f51b511947b667cb9e04b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 10 Jan 2023 09:51:20 +0100
+Subject: [PATCH] Ignore empty values when parsing
+ additional_default_grub_options
+
+- Add also configuration comment
+---
+ data/anaconda.conf                          | 1 +
+ pyanaconda/core/configuration/bootloader.py | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index 7246df75e2..cab5eaf54c 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -166,6 +166,7 @@ disable_grub_submenu = True
+ # Set GRUB terminal type
+ grub_terminal_type =
+ 
++# Additional default Grub options to be added
+ additional_default_grub_options =
+ 
+ [Storage]
+diff --git a/pyanaconda/core/configuration/bootloader.py b/pyanaconda/core/configuration/bootloader.py
+index f3c4414430..e02a679bac 100644
+--- a/pyanaconda/core/configuration/bootloader.py
++++ b/pyanaconda/core/configuration/bootloader.py
+@@ -83,4 +83,9 @@ class BootloaderSection(Section):
+     @property
+     def additional_default_grub_options(self):
+         """List of additional default GRUB options"""
+-        return self._get_option("additional_default_grub_options", str).strip("\n").split("\n")
++        options = []
++        parsed_options = self._get_option("additional_default_grub_options", str)
++        # We don't split directly as there is spaces in Grub option values
++        if parsed_options not in ("", "\n"):
++            options = parsed_options.strip("\n").split("\n")
++        return options
+-- 
+2.38.1
+

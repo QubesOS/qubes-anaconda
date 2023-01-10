@@ -1,0 +1,76 @@
+From b442f9b7d3c6df9403d7df8bb5ddbac1a5d74294 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sat, 16 Oct 2021 17:43:23 +0200
+Subject: [PATCH] Use kernel-install instead of grubby to regenerate
+
+Since we have own hook there, it properly handles Xen.
+This means we no longer need post scripts in kickstart for that.
+
+Adapted from QubesOS/qubes-anaconda/blob/677b12bf6206bc10ffae88435cefb261c2ee9105/0017-Use-kernel-install-instead-of-grubby-to-regenerate.patch
+---
+ .../modules/storage/bootloader/utils.py       | 42 +++----------------
+ 1 file changed, 6 insertions(+), 36 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
+index 27fc2a0058..15051b7ecd 100644
+--- a/pyanaconda/modules/storage/bootloader/utils.py
++++ b/pyanaconda/modules/storage/bootloader/utils.py
+@@ -257,7 +257,7 @@ def create_bls_entries(sysroot, storage, kernel_versions):
+ 
+ 
+ def recreate_initrds(sysroot, kernel_versions):
+-    """Recreate the initrds by calling new-kernel-pkg or dracut.
++    """Recreate the initrds by calling kernel-install or dracut
+ 
+     This needs to be done after all configuration files have been
+     written, since dracut depends on some of them.
+@@ -265,40 +265,10 @@ def recreate_initrds(sysroot, kernel_versions):
+     :param sysroot: a path to the root of the installed system
+     :param kernel_versions: a list of kernel versions
+     """
+-    if os.path.exists(sysroot + "/usr/sbin/new-kernel-pkg"):
+-        use_dracut = False
+-    else:
+-        log.debug("new-kernel-pkg does not exist, using dracut instead")
+-        use_dracut = True
+-
+     for kernel in kernel_versions:
+         log.info("Recreating initrd for %s", kernel)
+-
+-        if conf.target.is_image:
+-            # Dracut runs in the host-only mode by default, so we need to
+-            # turn it off by passing the -N option, because the mode is not
+-            # sensible for disk image installations. Using /dev/disk/by-uuid/
+-            # is necessary due to disk image naming.
+-            execWithRedirect(
+-                "dracut", [
+-                    "-N", "--persistent-policy", "by-uuid",
+-                    "-f", "/boot/initramfs-%s.img" % kernel, kernel
+-                ],
+-                root=sysroot
+-            )
+-        else:
+-            if use_dracut:
+-                execWithRedirect(
+-                    "depmod", ["-a", kernel], root=sysroot
+-                )
+-                execWithRedirect(
+-                    "dracut",
+-                    ["-f", "/boot/initramfs-%s.img" % kernel, kernel],
+-                    root=sysroot
+-                )
+-            else:
+-                execWithRedirect(
+-                    "new-kernel-pkg",
+-                    ["--mkinitrd", "--dracut", "--depmod", "--update", kernel],
+-                    root=sysroot
+-                )
++        execWithRedirect(
++            "kernel-install",
++            ["add", kernel, "/boot/vmlinuz-%s" % kernel],
++            root=sysroot
++        )
+-- 
+2.38.1
+

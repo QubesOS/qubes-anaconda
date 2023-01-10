@@ -1,0 +1,49 @@
+From 269866250f52767160e5ceb22fd5e1bdfe5ab68a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 18:42:49 +0100
+Subject: [PATCH] Generate proper extlinux.conf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes QubesOS/qubes-issues#2902
+
+From cfbbfb341a129b6ad9e02bec0c2af58300242986
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/modules/storage/bootloader/extlinux.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/extlinux.py b/pyanaconda/modules/storage/bootloader/extlinux.py
+index a12093ba83..6b9711ed8e 100644
+--- a/pyanaconda/modules/storage/bootloader/extlinux.py
++++ b/pyanaconda/modules/storage/bootloader/extlinux.py
+@@ -66,6 +66,8 @@ class EXTLINUX(BootLoader):
+ 
+     def write_config_images(self, config):
+         self.write_config_console(config)
++        xen_gz = [x for x in os.listdir(conf.target.system_root + self._config_dir)
++                  if x.startswith('xen-') and x.endswith('.gz')][0]
+         for image in self.images:
+             args = BootLoaderArguments()
+             args.update(["root=%s" % image.device.fstab_spec, "ro"])
+@@ -78,10 +80,12 @@ class EXTLINUX(BootLoader):
+             label = "%s(%s)" % (self.image_label(image), image.version)
+             label = label.replace(" ", "")
+             stanza = ("label %(label)s\n"
+-                      "\tkernel %(boot_prefix)s/%(kernel)s\n"
+-                      "\tinitrd %(boot_prefix)s/%(initrd)s\n"
+-                      "\tappend %(args)s\n\n"
++                      "\tkernel mboot.c32\n"
++                      "\tappend %(boot_prefix)s/%(xen)s --- "
++                      "%(boot_prefix)s/%(kernel)s %(args)s --- "
++                      "%(boot_prefix)s/%(initrd)s\n"
+                       % {"label": label,
++                         "xen": xen_gz,
+                          "kernel": image.kernel,
+                          "initrd": image.initrd,
+                          "args": args,
+-- 
+2.38.1
+

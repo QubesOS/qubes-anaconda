@@ -1,0 +1,55 @@
+From e4ba6b53381d21d9d34a3fa41a5a14a0b845a4cf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Wed, 4 Jan 2023 17:18:36 +0100
+Subject: [PATCH] Support for setting hostname from configuration file
+
+---
+ data/anaconda.conf                                 |  2 ++
+ pyanaconda/core/configuration/network.py           |  5 +++++
+ pyanaconda/modules/network/network.py              |  2 +-
+ .../pyanaconda_tests/core/test_configuration.py    | 14 ++++++++++++++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index b4d4d93d47..c174a37586 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -74,6 +74,8 @@ can_save_installation_logs = True
+ #
+ default_on_boot = NONE
+
++# Set hostname
++hostname =
+
+ [Payload]
+ # Default package environment.
+diff --git a/pyanaconda/core/configuration/network.py b/pyanaconda/core/configuration/network.py
+index f41c00b7e5..b3cb43a828 100644
+--- a/pyanaconda/core/configuration/network.py
++++ b/pyanaconda/core/configuration/network.py
+@@ -45,3 +45,8 @@ class NetworkSection(Section):
+         :return: an instance of NetworkOnBoot
+         """
+         return self._get_option("default_on_boot", NetworkOnBoot)
++
++    @property
++    def hostname(self):
++        """Hostname"""
++        return self._get_option("hostname", str)
+diff --git a/pyanaconda/modules/network/network.py b/pyanaconda/modules/network/network.py
+index 445c9d8b46..cd2156e62d 100644
+--- a/pyanaconda/modules/network/network.py
++++ b/pyanaconda/modules/network/network.py
+@@ -64,7 +64,7 @@ class NetworkService(KickstartService):
+         self._firewall_module = FirewallModule()
+
+         self.hostname_changed = Signal()
+-        self._hostname = ""
++        self._hostname = conf.network.hostname
+
+         self.current_hostname_changed = Signal()
+         self._hostname_service_proxy = self._get_hostname_proxy()
+--
+2.38.1
+

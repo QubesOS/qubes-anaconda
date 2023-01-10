@@ -1,0 +1,96 @@
+From 828a5da5c38dc8a2da0775dd515e7597dde2523f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 10 Jan 2023 09:47:22 +0100
+Subject: [PATCH] Use grub name-spaced for its options
+
+---
+ data/anaconda.conf                                        | 4 ++--
+ data/profile.d/qubesos.conf                               | 4 ++--
+ pyanaconda/core/configuration/bootloader.py               | 8 ++++----
+ pyanaconda/modules/storage/bootloader/grub2.py            | 4 ++--
+ .../pyanaconda_tests/core/test_configuration.py           | 6 +++---
+ 5 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index c174a37586..7246df75e2 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -161,10 +161,10 @@ preserved_arguments =
+     nosmt
+
+ # Disable the GRUB submenu
+-disable_submenu = True
++disable_grub_submenu = True
+
+ # Set GRUB terminal type
+-terminal_type =
++grub_terminal_type =
+
+ additional_default_grub_options =
+
+diff --git a/data/profile.d/qubesos.conf b/data/profile.d/qubesos.conf
+index 2dffe345c0..f43a0d4b98 100644
+--- a/data/profile.d/qubesos.conf
++++ b/data/profile.d/qubesos.conf
+@@ -41,8 +41,8 @@ selinux = -1
+
+ [Bootloader]
+ efi_dir = qubes
+-disable_submenu = False
+-terminal_type = gfxterm
++disable_grub_submenu = False
++grub_terminal_type = gfxterm
+ additional_default_grub_options =
+     GRUB_THEME="/boot/grub2/themes/qubes/theme.txt"
+     GRUB_CMDLINE_XEN_DEFAULT="console=none dom0_mem=min:1024M dom0_mem=max:4096M ucode=scan smt=off gnttab_max_frames=2048 gnttab_max_maptrack_frames=4096"
+diff --git a/pyanaconda/core/configuration/bootloader.py b/pyanaconda/core/configuration/bootloader.py
+index def20475ca..f3c4414430 100644
+--- a/pyanaconda/core/configuration/bootloader.py
++++ b/pyanaconda/core/configuration/bootloader.py
+@@ -54,9 +54,9 @@ class BootloaderSection(Section):
+         return self._get_option("menu_auto_hide", bool)
+
+     @property
+-    def disable_submenu(self):
++    def disable_grub_submenu(self):
+         """Disable the GRUB submenu."""
+-        return self._get_option("disable_submenu", bool)
++        return self._get_option("disable_grub_submenu", bool)
+
+     @property
+     def nonibft_iscsi_boot(self):
+@@ -76,9 +76,9 @@ class BootloaderSection(Section):
+         return self._get_option("preserved_arguments", str).split()
+
+     @property
+-    def terminal_type(self):
++    def grub_terminal_type(self):
+         """Terminal type."""
+-        return self._get_option("terminal_type", str)
++        return self._get_option("grub_terminal_type", str)
+
+     @property
+     def additional_default_grub_options(self):
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index a06a0fd84f..cd1bc30d82 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -256,12 +256,12 @@ class GRUB2(BootLoader):
+         defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
+         defaults.write("GRUB_DISTRIBUTOR=\"$(sed 's, release .*$,,g' /etc/system-release)\"\n")
+         defaults.write("GRUB_DEFAULT=saved\n")
+-        defaults.write("GRUB_DISABLE_SUBMENU=%s\n" % str(conf.bootloader.disable_submenu).lower())
++        defaults.write("GRUB_DISABLE_SUBMENU=%s\n" % str(conf.bootloader.disable_grub_submenu).lower())
+         if self.console and self.has_serial_console:
+             defaults.write("GRUB_TERMINAL=\"serial console\"\n")
+             defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
+         else:
+-            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n" % conf.bootloader.terminal_type or self.terminal_type)
++            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n" % conf.bootloader.grub_terminal_type or self.terminal_type)
+
+         # this is going to cause problems for systems containing multiple
+         # linux installations or even multiple boot entries with different
+--
+2.38.1
+

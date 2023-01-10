@@ -1,0 +1,48 @@
+From 8dae241a7afb4d6662535dd287f060000e439b3d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Wed, 25 Dec 2019 00:50:22 +0100
+Subject: [PATCH] Setup grubx64.efi directly as a bootloader
+
+Skip shim - we don't support SecureBoot and also Fedora's shim has
+hardcoded 'fedora' EFI vendor.
+---
+ pyanaconda/modules/storage/bootloader/efi.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
+index 1b47e247cd..1308f05434 100644
+--- a/pyanaconda/modules/storage/bootloader/efi.py
++++ b/pyanaconda/modules/storage/bootloader/efi.py
+@@ -131,7 +131,7 @@ class EFIBase(object):
+ 
+ class EFIGRUB(EFIBase, GRUB2):
+     """EFI GRUBv2"""
+-    _packages32 = [ "grub2-efi-ia32", "shim-ia32" ]
++    _packages32 = [ "grub2-efi-ia32" ]
+     _packages_common = [ "efibootmgr", "grub2-tools" ]
+     stage2_is_valid_stage1 = False
+     stage2_bootable = False
+@@ -140,7 +140,7 @@ class EFIGRUB(EFIBase, GRUB2):
+ 
+     def __init__(self):
+         super().__init__()
+-        self._packages64 = [ "grub2-efi-x64", "shim-x64" ]
++        self._packages64 = [ "grub2-efi-x64" ]
+ 
+         try:
+             f = open("/sys/firmware/efi/fw_platform_size", "r")
+@@ -155,8 +155,8 @@ class EFIGRUB(EFIBase, GRUB2):
+     @property
+     def _efi_binary(self):
+         if self._is_32bit_firmware:
+-            return "\\shimia32.efi"
+-        return "\\shimx64.efi"
++            return "\\grubx32.efi"
++        return "\\grubx64.efi"
+ 
+     @property
+     def packages(self):
+-- 
+2.38.1
+

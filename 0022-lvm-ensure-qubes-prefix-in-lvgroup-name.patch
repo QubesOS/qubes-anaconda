@@ -1,0 +1,28 @@
+From 061691a2d9b6fe316b594f1fa2cafa018beaf21e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 7 Jan 2020 19:20:22 +0100
+Subject: [PATCH] lvm: ensure 'qubes' prefix in lvgroup name
+
+---
+ pyanaconda/modules/storage/devicetree/model.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/modules/storage/devicetree/model.py b/pyanaconda/modules/storage/devicetree/model.py
+index 63c35fb0c9..931c3fcebd 100644
+--- a/pyanaconda/modules/storage/devicetree/model.py
++++ b/pyanaconda/modules/storage/devicetree/model.py
+@@ -409,7 +409,9 @@ class InstallerStorage(Blivet):
+ 
+     def _get_container_name_template(self, prefix=None):
+         """Return a template for suggest_container_name method."""
+-        prefix = prefix or ""  # make sure prefix is a string instead of None
++        # Ensure 'qubes' prefix for R4.0 compatibility
++        # else it's set to 'qubesos' the product variable
++        prefix = "qubes"
+ 
+         # try to create a device name incorporating the hostname
+         hostname = self._get_hostname()
+-- 
+2.38.1
+

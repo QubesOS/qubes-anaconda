@@ -1,0 +1,61 @@
+From 0af7e7f20a1ab9ca6042f72e43dee3515af7a099 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 17 Dec 2019 13:47:10 +0100
+Subject: [PATCH] Do not mount pre-existing partitions and do not detect OS
+ there
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Only allowed allowed in rescue mode
+
+This operation may be harmfull in many ways:
+ - may unintentionally modify a disk not selected as installation target
+   (mounting even read only replays journal for example)
+ - if previous system was compromised, it may try to exploit some of the
+   parsing code (filesystem driver etc) to survive across
+   re-installation
+
+QubesOS/qubes-issues#2835
+QubesOS/qubes-issues#5609
+
+Reworked from 1ce66b58907e229e21a0012a7a36ae93e9e32054
+By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/modules/storage/devicetree/root.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/devicetree/root.py b/pyanaconda/modules/storage/devicetree/root.py
+index c3f641fdee..91ff681b2c 100644
+--- a/pyanaconda/modules/storage/devicetree/root.py
++++ b/pyanaconda/modules/storage/devicetree/root.py
+@@ -27,6 +27,7 @@ from pyanaconda.core.configuration.anaconda import conf
+ from pyanaconda.core.i18n import _
+ from pyanaconda.core.path import set_system_root
+ from pyanaconda.modules.storage.devicetree.fsset import BlkidTab, CryptTab
++from pyanaconda.flags import flags
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+ log = get_module_logger(__name__)
+@@ -77,8 +78,15 @@ def find_existing_installations(devicetree):
+     :return: roots of all found installations
+     """
+     try:
+-        roots = _find_existing_installations(devicetree)
+-        return roots
++        if flags.rescue_mode:
++            msg = "[Qubes OS]: Find existing installations is enabled."
++            log.warning(msg)
++            roots = _find_existing_installations(devicetree)
++            return roots
++        else:
++            msg = "[Qubes OS]: Find existing installations is disabled for" \
++                  "security reasons. Only allowed in rescue mode."
++            log.info(msg)
+     except Exception:  # pylint: disable=broad-except
+         log_exception_info(log.info, "failure detecting existing installations")
+     finally:
+-- 
+2.38.1
+

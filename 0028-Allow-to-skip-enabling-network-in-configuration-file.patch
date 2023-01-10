@@ -1,0 +1,105 @@
+From ad5ac6f90ab7e62e551492352dd91feca9c70885 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Tue, 10 Jan 2023 15:30:14 +0100
+Subject: [PATCH] Allow to skip enabling network in configuration file
+
+---
+ data/anaconda.conf                       |  3 +++
+ data/profile.d/qubesos.conf              | 10 ++++++++++
+ pyanaconda/core/configuration/network.py |  5 +++++
+ pyanaconda/modules/network/network.py    | 23 +++++++++++++----------
+ 4 files changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index cab5eaf54c..5b86f2074e 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -77,6 +77,9 @@ default_on_boot = NONE
+ # Set hostname
+ hostname =
+ 
++# Allow to skip enabling network during installation
++skip_enable = False
++
+ [Payload]
+ # Default package environment.
+ default_environment =
+diff --git a/data/profile.d/qubesos.conf b/data/profile.d/qubesos.conf
+index f43a0d4b98..3f2ec44aec 100644
+--- a/data/profile.d/qubesos.conf
++++ b/data/profile.d/qubesos.conf
+@@ -1,6 +1,15 @@
+ # Anaconda configuration file for Qubes OS.
+ 
+ [Anaconda]
++activatable_modules =
++    org.fedoraproject.Anaconda.Modules.Localization
++    org.fedoraproject.Anaconda.Modules.Payloads
++    org.fedoraproject.Anaconda.Modules.Security
++    org.fedoraproject.Anaconda.Modules.Services
++    org.fedoraproject.Anaconda.Modules.Storage
++    org.fedoraproject.Anaconda.Modules.Timezone
++    org.fedoraproject.Anaconda.Modules.Users
++
+ forbidden_modules =
+     org.fedoraproject.Anaconda.Modules.Network
+ 
+@@ -35,6 +44,7 @@ default_rpm_gpg_keys =
+ [Network]
+ default_on_boot = NONE
+ hostname = dom0
++skip_enable = True
+ 
+ [Security]
+ selinux = -1
+diff --git a/pyanaconda/core/configuration/network.py b/pyanaconda/core/configuration/network.py
+index b3cb43a828..4066014ac1 100644
+--- a/pyanaconda/core/configuration/network.py
++++ b/pyanaconda/core/configuration/network.py
+@@ -50,3 +50,8 @@ class NetworkSection(Section):
+     def hostname(self):
+         """Hostname"""
+         return self._get_option("hostname", str)
++
++    @property
++    def skip_enable(self):
++        """Should we skip enabling network?"""
++        return self._get_option("skip_enable", bool)
+diff --git a/pyanaconda/modules/network/network.py b/pyanaconda/modules/network/network.py
+index cd2156e62d..4d17d036f1 100644
+--- a/pyanaconda/modules/network/network.py
++++ b/pyanaconda/modules/network/network.py
+@@ -71,16 +71,19 @@ class NetworkService(KickstartService):
+ 
+         self.connected_changed = Signal()
+         self.nm_client = None
+-        # TODO fallback solution - use Gio/GNetworkMonitor ?
+-        if SystemBus.check_connection():
+-            nm_client = NM.Client.new(None)
+-            if nm_client.get_nm_running():
+-                self.nm_client = nm_client
+-                self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
+-                initial_state = self.nm_client.get_state()
+-                self.set_connected(self._nm_state_connected(initial_state))
+-            else:
+-                log.debug("NetworkManager is not running.")
++        if not conf.network.skip_enable:
++            # TODO fallback solution - use Gio/GNetworkMonitor ?
++            if SystemBus.check_connection():
++                nm_client = NM.Client.new(None)
++                if nm_client.get_nm_running():
++                    self.nm_client = nm_client
++                    self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
++                    initial_state = self.nm_client.get_state()
++                    self.set_connected(self._nm_state_connected(initial_state))
++                else:
++                    log.debug("NetworkManager is not running.")
++        else:
++            log.debug("Enabling network is skipped.")
+ 
+         self._original_network_data = []
+         self._device_configurations = None
+-- 
+2.38.1
+

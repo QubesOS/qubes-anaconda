@@ -1,0 +1,79 @@
+From 122eac40319ac1599e7ddf44b8a9726ed6bcf408 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Wed, 4 Jan 2023 10:43:16 +0100
+Subject: [PATCH] Allow to provide default_partitionning based on scheme
+
+---
+ pyanaconda/core/configuration/storage.py      | 16 +++
+ .../automatic/automatic_partitioning.py       |  2 +-
+ .../storage/partitioning/automatic/utils.py   |  5 +-
+ .../pyanaconda_tests/core/test_profile.py     | 99 ++++++++++++++++++-
+ 4 files changed, 113 insertions(+), 9 deletions(-)
+
+diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
+index c9e7eae5ee..05982ebb85 100644
+--- a/pyanaconda/core/configuration/storage.py
++++ b/pyanaconda/core/configuration/storage.py
+@@ -179,6 +179,22 @@ class StorageSection(Section):
+         """
+         return self._get_option("default_partitioning", self._convert_partitioning)
+
++    def get_default_partitioning(self, scheme=None):
++        option = None
++        if scheme == AUTOPART_TYPE_PLAIN:
++            option = "default_partitioning_plain"
++        elif scheme == AUTOPART_TYPE_BTRFS:
++            option = "default_partitioning_btrfs"
++        elif scheme == AUTOPART_TYPE_LVM:
++            option = "default_partitioning_lvm"
++        elif scheme == AUTOPART_TYPE_LVM_THINP:
++            option = "default_partitioning_lvm_thinp"
++        if option and self._has_option(option):
++            partitioning = self._get_option(option, self._convert_partitioning)
++        else:
++            partitioning = self.default_partitioning
++        return partitioning
++
+     def _convert_partitioning(self, value):
+         """Convert a partitioning string into a list of dictionaries."""
+         return list(map(self._convert_partitioning_line, value.strip().split("\n")))
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+index bdf27bc8db..01c6cdcb23 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+@@ -132,7 +132,7 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
+         """
+         requests = []
+
+-        for request in get_default_partitioning():
++        for request in get_default_partitioning(scheme):
+             # Skip mount points excluded from the chosen scheme.
+             if request.schemes and scheme not in request.schemes:
+                 continue
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+index 8a1a9a6324..ff10dbd11b 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+@@ -255,8 +255,7 @@ def schedule_implicit_partitions(storage, disks, scheme, encrypted=False, luks_f
+
+     return devs
+
+-
+-def get_default_partitioning():
++def get_default_partitioning(scheme=None):
+     """Get the default partitioning requests.
+
+     :return: a list of partitioning specs
+@@ -265,7 +264,7 @@ def get_default_partitioning():
+     partitioning = list(platform.partitions)
+
+     # Get the product-specific partitioning.
+-    for attrs in conf.storage.default_partitioning:
++    for attrs in conf.storage.get_default_partitioning(scheme=scheme):
+         name = attrs.get("name")
+         swap = name == "swap"
+         schemes = set()
+--
+2.38.1
+

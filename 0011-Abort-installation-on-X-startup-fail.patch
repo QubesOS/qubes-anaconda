@@ -1,0 +1,67 @@
+From db1bd659bf45cf930e979d4d0e2fc1803e64fe58 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 16:30:22 +0100
+Subject: [PATCH] Abort installation on X startup fail
+
+Do not fallback to text mode, which cannot property install the system
+without kickstart file (missing LUKS passphrase prompt).
+
+Fixes QubesOS/qubes-issues#2996
+
+From 2607fb80f18ab63e94c786937d2850834b7d4b48
+By Marek Marczykowski <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/display.py | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
+
+diff --git a/pyanaconda/display.py b/pyanaconda/display.py
+index 880af9c4d7..b16ae2c3d2 100644
+--- a/pyanaconda/display.py
++++ b/pyanaconda/display.py
+@@ -19,6 +19,7 @@
+ #
+ # Author(s):  Martin Kolman <mkolman@redhat.com>
+ #
++import sys
+ import os
+ import subprocess
+ import time
+@@ -344,26 +345,14 @@ def setup_display(anaconda, options):
+         try:
+             start_x11(xtimeout)
+             do_startup_x11_actions()
+-        except TimeoutError as e:
+-            log.warning("X startup failed: %s", e)
+-            print("\nX did not start in the expected time, falling back to text mode. There are "
+-                  "multiple ways to avoid this issue:")
+-            wrapper = textwrap.TextWrapper(initial_indent=" * ", subsequent_indent="   ",
+-                                           width=os.get_terminal_size().columns - 3)
+-            for line in X_TIMEOUT_ADVICE.split("\n"):
+-                print(wrapper.fill(line))
+-            util.vtActivate(1)
+-            anaconda.display_mode = constants.DisplayModes.TUI
+-            anaconda.gui_startup_failed = True
+-            time.sleep(2)
+-
+-        except (OSError, RuntimeError) as e:
+-            log.warning("X or window manager startup failed: %s", e)
+-            print("\nX or window manager startup failed, falling back to text mode.")
+-            util.vtActivate(1)
+-            anaconda.display_mode = constants.DisplayModes.TUI
+-            anaconda.gui_startup_failed = True
+-            time.sleep(2)
++        except (OSError, RuntimeError, TimeoutError) as e:
++            log.warning("X startup failed, aborting installation")
++            stdout_log.error("X startup failed, aborting installation")
++            print(_("The installation cannot continue and the system will be rebooted"))
++            print(_("Press ENTER to continue"))
++            input()
++            util.ipmi_report(constants.IPMI_ABORTED)
++            sys.exit(1)
+ 
+         if not anaconda.gui_startup_failed:
+             do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
+-- 
+2.38.1
+

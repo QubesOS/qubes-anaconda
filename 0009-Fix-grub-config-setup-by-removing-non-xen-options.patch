@@ -1,0 +1,29 @@
+From ef67221e2c6801fe8044c3cc25e8244babf73578 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 15 Dec 2019 10:43:09 +0100
+Subject: [PATCH] Fix grub config setup by removing non-xen options
+
+From e69c3148caf82cdc4ef736348c2aea39200ce40e
+By Marek Marczykowski <marmarek@invisiblethingslab.com>
+---
+ pyanaconda/modules/storage/bootloader/grub2.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index cd1bc30d82..b1a9132ef0 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -335,6 +335,9 @@ class GRUB2(BootLoader):
+         except (BootLoaderError, OSError, RuntimeError) as e:
+             log.error("boot loader password setup failed: %s", e)
+ 
++        # disable non-xen entries
++        os.chmod("%s/etc/grub.d/10_linux" % conf.target.system_root, 0o644)
++
+         # make sure the default entry is the OS we are installing
+         if self.default is not None:
+             machine_id_path = conf.target.system_root + "/etc/machine-id"
+-- 
+2.38.1
+

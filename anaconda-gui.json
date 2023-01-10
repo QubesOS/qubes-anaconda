@@ -1,0 +1,9 @@
+{
+  "_comment_": [
+    "This is a mapping of screen ids and help files for Anaconda GUI on Qubes OS."
+  ],
+  "_default_": {
+    "file": "QubesPlaceholderWithLinks.html",
+    "anchor": ""
+  }
+}
