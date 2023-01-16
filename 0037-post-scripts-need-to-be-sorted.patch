@@ -1,0 +1,29 @@
+From 1a2c17528cf880b1b76d3c94cbd85e781145c76c Mon Sep 17 00:00:00 2001
+From: Jan Stodola <honza.stodola@gmail.com>
+Date: Wed, 7 Oct 2020 00:39:21 +0200
+Subject: [PATCH] post-scripts need to be sorted
+
+Because glob.glob() doesn't return a sorted list.
+
+Related: rhbz#1870493
+(cherry picked from commit 0eafa6399ca4ab093d0b7dc6ca442294cc14d842)
+---
+ pyanaconda/kickstart.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
+index 7dbf83971a..d26ff7e0a1 100644
+--- a/pyanaconda/kickstart.py
++++ b/pyanaconda/kickstart.py
+@@ -565,7 +565,7 @@ def appendPostScripts(ksdata):
+     scripts = ""
+ 
+     # Read in all the post script snippets to a single big string.
+-    for fn in glob.glob("/usr/share/anaconda/post-scripts/*ks"):
++    for fn in sorted(glob.glob("/usr/share/anaconda/post-scripts/*ks")):
+         f = open(fn, "r")
+         scripts += f.read()
+         f.close()
+-- 
+2.37.3
+

@@ -61,6 +61,7 @@ Patch32: 0033-Set-human-names-for-Qubes-thin-pools.patch
 Patch33: 0034-Fix-standard-partitioning-set-xfs-as-default-fs-ther.patch
 Patch34: 0035-Resolve-filename-into-associated-loop-device.patch
 Patch35: 0036-Set-GRUB_DISABLE_SUBMENU-false.patch
+Patch36: 0037-post-scripts-need-to-be-sorted.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
