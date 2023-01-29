@@ -285,7 +285,7 @@ Requires: xrandr
 Requires: xrdb
 Requires: dbus-x11
 Requires: gsettings-desktop-schemas
-Requires: nm-connection-editor
+#Requires: nm-connection-editor
 Requires: librsvg2
 Requires: gnome-kiosk
 Requires: brltty
@@ -315,11 +315,11 @@ Requires: tigervnc-server-minimal
 Requires: libxklavier >= %{libxklavierver}
 Requires: libgnomekbd
 Requires: libtimezonemap >= %{libtimezonemapver}
-Requires: nm-connection-editor
+#Requires: nm-connection-editor
 Requires: keybinder3
-%ifnarch s390 s390x
-Requires: NetworkManager-wifi
-%endif
+#%ifnarch s390 s390x
+#Requires: NetworkManager-wifi
+#%endif
 Requires: anaconda-user-help >= %{helpver}
 Requires: yelp
 %if ! 0%{?rhel}
