@@ -1,0 +1,676 @@
+From cbd8537bdb0826c004f9b9a3c8cd459e71b2f056 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 29 Jan 2023 17:35:25 +0100
+Subject: [PATCH 29/30] Drop NTP configuration spoke
+
+---
+ pyanaconda/ui/gui/spokes/datetime_spoke.glade | 280 +++++++-----------
+ pyanaconda/ui/gui/spokes/datetime_spoke.py    |  35 +--
+ 2 files changed, 111 insertions(+), 204 deletions(-)
+
+diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.glade b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
+index 188f93ba45..8ed666994e 100644
+--- a/pyanaconda/ui/gui/spokes/datetime_spoke.glade
++++ b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<!-- Generated with glade 3.36.0 -->
++<!-- Generated with glade 3.40.0 -->
+ <interface>
+   <requires lib="gtk+" version="3.12"/>
+   <requires lib="AnacondaWidgets" version="1.0"/>
+@@ -13,18 +13,13 @@
+     </columns>
+   </object>
+   <object class="GtkTreeModelFilter" id="citiesFilter">
+-    <property name="child_model">cities</property>
++    <property name="child-model">cities</property>
+   </object>
+   <object class="GtkEntryCompletion" id="cityCompletion">
+     <property name="model">citiesFilter</property>
+-    <property name="inline_completion">True</property>
++    <property name="inline-completion">True</property>
+     <signal name="match-selected" handler="on_completion_match_selected" object="cityCombobox" swapped="no"/>
+   </object>
+-  <object class="GtkImage" id="configImage">
+-    <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">system-run-symbolic</property>
+-  </object>
+   <object class="GtkListStore" id="days">
+     <columns>
+       <!-- column-name idx -->
+@@ -34,22 +29,22 @@
+     </columns>
+   </object>
+   <object class="GtkTreeModelFilter" id="daysFilter">
+-    <property name="child_model">days</property>
++    <property name="child-model">days</property>
+   </object>
+   <object class="GtkImage" id="downImage">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-down-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-down-symbolic</property>
+   </object>
+   <object class="GtkImage" id="downImage1">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-down-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-down-symbolic</property>
+   </object>
+   <object class="GtkImage" id="downImage2">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-down-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-down-symbolic</property>
+   </object>
+   <object class="GtkListStore" id="months">
+     <columns>
+@@ -69,39 +64,40 @@
+   </object>
+   <object class="GtkEntryCompletion" id="regionCompletion">
+     <property name="model">regions</property>
+-    <property name="inline_completion">True</property>
++    <property name="inline-completion">True</property>
+     <signal name="match-selected" handler="on_completion_match_selected" object="regionCombobox" swapped="no"/>
+   </object>
+   <object class="GtkImage" id="upImage">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-up-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-up-symbolic</property>
+   </object>
+   <object class="GtkImage" id="upImage1">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-up-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-up-symbolic</property>
+   </object>
+   <object class="GtkImage" id="upImage2">
+     <property name="visible">True</property>
+-    <property name="can_focus">False</property>
+-    <property name="icon_name">go-up-symbolic</property>
++    <property name="can-focus">False</property>
++    <property name="icon-name">go-up-symbolic</property>
+   </object>
+   <object class="AnacondaSpokeWindow" id="datetimeWindow">
+-    <property name="can_focus">False</property>
+-    <property name="window_name" translatable="yes">TIME &amp; DATE</property>
++    <property name="can-focus">False</property>
++    <property name="window-name" translatable="yes">TIME &amp; DATE</property>
+     <signal name="button-clicked" handler="on_back_clicked" swapped="no"/>
+     <child internal-child="main_box">
+       <object class="GtkBox" id="AnacondaSpokeWindow-main_box1">
+-        <property name="can_focus">False</property>
++        <property name="can-focus">False</property>
+         <property name="orientation">vertical</property>
+         <property name="spacing">6</property>
+         <child internal-child="nav_box">
+           <object class="GtkEventBox" id="AnacondaSpokeWindow-nav_box1">
+-            <property name="can_focus">False</property>
++            <property name="can-focus">False</property>
+             <child internal-child="nav_area">
++              <!-- n-columns=3 n-rows=3 -->
+               <object class="GtkGrid" id="AnacondaSpokeWindow-nav_area1">
+-                <property name="can_focus">False</property>
++                <property name="can-focus">False</property>
+               </object>
+             </child>
+           </object>
+@@ -113,35 +109,35 @@
+         </child>
+         <child internal-child="alignment">
+           <object class="GtkAlignment" id="AnacondaSpokeWindow-alignment1">
+-            <property name="can_focus">False</property>
++            <property name="can-focus">False</property>
+             <property name="yalign">0</property>
+             <child internal-child="action_area">
+               <object class="GtkBox" id="AnacondaSpokeWindow-action_area1">
+-                <property name="can_focus">False</property>
++                <property name="can-focus">False</property>
+                 <property name="orientation">vertical</property>
+                 <property name="spacing">6</property>
+                 <child>
+                   <object class="GtkBox" id="box1">
+                     <property name="visible">True</property>
+-                    <property name="can_focus">False</property>
++                    <property name="can-focus">False</property>
+                     <property name="orientation">vertical</property>
+                     <child>
+                       <object class="GtkAlignment" id="headerAlignment">
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
++                        <property name="can-focus">False</property>
+                         <property name="xalign">1</property>
+                         <property name="xscale">0.949999988079071</property>
+                         <child>
+                           <object class="GtkBox" id="headerBox">
+                             <property name="visible">True</property>
+-                            <property name="can_focus">False</property>
++                            <property name="can-focus">False</property>
+                             <child>
+                               <object class="GtkLabel" id="regionLabel">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="label" translatable="yes" context="GUI|Date and Time">_Region:</property>
+-                                <property name="use_underline">True</property>
+-                                <property name="mnemonic_widget">regionCombobox</property>
++                                <property name="use-underline">True</property>
++                                <property name="mnemonic-widget">regionCombobox</property>
+                               </object>
+                               <packing>
+                                 <property name="expand">False</property>
+@@ -153,16 +149,16 @@
+                             <child>
+                               <object class="GtkComboBox" id="regionCombobox">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="model">regions</property>
+-                                <property name="has_entry">True</property>
+-                                <property name="entry_text_column">1</property>
++                                <property name="has-entry">True</property>
++                                <property name="entry-text-column">1</property>
+                                 <signal name="changed" handler="on_region_changed" object="regionsEntry" swapped="no"/>
+                                 <child internal-child="entry">
+                                   <object class="GtkEntry" id="regionsEntry">
+-                                    <property name="can_focus">True</property>
++                                    <property name="can-focus">True</property>
+                                     <property name="events">GDK_KEY_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
+-                                    <property name="width_chars">20</property>
++                                    <property name="width-chars">20</property>
+                                     <property name="completion">regionCompletion</property>
+                                     <signal name="activate" handler="on_city_region_text_entry_activated" swapped="no"/>
+                                     <signal name="focus-out-event" handler="on_entry_left" swapped="no"/>
+@@ -185,11 +181,11 @@
+                             <child>
+                               <object class="GtkLabel" id="cityLabel">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
+-                                <property name="margin_start">6</property>
++                                <property name="can-focus">False</property>
++                                <property name="margin-start">6</property>
+                                 <property name="label" translatable="yes" context="GUI|Date and Time">_City:</property>
+-                                <property name="use_underline">True</property>
+-                                <property name="mnemonic_widget">cityCombobox</property>
++                                <property name="use-underline">True</property>
++                                <property name="mnemonic-widget">cityCombobox</property>
+                               </object>
+                               <packing>
+                                 <property name="expand">False</property>
+@@ -201,16 +197,16 @@
+                             <child>
+                               <object class="GtkComboBox" id="cityCombobox">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="model">citiesFilter</property>
+-                                <property name="has_entry">True</property>
+-                                <property name="entry_text_column">1</property>
++                                <property name="has-entry">True</property>
++                                <property name="entry-text-column">1</property>
+                                 <signal name="changed" handler="on_city_changed" object="citiesEntry" swapped="no"/>
+                                 <child internal-child="entry">
+                                   <object class="GtkEntry" id="citiesEntry">
+-                                    <property name="can_focus">True</property>
++                                    <property name="can-focus">True</property>
+                                     <property name="events">GDK_KEY_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
+-                                    <property name="width_chars">20</property>
++                                    <property name="width-chars">20</property>
+                                     <property name="completion">cityCompletion</property>
+                                     <signal name="activate" handler="on_city_region_text_entry_activated" swapped="no"/>
+                                     <signal name="focus-out-event" handler="on_entry_left" swapped="no"/>
+@@ -232,71 +228,12 @@
+                             <child>
+                               <object class="GtkAlignment" id="alignment4">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="xalign">1</property>
+                                 <property name="xscale">0.20000000298023224</property>
+-                                <property name="right_padding">24</property>
++                                <property name="right-padding">24</property>
+                                 <child>
+-                                  <object class="GtkBox" id="box6">
+-                                    <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
+-                                    <property name="halign">end</property>
+-                                    <child>
+-                                      <object class="GtkLabel" id="networkTimeLabel">
+-                                        <property name="visible">True</property>
+-                                        <property name="can_focus">False</property>
+-                                        <property name="label" translatable="yes" context="GUI|Date and Time">_Network Time</property>
+-                                        <property name="use_underline">True</property>
+-                                        <property name="mnemonic_widget">networkTimeSwitch</property>
+-                                      </object>
+-                                      <packing>
+-                                        <property name="expand">False</property>
+-                                        <property name="fill">True</property>
+-                                        <property name="padding">3</property>
+-                                        <property name="position">0</property>
+-                                      </packing>
+-                                    </child>
+-                                    <child>
+-                                      <object class="GtkSwitch" id="networkTimeSwitch">
+-                                        <property name="visible">True</property>
+-                                        <property name="can_focus">True</property>
+-                                        <property name="valign">center</property>
+-                                        <property name="margin_end">6</property>
+-                                        <signal name="notify::active" handler="on_ntp_switched" swapped="no"/>
+-                                        <child internal-child="accessible">
+-                                          <object class="AtkObject" id="networkTimeSwitch-atkobject">
+-                                            <property name="AtkObject::accessible-name" translatable="yes">Use Network Time</property>
+-                                          </object>
+-                                        </child>
+-                                      </object>
+-                                      <packing>
+-                                        <property name="expand">False</property>
+-                                        <property name="fill">True</property>
+-                                        <property name="padding">1</property>
+-                                        <property name="position">1</property>
+-                                      </packing>
+-                                    </child>
+-                                    <child>
+-                                      <object class="GtkButton" id="ntpConfigButton">
+-                                        <property name="visible">True</property>
+-                                        <property name="can_focus">True</property>
+-                                        <property name="receives_default">True</property>
+-                                        <property name="image">configImage</property>
+-                                        <signal name="clicked" handler="on_ntp_config_clicked" swapped="no"/>
+-                                        <child internal-child="accessible">
+-                                          <object class="AtkObject" id="ntpConfigButton-atkobject">
+-                                            <property name="AtkObject::accessible-name" translatable="yes">Configure NTP</property>
+-                                          </object>
+-                                        </child>
+-                                      </object>
+-                                      <packing>
+-                                        <property name="expand">False</property>
+-                                        <property name="fill">True</property>
+-                                        <property name="padding">1</property>
+-                                        <property name="position">2</property>
+-                                      </packing>
+-                                    </child>
+-                                  </object>
++                                  <placeholder/>
+                                 </child>
+                               </object>
+                               <packing>
+@@ -317,7 +254,7 @@
+                     <child>
+                       <object class="CcTimezoneMap" id="tzmap">
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
++                        <property name="can-focus">False</property>
+                         <signal name="location-changed" handler="on_location_changed" swapped="no"/>
+                       </object>
+                       <packing>
+@@ -330,22 +267,23 @@
+                     <child>
+                       <object class="GtkAlignment" id="footerAlignment">
+                         <property name="visible">True</property>
+-                        <property name="can_focus">False</property>
++                        <property name="can-focus">False</property>
+                         <property name="xalign">1</property>
+-                        <property name="left_padding">24</property>
++                        <property name="left-padding">24</property>
+                         <child>
+                           <object class="GtkBox" id="footerBox">
+                             <property name="visible">True</property>
+-                            <property name="can_focus">False</property>
+-                            <property name="margin_bottom">6</property>
++                            <property name="can-focus">False</property>
++                            <property name="margin-bottom">6</property>
+                             <child>
++                              <!-- n-columns=5 n-rows=3 -->
+                               <object class="GtkGrid" id="grid2">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <child>
+                                   <object class="GtkLabel" id="hoursLabel">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="label">00</property>
+                                     <attributes>
+                                       <attribute name="scale" value="2"/>
+@@ -357,28 +295,28 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">0</property>
+-                                    <property name="top_attach">1</property>
++                                    <property name="left-attach">0</property>
++                                    <property name="top-attach">1</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkLabel" id="colonLabel">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="label" translatable="yes" context="GUI|Date and Time" comments="TRANSLATORS: This is the separator between hours and minutes, like in HH:MM">:</property>
+                                     <attributes>
+                                       <attribute name="scale" value="2"/>
+                                     </attributes>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">1</property>
+-                                    <property name="top_attach">1</property>
++                                    <property name="left-attach">1</property>
++                                    <property name="top-attach">1</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkLabel" id="minutesLabel">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="label">00</property>
+                                     <attributes>
+                                       <attribute name="scale" value="2"/>
+@@ -390,15 +328,15 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">2</property>
+-                                    <property name="top_attach">1</property>
++                                    <property name="left-attach">2</property>
++                                    <property name="top-attach">1</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkButton" id="hoursUpButton">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">True</property>
+-                                    <property name="receives_default">True</property>
++                                    <property name="can-focus">True</property>
++                                    <property name="receives-default">True</property>
+                                     <property name="image">upImage</property>
+                                     <signal name="clicked" handler="on_up_hours_clicked" swapped="no"/>
+                                     <child internal-child="accessible">
+@@ -408,15 +346,15 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">0</property>
+-                                    <property name="top_attach">0</property>
++                                    <property name="left-attach">0</property>
++                                    <property name="top-attach">0</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkButton" id="hoursDownButton">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">True</property>
+-                                    <property name="receives_default">True</property>
++                                    <property name="can-focus">True</property>
++                                    <property name="receives-default">True</property>
+                                     <property name="image">downImage</property>
+                                     <signal name="clicked" handler="on_down_hours_clicked" swapped="no"/>
+                                     <child internal-child="accessible">
+@@ -426,15 +364,15 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">0</property>
+-                                    <property name="top_attach">2</property>
++                                    <property name="left-attach">0</property>
++                                    <property name="top-attach">2</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkButton" id="minutesUpButton">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">True</property>
+-                                    <property name="receives_default">True</property>
++                                    <property name="can-focus">True</property>
++                                    <property name="receives-default">True</property>
+                                     <property name="image">upImage2</property>
+                                     <signal name="clicked" handler="on_up_minutes_clicked" swapped="no"/>
+                                     <child internal-child="accessible">
+@@ -444,15 +382,15 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">2</property>
+-                                    <property name="top_attach">0</property>
++                                    <property name="left-attach">2</property>
++                                    <property name="top-attach">0</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkButton" id="minutesDownButton">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">True</property>
+-                                    <property name="receives_default">True</property>
++                                    <property name="can-focus">True</property>
++                                    <property name="receives-default">True</property>
+                                     <property name="image">downImage2</property>
+                                     <signal name="clicked" handler="on_down_minutes_clicked" swapped="no"/>
+                                     <child internal-child="accessible">
+@@ -462,41 +400,41 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">2</property>
+-                                    <property name="top_attach">2</property>
++                                    <property name="left-attach">2</property>
++                                    <property name="top-attach">2</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkLabel" id="spaceLabel">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="label"> </property>
+                                     <attributes>
+                                       <attribute name="scale" value="2"/>
+                                     </attributes>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">3</property>
+-                                    <property name="top_attach">1</property>
++                                    <property name="left-attach">3</property>
++                                    <property name="top-attach">1</property>
+                                   </packing>
+                                 </child>
+                                 <child>
+                                   <object class="GtkRevealer" id="amPmRevealer">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
+-                                    <property name="transition_type">crossfade</property>
+-                                    <property name="reveal_child">True</property>
++                                    <property name="can-focus">False</property>
++                                    <property name="transition-type">crossfade</property>
++                                    <property name="reveal-child">True</property>
+                                     <child>
+                                       <object class="GtkBox" id="amPmBox">
+                                         <property name="visible">True</property>
+-                                        <property name="can_focus">False</property>
++                                        <property name="can-focus">False</property>
+                                         <property name="valign">center</property>
+                                         <property name="orientation">vertical</property>
+                                         <child>
+                                           <object class="GtkButton" id="amPmUpButton">
+                                             <property name="visible">True</property>
+-                                            <property name="can_focus">True</property>
+-                                            <property name="receives_default">True</property>
++                                            <property name="can-focus">True</property>
++                                            <property name="receives-default">True</property>
+                                             <property name="image">upImage1</property>
+                                             <signal name="clicked" handler="on_updown_ampm_clicked" swapped="no"/>
+                                             <child internal-child="accessible">
+@@ -514,9 +452,9 @@
+                                         <child>
+                                           <object class="GtkLabel" id="amPmLabel">
+                                             <property name="visible">True</property>
+-                                            <property name="can_focus">False</property>
+-                                            <property name="margin_top">4</property>
+-                                            <property name="margin_bottom">5</property>
++                                            <property name="can-focus">False</property>
++                                            <property name="margin-top">4</property>
++                                            <property name="margin-bottom">5</property>
+                                             <property name="label" translatable="yes">PM</property>
+                                             <attributes>
+                                               <attribute name="scale" value="1.5"/>
+@@ -531,8 +469,8 @@
+                                         <child>
+                                           <object class="GtkButton" id="amPmDownButton">
+                                             <property name="visible">True</property>
+-                                            <property name="can_focus">True</property>
+-                                            <property name="receives_default">True</property>
++                                            <property name="can-focus">True</property>
++                                            <property name="receives-default">True</property>
+                                             <property name="image">downImage1</property>
+                                             <signal name="clicked" handler="on_updown_ampm_clicked" swapped="no"/>
+                                             <child internal-child="accessible">
+@@ -551,8 +489,8 @@
+                                     </child>
+                                   </object>
+                                   <packing>
+-                                    <property name="left_attach">4</property>
+-                                    <property name="top_attach">0</property>
++                                    <property name="left-attach">4</property>
++                                    <property name="top-attach">0</property>
+                                     <property name="height">3</property>
+                                   </packing>
+                                 </child>
+@@ -578,24 +516,24 @@
+                             <child>
+                               <object class="GtkAlignment" id="alignment2">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="yalign">1</property>
+                                 <property name="yscale">0.5</property>
+                                 <child>
+                                   <object class="GtkBox" id="box4">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="orientation">vertical</property>
+                                     <child>
+                                       <object class="GtkRadioButton" id="timeFormatRB">
+                                         <property name="label" translatable="yes" context="GUI|Date and Time">24-_hour</property>
+                                         <property name="visible">True</property>
+-                                        <property name="can_focus">True</property>
+-                                        <property name="receives_default">False</property>
+-                                        <property name="use_underline">True</property>
++                                        <property name="can-focus">True</property>
++                                        <property name="receives-default">False</property>
++                                        <property name="use-underline">True</property>
+                                         <property name="xalign">0</property>
+                                         <property name="active">True</property>
+-                                        <property name="draw_indicator">True</property>
++                                        <property name="draw-indicator">True</property>
+                                         <signal name="toggled" handler="on_timeformat_changed" swapped="no"/>
+                                       </object>
+                                       <packing>
+@@ -608,11 +546,11 @@
+                                       <object class="GtkRadioButton" id="timeFormatRB2">
+                                         <property name="label" translatable="yes" context="GUI|Date and Time">_AM/PM</property>
+                                         <property name="visible">True</property>
+-                                        <property name="can_focus">True</property>
+-                                        <property name="receives_default">False</property>
+-                                        <property name="use_underline">True</property>
++                                        <property name="can-focus">True</property>
++                                        <property name="receives-default">False</property>
++                                        <property name="use-underline">True</property>
+                                         <property name="xalign">0</property>
+-                                        <property name="draw_indicator">True</property>
++                                        <property name="draw-indicator">True</property>
+                                         <property name="group">timeFormatRB</property>
+                                       </object>
+                                       <packing>
+@@ -634,15 +572,15 @@
+                             <child>
+                               <object class="GtkAlignment" id="alignment5">
+                                 <property name="visible">True</property>
+-                                <property name="can_focus">False</property>
++                                <property name="can-focus">False</property>
+                                 <property name="xalign">1</property>
+                                 <property name="xscale">0.30000001192092896</property>
+                                 <property name="yscale">0.20000000298023224</property>
+-                                <property name="right_padding">24</property>
++                                <property name="right-padding">24</property>
+                                 <child>
+                                   <object class="GtkBox" id="dateBox">
+                                     <property name="visible">True</property>
+-                                    <property name="can_focus">False</property>
++                                    <property name="can-focus">False</property>
+                                     <property name="halign">end</property>
+                                     <property name="spacing">3</property>
+                                     <child>
+diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
+index 9b56e5d21f..6375b3b3fa 100644
+--- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
++++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
+@@ -265,7 +265,7 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+         self._year_format, suffix = formats[widgets.index(year_box)]
+         year_label.set_text(suffix)
+ 
+-        self._ntpSwitch = self.builder.get_object("networkTimeSwitch")
++        self._ntpSwitch = None
+ 
+         self._regions_zones = get_all_regions_and_timezones()
+ 
+@@ -353,7 +353,7 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+             return
+ 
+         self._timezone_module.Timezone = region + "/" + city
+-        self._timezone_module.NTPEnabled = self._ntpSwitch.get_active()
++        self._timezone_module.NTPEnabled = False
+         self._kickstarted = False
+ 
+     def execute(self):
+@@ -393,37 +393,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+ 
+         self._update_datetime()
+ 
+-        # update the ntp configuration
+-        self._ntp_servers = TimeSourceData.from_structure_list(
+-            self._timezone_module.TimeSources
+-        )
+-
+-        if not self._ntp_servers:
+-            try:
+-                self._ntp_servers = ntp.get_servers_from_config()
+-            except ntp.NTPconfigError:
+-                log.warning("Failed to load NTP servers configuration")
+-
+-        self._ntp_servers_states = NTPServerStatusCache()
+-        self._ntp_servers_states.changed.connect(self._update_ntp_server_warning)
+-
+-        has_active_network = self._network_module.Connected
+-
+-        if not has_active_network:
+-            self._show_no_network_warning()
+-        else:
+-            self.clear_info()
+-
+-            for server in self._ntp_servers:
+-                self._ntp_servers_states.check_status(server)
+-
+-        if conf.system.can_set_time_synchronization:
+-            ntp_working = has_active_network and is_service_running(NTP_SERVICE)
+-        else:
+-            ntp_working = self._timezone_module.NTPEnabled
+-
+-        self._ntpSwitch.set_active(ntp_working)
+-
+     @async_action_wait
+     def _set_timezone(self, timezone):
+         """
+-- 
+2.38.1
+

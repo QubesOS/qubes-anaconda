@@ -53,6 +53,8 @@ Patch24: 0025-Use-kernel-install-instead-of-grubby-to-regenerate.patch
 Patch25: 0026-Compute-template-RPMs-needed-spaces.patch
 Patch26: 0027-dnfpayload-make-available-repos-for-post-scripts.patch
 Patch27: 0028-Allow-to-skip-enabling-network-in-configuration-file.patch
+Patch28: 0029-Drop-NTP-configuration-spoke.patch
+Patch29: 0030-Simplify-USER-configuration-spoke.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
