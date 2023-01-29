@@ -376,9 +376,6 @@ runtime on NFS/HTTP/FTP servers or local disks.
 %prep
 %autosetup -p 1
 
-# Copy QubesOS product file
-cp %{SOURCE1} data/profile.d/
-
 %build
 # use actual build-time release number, not tarball creation time release number
 %configure ANACONDA_RELEASE=%{release}
@@ -401,6 +398,9 @@ cp -r %{SOURCE6} %{SOURCE7} %{SOURCE8} %{SOURCE9} %{buildroot}%{_datadir}/anacon
 mkdir -p %{buildroot}%{_datadir}/anaconda/help/qubesos/en-US
 cp -r %{SOURCE2} %{SOURCE3} %{buildroot}%{_datadir}/anaconda/help/qubesos/
 cp -r %{SOURCE4} %{SOURCE5} %{buildroot}%{_datadir}/anaconda/help/qubesos/en-US/
+
+# Copy QubesOS product file
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/profile.d/
 
 # required for live installations
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
