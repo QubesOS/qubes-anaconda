@@ -1,0 +1,27 @@
+From a0d2e4dcac483d1c2542b6dc1ae2b95952eda1d2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic@invisiblethingslab.com>
+Date: Mon, 30 Jan 2023 11:19:15 +0100
+Subject: [PATCH] Setting root is not mandatory
+
+We enforce to have a user being an admin.
+---
+ pyanaconda/ui/gui/spokes/root_password.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/ui/gui/spokes/root_password.py b/pyanaconda/ui/gui/spokes/root_password.py
+index 49d073682a..2c167b97d7 100644
+--- a/pyanaconda/ui/gui/spokes/root_password.py
++++ b/pyanaconda/ui/gui/spokes/root_password.py
+@@ -174,7 +174,7 @@ class PasswordSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler)
+     @property
+     def mandatory(self):
+         """Only mandatory if no admin user has been requested."""
+-        return not self._users_module.CheckAdminUserExists()
++        return False
+ 
+     def apply(self):
+         if self.root_enabled and self.password:
+-- 
+2.38.1
+
