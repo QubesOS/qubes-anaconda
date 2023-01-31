@@ -1,8 +1,8 @@
-From cbd8537bdb0826c004f9b9a3c8cd459e71b2f056 Mon Sep 17 00:00:00 2001
+From c12740adbb29443f456046190c648133b7b9c3e8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 29 Jan 2023 17:35:25 +0100
-Subject: [PATCH 29/30] Drop NTP configuration spoke
+Subject: [PATCH] Drop NTP configuration spoke
 
 ---
  pyanaconda/ui/gui/spokes/datetime_spoke.glade | 280 +++++++-----------

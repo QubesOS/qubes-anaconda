@@ -1,8 +1,8 @@
-From e54ba3f3713335233bbe37871f710b8e1e8925bc Mon Sep 17 00:00:00 2001
+From 0964a1b83d4b1b5cd38faab94da8d58feff76944 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 29 Jan 2023 17:46:18 +0100
-Subject: [PATCH 30/30] Simplify USER configuration spoke
+Subject: [PATCH] Simplify USER configuration spoke
 
 ---
  pyanaconda/ui/gui/spokes/user.glade | 57 ++++-------------------------

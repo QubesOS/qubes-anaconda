@@ -1,27 +1,28 @@
-From 1b236bbd2790f29e935bd838020c1b4fe84c646a Mon Sep 17 00:00:00 2001
+From 5da5b8ad9373c5c21c6a4ddbd8f6709dc575d211 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 29 Jan 2023 14:10:19 +0100
-Subject: [PATCH 27/28] dnfpayload: make available repos for post-scripts
+Subject: [PATCH] dnfpayload: make available repos for post-scripts
 
 ---
  pyanaconda/modules/payloads/payload/dnf/installation.py | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
-index 4e596239ab..9fe4214347 100644
+index 4e596239ab..144d8d4dba 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/installation.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
 @@ -320,6 +320,10 @@ class WriteRepositoriesTask(Task):
          with open(repo_path, "w") as f:
              f.write(content.strip() + "\n")
-
-+        repo_file = '/tmp/installer.repo'
+ 
++        repo_file = join_paths(self._sysroot, '/tmp/installer.repo')
 +        with open(repo_file, 'a') as repo_fd:
 +            repo_fd.write(content)
 +
-
+ 
  class ImportRPMKeysTask(Task):
      """The installation task for import of the RPM keys."""
---
+-- 
 2.38.1
+
