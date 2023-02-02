@@ -1,28 +1,33 @@
-From 5da5b8ad9373c5c21c6a4ddbd8f6709dc575d211 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
- <frederic.pierret@qubes-os.org>
-Date: Sun, 29 Jan 2023 14:10:19 +0100
+From d56ad081582f63666847daf622e4053f6882c075 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Thu, 2 Feb 2023 06:16:37 +0100
 Subject: [PATCH] dnfpayload: make available repos for post-scripts
 
+This is used by kickstart post-scripts to copy templates and
+kernel-latest from installation source, whatever that source was.
 ---
- pyanaconda/modules/payloads/payload/dnf/installation.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ pyanaconda/payload/dnf/payload.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
-index 4e596239ab..144d8d4dba 100644
---- a/pyanaconda/modules/payloads/payload/dnf/installation.py
-+++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
-@@ -320,6 +320,10 @@ class WriteRepositoriesTask(Task):
-         with open(repo_path, "w") as f:
-             f.write(content.strip() + "\n")
+diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
+index 2b0684a3a8..e5d8905221 100644
+--- a/pyanaconda/payload/dnf/payload.py
++++ b/pyanaconda/payload/dnf/payload.py
+@@ -446,6 +446,13 @@ class DNFPayload(Payload):
+         log.debug("[Qubes OS]: Total templates RPMs size: %s", templates_size)
+         return templates_size
  
-+        repo_file = join_paths(self._sysroot, '/tmp/installer.repo')
-+        with open(repo_file, 'a') as repo_fd:
-+            repo_fd.write(content)
++    def pre_install(self):
++        super().pre_install()
++        for repo in self._dnf_manager._base.repos.iter_enabled():
++            repo_file = '/tmp/installer.repo'
++            with open(repo_file, 'a') as repo_fd:
++                repo_fd.write(repo.dump())
 +
+     def install(self):
+         self._progress_cb(0, _('Starting package installation process'))
  
- class ImportRPMKeysTask(Task):
-     """The installation task for import of the RPM keys."""
 -- 
-2.38.1
+2.39.0
 
