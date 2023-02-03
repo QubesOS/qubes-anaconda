@@ -1,0 +1,29 @@
+From 058f37e13f21b5df36fac3ae8a1d6c7a6a922975 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Thu, 2 Feb 2023 14:59:26 +0100
+Subject: [PATCH] efi: deal with verbose by default output from efibootmgr
+
+efibootmgr version 18 uses verbose format by default. This includes boot
+entry details, not only their name. Strip it when looking for names to
+remove.
+---
+ pyanaconda/modules/storage/bootloader/efi.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
+index 1308f05434..32f0227dc6 100644
+--- a/pyanaconda/modules/storage/bootloader/efi.py
++++ b/pyanaconda/modules/storage/bootloader/efi.py
+@@ -93,6 +93,8 @@ class EFIBase(object):
+         for line in buf.splitlines():
+             try:
+                 (slot, _product) = line.split(None, 1)
++                # keep only the name, if verbose output is default in this version
++                _product = _product.split("\t")[0]
+             except ValueError:
+                 continue
+ 
+-- 
+2.39.0
+
