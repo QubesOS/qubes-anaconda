@@ -1,0 +1,34 @@
+From 65c2df5fd44a1a73d4a449e25c49761dd94e86ec Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Thu, 9 Feb 2023 22:25:41 +0100
+Subject: [PATCH] Apply hidden_spokes setting to standalone spokes too
+
+Disabling spokes like NetworkStandaloneSpoke may be useful too.
+---
+ pyanaconda/ui/__init__.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pyanaconda/ui/__init__.py b/pyanaconda/ui/__init__.py
+index b29a1e6923..45162c9d08 100644
+--- a/pyanaconda/ui/__init__.py
++++ b/pyanaconda/ui/__init__.py
+@@ -20,6 +20,7 @@
+ __all__ = ["UserInterface"]
+ 
+ import copy
++from pyanaconda.core.configuration.anaconda import conf
+ from pyanaconda.core.util import collect
+ 
+ 
+@@ -154,6 +155,7 @@ class UserInterface(object):
+ 
+         def check_standalone_spokes(obj):
+             return issubclass(obj, standalone_class) and \
++                obj.__name__ not in conf.ui.hidden_spokes and \
+                 getattr(obj, "preForHub", False) or \
+                 getattr(obj, "postForHub", False)
+ 
+-- 
+2.39.0
+
