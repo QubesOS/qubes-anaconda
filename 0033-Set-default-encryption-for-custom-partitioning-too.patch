@@ -1,0 +1,28 @@
+From b618d252f28fac436f18b0f94351382d8bbd9d75 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Thu, 9 Feb 2023 21:57:20 +0100
+Subject: [PATCH] Set default encryption for custom partitioning too
+
+Fixes: b3b3b45332 "Support for setting encryption from configuration
+file"
+---
+ pyanaconda/ui/gui/spokes/custom_storage.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/ui/gui/spokes/custom_storage.py b/pyanaconda/ui/gui/spokes/custom_storage.py
+index b78c3382e4..e44dfb3dec 100644
+--- a/pyanaconda/ui/gui/spokes/custom_storage.py
++++ b/pyanaconda/ui/gui/spokes/custom_storage.py
+@@ -115,7 +115,7 @@ class CustomPartitioningSpoke(NormalSpoke, StorageCheckHandler):
+         self._accordion = None
+ 
+         self._partitioning_scheme = conf.storage.default_scheme
+-        self._partitioning_encrypted = False
++        self._partitioning_encrypted = conf.storage.encrypted
+ 
+         self._default_file_system = ""
+         self._selected_disks = []
+-- 
+2.39.0
+

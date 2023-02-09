@@ -57,6 +57,7 @@ Patch28: 0029-Drop-NTP-configuration-spoke.patch
 Patch29: 0030-Simplify-USER-configuration-spoke.patch
 Patch30: 0031-Setting-root-is-not-mandatory.patch
 Patch31: 0032-efi-deal-with-verbose-by-default-output-from-efiboot.patch
+Patch32: 0033-Set-default-encryption-for-custom-partitioning-too.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
