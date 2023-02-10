@@ -1,0 +1,32 @@
+From 6ee759df73b6c5f541116e60224e18d1c20431be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Fri, 10 Feb 2023 22:19:57 +0100
+Subject: [PATCH] Do not add resume= to the kernel cmdline
+
+We don't support suspend to disk, at least at this stage. It isn't just
+about hibernating dom0, it would need to handle all the other VMs too.
+---
+ pyanaconda/modules/storage/bootloader/base.py | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
+index df907d7493..415a1294ad 100644
+--- a/pyanaconda/modules/storage/bootloader/base.py
++++ b/pyanaconda/modules/storage/bootloader/base.py
+@@ -802,12 +802,6 @@ class BootLoader(object):
+         swap_devices = storage.fsset.swap_devices
+         dracut_devices.extend(swap_devices)
+ 
+-        # Add resume= option to enable hibernation for x86 and arm.
+-        # Choose the largest swap device for that.
+-        if (blivet.arch.is_x86() or blivet.arch.is_arm()) and swap_devices:
+-            resume_device = max(swap_devices, key=lambda x: x.size)
+-            self.boot_args.add("resume=%s" % resume_device.fstab_spec)
+-
+         # Does /usr have its own device? If so, we need to tell dracut
+         usr_device = storage.mountpoints.get("/usr")
+         if usr_device:
+-- 
+2.39.0
+
