@@ -1,0 +1,66 @@
+From d124b7a829b1e74abd650b81369a180ab3bf57ed Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Sun, 12 Feb 2023 03:38:37 +0100
+Subject: [PATCH] Add support for fstype in default partitioning config
+
+Allow setting specific fstype for individual partitions in the config.
+This specifically allows different fstypes for different partitions.
+The feature is optional - if fstype is not set, the behavior is
+unchanged.
+---
+ pyanaconda/core/configuration/storage.py         | 11 +++++++++++
+ .../storage/partitioning/automatic/utils.py      |  2 +-
+ .../pyanaconda_tests/core/test_configuration.py  | 11 +++++++++++
+ .../partitioning/test_module_part_automatic.py   | 16 ++++++++++++++++
+ 4 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
+index 9f0c31ab63..02db385bac 100644
+--- a/pyanaconda/core/configuration/storage.py
++++ b/pyanaconda/core/configuration/storage.py
+@@ -178,6 +178,7 @@ class StorageSection(Section):
+             min        The size will grow from min size to max size.
+             max        The max size is unlimited by default.
+             free       The required available space.
++            fstype     Force specific file system.
+             btrfs      The mount point will be created only for the Btrfs scheme
+ 
+         :return: a list of dictionaries with mount point attributes
+@@ -217,6 +218,9 @@ class StorageSection(Section):
+             if not value and name in ("btrfs", ):
+                 # Handle a boolean attribute.
+                 attrs[name] = True
++            elif value and name in ("fstype", ):
++                # str.
++                attrs[name] = value
+             elif value and name in ("size", "min", "max", "free"):
+                 # Handle a size attribute.
+                 attrs[name] = Size(value)
+@@ -243,3 +247,10 @@ class StorageSection(Section):
+ 
+         if attrs.get("max") and not attrs.get("min"):
+             raise ValueError("The attribute 'max' cannot be set without 'min'.")
++
++        # HACK: hardcode fs types here, didn't find a nice method to get just
++        # filesystem types from blivet, without other formats
++        if "fstype" in attrs and attrs.get("fstype") not in (
++                "ext2", "ext3", "ext4", "xfs", "vfat", "efi", "btrfs", "gfs2",
++                "jfs", "reiserfs", "hfs", "appleboot", "hfs+", "macefi", "ntfs"):
++            raise ValueError("Unsupported 'fstype' value")
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+index ff10dbd11b..14d58b36fe 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
+@@ -274,7 +274,7 @@ def get_default_partitioning(scheme=None):
+ 
+         spec = PartSpec(
+             mountpoint=name if not swap else None,
+-            fstype=None if not swap else "swap",
++            fstype=attrs.get("fstype") if not swap else "swap",
+             lv=True,
+             thin=not swap,
+             btr=not swap,
+-- 
+2.39.0
+
