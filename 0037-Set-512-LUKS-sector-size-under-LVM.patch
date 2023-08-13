@@ -1,0 +1,70 @@
+From 226838a282e9172ee3578f250f5203541aec7764 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Sun, 13 Aug 2023 04:00:50 +0200
+Subject: [PATCH] Set 512 LUKS sector size under LVM
+
+LVM (thin) volumes present the original sector size to the VM. Currently
+all the qubes templates are built with 512 sector size (that's how
+partition table and filesystem are created). When installing Qubes on a
+4Kn disk, such VMs won't boot. LUKS2 supports passing down the sector
+size, and cryptsetup used in Qubes 4.2 has it enabled by default.
+
+As a temporary workaround, force 512 LUKS sector size on a LVM thin
+partitioning layout.
+
+QubesOS/qubes-issues#4974
+---
+ .../partitioning/automatic/automatic_partitioning.py        | 4 ++++
+ .../storage/partitioning/custom/custom_partitioning.py      | 6 ++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+index 01c6cdcb23..1d14377cda 100644
+--- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
+@@ -17,6 +17,7 @@
+ #
+ from blivet.partitioning import do_partitioning, grow_lvm
+ from blivet.static_data import luks_data
++from pykickstart.constants import AUTOPART_TYPE_LVM_THINP
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+ from pyanaconda.modules.common.structures.partitioning import PartitioningRequest
+@@ -119,6 +120,9 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
+             "pbkdf_args": pbkdf_args,
+             "escrow_cert": escrow_cert,
+             "add_backup_passphrase": request.backup_passphrase_enabled,
++            "luks_sector_size": (
++                512 if request.partitioning_scheme == AUTOPART_TYPE_LVM_THINP else 0
++            ),
+         }
+ 
+     @staticmethod
+diff --git a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py b/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
+index e2e67904bf..df62e94590 100644
+--- a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
++++ b/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
+@@ -413,7 +413,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
+                     escrow_cert=cert,
+                     add_backup_passphrase=partition_data.backuppassphrase,
+                     luks_version=partition_data.luks_version,
+-                    pbkdf_args=pbkdf_args
++                    pbkdf_args=pbkdf_args,
++                    luks_sector_size=(512 if ty == "lvmpv" else 0),
+                 )
+                 luksdev = LUKSDevice(
+                     "luks%d" % storage.next_id,
+@@ -429,7 +430,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
+                     escrow_cert=cert,
+                     add_backup_passphrase=partition_data.backuppassphrase,
+                     luks_version=partition_data.luks_version,
+-                    pbkdf_args=pbkdf_args
++                    pbkdf_args=pbkdf_args,
++                    luks_sector_size=(512 if ty == "lvmpv" else 0),
+                 )
+                 luksdev = LUKSDevice("luks%d" % storage.next_id,
+                                      fmt=luksformat,
+-- 
+2.41.0
+
