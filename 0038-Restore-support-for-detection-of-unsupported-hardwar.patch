@@ -1,0 +1,473 @@
+From bc63ca7d1869fe35e4e4350545de2f88815e5532 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Sat, 2 Sep 2023 23:36:10 +0200
+Subject: [PATCH 38/39] Restore support for detection of unsupported hardware
+
+This reverts commit 027ba76bd5c8e715451803b375661c7e0f07c571.
+---
+ data/anaconda.conf                            |   6 +
+ data/profile.d/rhel.conf                      |   5 +
+ pyanaconda/core/configuration/system.py       |  10 ++
+ pyanaconda/core/constants.py                  |  14 ++
+ pyanaconda/core/util.py                       |  70 +++++++++-
+ .../gui/spokes/lib/unsupported_hardware.glade | 126 ++++++++++++++++++
+ .../ui/gui/spokes/lib/unsupported_hardware.py |  48 +++++++
+ pyanaconda/ui/gui/spokes/welcome.py           |  13 ++
+ .../ui/tui/spokes/unsupported_hardware.py     |  57 ++++++++
+ .../pyanaconda_tests/ui/test_simple_ui.py     |   2 +
+ 10 files changed, 350 insertions(+), 1 deletion(-)
+ create mode 100644 pyanaconda/ui/gui/spokes/lib/unsupported_hardware.glade
+ create mode 100644 pyanaconda/ui/gui/spokes/lib/unsupported_hardware.py
+ create mode 100644 pyanaconda/ui/tui/spokes/unsupported_hardware.py
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index 5b86f2074e..3a031974b1 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -37,6 +37,12 @@ optional_modules =
+ # FIXME: This is a temporary solution.
+ type = UNKNOWN
+ 
++# Should the installer show a warning about unsupported hardware?
++can_detect_unsupported_hardware = False
++
++# Should the installer show a warning about removed support for hardware?
++can_detect_support_removed = False
++
+ # Should the installer show a warning about enabled SMT?
+ can_detect_enabled_smt = False
+ 
+diff --git a/data/profile.d/rhel.conf b/data/profile.d/rhel.conf
+index a4976793a9..8d19dc1210 100644
+--- a/data/profile.d/rhel.conf
++++ b/data/profile.d/rhel.conf
+@@ -9,6 +9,11 @@ profile_id = rhel
+ os_id = rhel
+ 
+ [Installation System]
++# The detection is disabled since #1645686.
++# can_detect_unsupported_hardware = True
++# can_detect_support_removed = True
++
++# Show a warning if SMT is enabled.
+ can_detect_enabled_smt = True
+ 
+ [Network]
+diff --git a/pyanaconda/core/configuration/system.py b/pyanaconda/core/configuration/system.py
+index 9138dd2d88..b2d53eef4f 100644
+--- a/pyanaconda/core/configuration/system.py
++++ b/pyanaconda/core/configuration/system.py
+@@ -147,6 +147,16 @@ class SystemSection(Section):
+         """Can we configure the network?"""
+         return self._is_boot_iso or self._is_booted_os
+ 
++    @property
++    def can_detect_unsupported_hardware(self):
++        """Can we try to detect unsupported hardware?"""
++        return self._get_option("can_detect_unsupported_hardware", bool)
++
++    @property
++    def can_detect_support_removed(self):
++        """Can we try to detect removed support for hardware"""
++        return self._get_option("can_detect_support_removed", bool)
++
+     @property
+     def can_detect_enabled_smt(self):
+         """Can we try to detect enabled SMT?"""
+diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
+index b130f71fd9..6762223385 100644
+--- a/pyanaconda/core/constants.py
++++ b/pyanaconda/core/constants.py
+@@ -140,6 +140,20 @@ GEOLOC_CONNECTION_TIMEOUT = 5
+ ANACONDA_ENVIRON = "anaconda"
+ FIRSTBOOT_ENVIRON = "firstboot"
+ 
++# Tainted hardware
++TAINT_SUPPORT_REMOVED = 27
++TAINT_HARDWARE_UNSUPPORTED = 28
++
++WARNING_SUPPORT_REMOVED = N_(
++    "Support for this hardware has been removed in this major OS release. Please check the "
++    "removed functionality section of the release notes."
++)
++
++WARNING_HARDWARE_UNSUPPORTED = N_(
++    "This hardware (or a combination thereof) is not supported by Red Hat. For more information "
++    "on supported hardware, please refer to http://www.redhat.com/hardware."
++)
++
+ # Storage messages
+ WARNING_NO_DISKS_DETECTED = N_(
+     "No disks detected.  Please shut down the computer, connect at least one disk, and restart "
+diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
+index 5fe1fa62ba..553e24715c 100644
+--- a/pyanaconda/core/util.py
++++ b/pyanaconda/core/util.py
+@@ -43,7 +43,8 @@ from pyanaconda.core.path import make_directories, open_with_perm, join_paths
+ from pyanaconda.flags import flags
+ from pyanaconda.core.process_watchers import WatchProcesses
+ from pyanaconda.core.constants import DRACUT_SHUTDOWN_EJECT, \
+-    IPMI_ABORTED, X_TIMEOUT
++    IPMI_ABORTED, X_TIMEOUT, TAINT_HARDWARE_UNSUPPORTED, TAINT_SUPPORT_REMOVED, \
++    WARNING_HARDWARE_UNSUPPORTED, WARNING_SUPPORT_REMOVED
+ from pyanaconda.errors import RemovedModuleError
+ 
+ from pyanaconda.anaconda_logging import program_log_lock
+@@ -582,6 +583,73 @@ def cmp_obj_attrs(obj1, obj2, attr_list):
+     return True
+ 
+ 
++def get_kernel_taint(flag):
++    """Get a value of a kernel taint.
++
++    :param flag: a kernel taint flag
++    :return: False if the value of taint is 0, otherwise True
++    """
++    try:
++        tainted = int(open("/proc/sys/kernel/tainted").read())
++    except (OSError, ValueError):
++        tainted = 0
++
++    return bool(tainted & (1 << flag))
++
++
++def find_hardware_with_removed_support():
++    """Find hardware with removed support.
++
++    :return: a list of hardware specifications
++    """
++    pattern = "Warning: (.*) - Support for this device has been removed in this major release."
++    hardware = []
++
++    for line in execReadlines("journalctl", ["-b", "-k", "-g", pattern, "-o", "cat"]):
++        matched = re.match(pattern, line)
++
++        if matched:
++            hardware.append(matched.group(1))
++
++    return hardware
++
++
++def detect_unsupported_hardware():
++    """Detect unsupported hardware.
++
++    :return: a list of warnings
++    """
++    warnings = []  # pylint: disable=redefined-outer-name
++
++    if flags.automatedInstall or not conf.target.is_hardware:
++        log.info("Skipping detection of unsupported hardware.")
++        return []
++
++    # Check TAINT_HARDWARE_UNSUPPORTED
++    if not conf.system.can_detect_unsupported_hardware:
++        log.debug("This system doesn't support TAINT_HARDWARE_UNSUPPORTED.")
++    elif get_kernel_taint(TAINT_HARDWARE_UNSUPPORTED):
++        warnings.append(WARNING_HARDWARE_UNSUPPORTED)
++
++    # Check TAINT_SUPPORT_REMOVED
++    if not conf.system.can_detect_support_removed:
++        log.debug("This system doesn't support TAINT_SUPPORT_REMOVED.")
++    elif get_kernel_taint(TAINT_SUPPORT_REMOVED):
++        warning = WARNING_SUPPORT_REMOVED
++        hardware = find_hardware_with_removed_support()
++
++        if hardware:
++            warning += "\n\n" + "\n".join(hardware)
++
++        warnings.append(warning)
++
++    # Log all warnings.
++    for msg in warnings:
++        log.warning(msg)
++
++    return warnings
++
++
+ def xprogressive_delay():
+     """ A delay generator, the delay starts short and gets longer
+         as the internal counter increases.
+diff --git a/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.glade b/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.glade
+new file mode 100644
+index 0000000000..576f635003
+--- /dev/null
++++ b/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.glade
+@@ -0,0 +1,126 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!-- Generated with glade 3.22.1 -->
++<interface>
++  <requires lib="gtk+" version="3.6"/>
++  <object class="GtkTextBuffer" id="logBuffer"/>
++  <object class="GtkDialog" id="unsupportedHardwareDialog">
++    <property name="can_focus">False</property>
++    <property name="border_width">6</property>
++    <property name="default_width">550</property>
++    <property name="type_hint">dialog</property>
++    <property name="decorated">False</property>
++    <child internal-child="vbox">
++      <object class="GtkBox" id="uhd-vbox">
++        <property name="can_focus">False</property>
++        <property name="orientation">vertical</property>
++        <property name="spacing">2</property>
++        <child internal-child="action_area">
++          <object class="GtkButtonBox" id="uhd-action_area">
++            <property name="can_focus">False</property>
++            <property name="layout_style">end</property>
++            <child>
++              <object class="GtkButton" id="quitButton">
++                <property name="label" translatable="yes" context="GUI|Welcome|Unsupported Hardware Dialog">_Quit</property>
++                <property name="visible">True</property>
++                <property name="can_focus">True</property>
++                <property name="receives_default">True</property>
++                <property name="use_underline">True</property>
++              </object>
++              <packing>
++                <property name="expand">False</property>
++                <property name="fill">True</property>
++                <property name="position">0</property>
++              </packing>
++            </child>
++            <child>
++              <object class="GtkButton" id="continueButton">
++                <property name="label" translatable="yes" context="GUI|Welcome|Unsupported Hardware Dialog">_Continue</property>
++                <property name="visible">True</property>
++                <property name="can_focus">True</property>
++                <property name="receives_default">True</property>
++                <property name="use_underline">True</property>
++              </object>
++              <packing>
++                <property name="expand">False</property>
++                <property name="fill">True</property>
++                <property name="position">1</property>
++              </packing>
++            </child>
++          </object>
++          <packing>
++            <property name="expand">False</property>
++            <property name="fill">True</property>
++            <property name="pack_type">end</property>
++            <property name="position">0</property>
++          </packing>
++        </child>
++        <child>
++          <object class="GtkGrid" id="uhd-grid">
++            <property name="visible">True</property>
++            <property name="can_focus">False</property>
++            <property name="row_spacing">12</property>
++            <property name="column_spacing">6</property>
++            <child>
++              <object class="GtkLabel" id="unsupportedHardwareTitle">
++                <property name="visible">True</property>
++                <property name="can_focus">False</property>
++                <property name="halign">start</property>
++                <property name="label" translatable="yes">Unsupported Hardware Detected</property>
++                <attributes>
++                  <attribute name="font-desc" value="Cantarell Bold 12"/>
++                  <attribute name="weight" value="bold"/>
++                </attributes>
++              </object>
++              <packing>
++                <property name="left_attach">1</property>
++                <property name="top_attach">0</property>
++              </packing>
++            </child>
++            <child>
++              <object class="GtkImage" id="uhd-image">
++                <property name="visible">True</property>
++                <property name="can_focus">False</property>
++                <property name="icon_name">dialog-warning</property>
++                <property name="icon_size">6</property>
++              </object>
++              <packing>
++                <property name="left_attach">0</property>
++                <property name="top_attach">0</property>
++              </packing>
++            </child>
++            <child>
++              <object class="GtkLabel" id="messageLabel">
++                <property name="width_request">300</property>
++                <property name="visible">True</property>
++                <property name="can_focus">False</property>
++                <property name="valign">start</property>
++                <property name="wrap">True</property>
++                <attributes>
++                  <attribute name="font-desc" value="Cantarell 12"/>
++                </attributes>
++              </object>
++              <packing>
++                <property name="left_attach">1</property>
++                <property name="top_attach">1</property>
++              </packing>
++            </child>
++          </object>
++          <packing>
++            <property name="expand">False</property>
++            <property name="fill">True</property>
++            <property name="position">1</property>
++          </packing>
++        </child>
++      </object>
++    </child>
++    <action-widgets>
++      <action-widget response="0">quitButton</action-widget>
++      <action-widget response="1">continueButton</action-widget>
++    </action-widgets>
++    <child internal-child="accessible">
++      <object class="AtkObject" id="unsupportedHardwareDialog-atkobject">
++        <property name="AtkObject::accessible-name" translatable="yes">Unsupported Hardware</property>
++      </object>
++    </child>
++  </object>
++</interface>
+diff --git a/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.py b/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.py
+new file mode 100644
+index 0000000000..d4542be054
+--- /dev/null
++++ b/pyanaconda/ui/gui/spokes/lib/unsupported_hardware.py
+@@ -0,0 +1,48 @@
++#
++# Copyright (C) 2018  Red Hat, Inc.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions of
++# the GNU General Public License v.2, or (at your option) any later version.
++# This program is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY expressed or implied, including the implied warranties of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
++# Public License for more details.  You should have received a copy of the
++# GNU General Public License along with this program; if not, write to the
++# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
++# source code or documentation are not subject to the GNU General Public
++# License and may only be used or replicated with the express permission of
++# Red Hat, Inc.
++#
++from pyanaconda.core.util import detect_unsupported_hardware
++from pyanaconda.ui.gui import GUIObject
++
++__all__ = ["UnsupportedHardwareDialog"]
++
++
++class UnsupportedHardwareDialog(GUIObject):
++    """Dialog for warnings about unsupported hardware.
++
++    Show this dialog if the unsupported hardware was detected.
++    """
++    builderObjects = ["unsupportedHardwareDialog"]
++    mainWidgetName = "unsupportedHardwareDialog"
++    uiFile = "spokes/lib/unsupported_hardware.glade"
++
++    def __init__(self, data):
++        super().__init__(data)
++        self._warnings = detect_unsupported_hardware()
++
++    @property
++    def supported(self):
++        return not self._warnings
++
++    def refresh(self):
++        message_label = self.builder.get_object("messageLabel")
++        message_label.set_label("\n\n".join(self._warnings))
++
++    def run(self):
++        rc = self.window.run()
++        self.window.destroy()
++        return rc
+diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
+index 9ed05bd1fe..a698e7acc1 100644
+--- a/pyanaconda/ui/gui/spokes/welcome.py
++++ b/pyanaconda/ui/gui/spokes/welcome.py
+@@ -31,6 +31,8 @@ from pyanaconda.ui.gui.spokes import StandaloneSpoke
+ from pyanaconda.ui.gui.utils import setup_gtk_direction, escape_markup
+ from pyanaconda.core.async_utils import async_action_wait
+ from pyanaconda.ui.gui.spokes.lib.lang_locale_handler import LangLocaleHandler
++from pyanaconda.ui.gui.spokes.lib.unsupported_hardware import UnsupportedHardwareDialog
++
+ from pyanaconda import localization
+ from pyanaconda.product import distributionText, isFinal, productName, productVersion
+ from pyanaconda import flags
+@@ -347,6 +349,17 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
+                 ipmi_abort(scripts=self.data.scripts)
+                 sys.exit(0)
+ 
++        dialog = UnsupportedHardwareDialog(self.data)
++        if not dialog.supported:
++
++            with self.main_window.enlightbox(dialog.window):
++                dialog.refresh()
++                rc = dialog.run()
++
++            if rc != 1:
++                ipmi_abort(scripts=self.data.scripts)
++                sys.exit(0)
++
+         StandaloneSpoke._on_continue_clicked(self, window, user_data)
+ 
+     @async_action_wait
+diff --git a/pyanaconda/ui/tui/spokes/unsupported_hardware.py b/pyanaconda/ui/tui/spokes/unsupported_hardware.py
+new file mode 100644
+index 0000000000..97ad2e1488
+--- /dev/null
++++ b/pyanaconda/ui/tui/spokes/unsupported_hardware.py
+@@ -0,0 +1,57 @@
++#
++# Copyright (C) 2013  Red Hat, Inc.
++#
++# This copyrighted material is made available to anyone wishing to use,
++# modify, copy, or redistribute it subject to the terms and conditions of
++# the GNU General Public License v.2, or (at your option) any later version.
++# This program is distributed in the hope that it will be useful, but WITHOUT
++# ANY WARRANTY expressed or implied, including the implied warranties of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
++# Public License for more details.  You should have received a copy of the
++# GNU General Public License along with this program; if not, write to the
++# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
++# source code or documentation are not subject to the GNU General Public
++# License and may only be used or replicated with the express permission of
++# Red Hat, Inc.
++#
++from simpleline.render.widgets import TextWidget
++
++from pyanaconda.ui.tui.spokes import StandaloneTUISpoke
++from pyanaconda.ui.tui.hubs.summary import SummaryHub
++from pyanaconda.core.i18n import N_
++from pyanaconda.core.util import detect_unsupported_hardware
++
++__all__ = ["UnsupportedHardwareSpoke"]
++
++
++class UnsupportedHardwareSpoke(StandaloneTUISpoke):
++    """Spoke for warnings about unsupported hardware.
++
++    Show this spoke if the unsupported hardware was detected.
++    """
++    preForHub = SummaryHub
++    priority = -10
++
++    @staticmethod
++    def get_screen_id():
++        """Return a unique id of this UI screen."""
++        return "unsupported-hardware-warning"
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.title = N_("Unsupported Hardware Detected")
++        self._warnings = detect_unsupported_hardware()
++
++    @property
++    def completed(self):
++        return not self._warnings
++
++    def refresh(self, args=None):
++        super().refresh(args)
++
++        for warning in self._warnings:
++            self.window.add_with_separator(TextWidget(warning))
++
++    def apply(self):
++        pass
+-- 
+2.41.0
+

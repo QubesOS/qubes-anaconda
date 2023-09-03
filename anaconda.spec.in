@@ -62,6 +62,8 @@ Patch33: 0034-Apply-hidden_spokes-setting-to-standalone-spokes-too.patch
 Patch34: 0035-Do-not-add-resume-to-the-kernel-cmdline.patch
 Patch35: 0036-Add-support-for-fstype-in-default-partitioning-confi.patch
 Patch36: 0037-Set-512-LUKS-sector-size-under-LVM.patch
+patch37: 0038-Restore-support-for-detection-of-unsupported-hardwar.patch
+patch38: 0039-check-for-Qubes-OS-hardware-required-features.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
