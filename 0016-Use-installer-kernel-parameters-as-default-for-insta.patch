@@ -1,4 +1,4 @@
-From cff8a08f538794d785e69f03c638d6fc293a4b98 Mon Sep 17 00:00:00 2001
+From 6775647e65b8f172672105f64cdf9a177457a2d1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:39:15 +0100
@@ -10,14 +10,14 @@ Fixes QubesOS/qubes-issues#1650
 
 Adapted from a98ba275162937a56f7ca1ee5428b00de883677a
 ---
- pyanaconda/modules/storage/bootloader/base.py | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ pyanaconda/modules/storage/bootloader/base.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
-index da8272b7f3..df907d7493 100644
+index da8272b7f3..273947a063 100644
 --- a/pyanaconda/modules/storage/bootloader/base.py
 +++ b/pyanaconda/modules/storage/bootloader/base.py
-@@ -904,11 +904,13 @@ class BootLoader(object):
+@@ -904,11 +904,14 @@ class BootLoader(object):
  
      def _preserve_some_boot_args(self):
          """Preserve some of the boot args."""
@@ -25,7 +25,8 @@ index da8272b7f3..df907d7493 100644
 -            if opt not in kernel_arguments:
 +        global_no_preserve_args = ["stage2", "root", "rescue", "rd.live.check",
 +                                   "ip", "repo", "ks", "rd.md", "rd.luks",
-+                                   "rd.dm", "rd.lvm.lv", "rd.lvm", "rd.neednet"]
++                                   "rd.dm", "rd.lvm.lv", "rd.lvm", "rd.neednet",
++                                   "rd.net.dhcp.vendor-class", "rd.driver.pre"]
 +        for opt, arg in kernel_arguments.items():
 +            if opt in global_no_preserve_args:
                  continue
@@ -35,5 +36,5 @@ index da8272b7f3..df907d7493 100644
              if arg:
                  new_arg += "=%s" % arg
 -- 
-2.38.1
+2.41.0
 
