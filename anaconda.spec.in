@@ -64,6 +64,7 @@ Patch35: 0036-Add-support-for-fstype-in-default-partitioning-confi.patch
 Patch36: 0037-Set-512-LUKS-sector-size-under-LVM.patch
 patch37: 0038-Restore-support-for-detection-of-unsupported-hardwar.patch
 patch38: 0039-check-for-Qubes-OS-hardware-required-features.patch
+Patch39: 0040-Use-another-type-to-make-new-GCC-warnings-go-away.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
