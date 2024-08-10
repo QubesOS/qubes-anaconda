@@ -1,4 +1,4 @@
-From db1bd659bf45cf930e979d4d0e2fc1803e64fe58 Mon Sep 17 00:00:00 2001
+From 0a43c3df8e21aa56f05ffbf9f4980c42c28874d9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:30:22 +0100
@@ -16,7 +16,7 @@ By Marek Marczykowski <marmarek@invisiblethingslab.com>
  1 file changed, 9 insertions(+), 20 deletions(-)
 
 diff --git a/pyanaconda/display.py b/pyanaconda/display.py
-index 880af9c4d7..b16ae2c3d2 100644
+index 8db108e923..33d0f761a1 100644
 --- a/pyanaconda/display.py
 +++ b/pyanaconda/display.py
 @@ -19,6 +19,7 @@
@@ -27,7 +27,7 @@ index 880af9c4d7..b16ae2c3d2 100644
  import os
  import subprocess
  import time
-@@ -344,26 +345,14 @@ def setup_display(anaconda, options):
+@@ -381,26 +382,14 @@ def setup_display(anaconda, options):
          try:
              start_x11(xtimeout)
              do_startup_x11_actions()
@@ -63,5 +63,5 @@ index 880af9c4d7..b16ae2c3d2 100644
          if not anaconda.gui_startup_failed:
              do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
 -- 
-2.38.1
+2.45.2
 

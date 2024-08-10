@@ -1,4 +1,4 @@
-From 571e79b885a8165aa414a436c2179a2256d62c14 Mon Sep 17 00:00:00 2001
+From bcb1a939d939669bd58d5c16a6c687f538b103f9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Wed, 4 Jan 2023 19:22:14 +0100
@@ -11,7 +11,7 @@ Subject: [PATCH] Allow to specify default thin pool name and size
  3 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/data/anaconda.conf b/data/anaconda.conf
-index 6624da57fc..ed78944b37 100644
+index 609d2b70a0..9f5b69cc07 100644
 --- a/data/anaconda.conf
 +++ b/data/anaconda.conf
 @@ -221,6 +221,11 @@ default_scheme = LVM
@@ -27,10 +27,10 @@ index 6624da57fc..ed78944b37 100644
  [Storage Constraints]
  
 diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
-index 7f85d4078d..c9e7eae5ee 100644
+index d52468ada3..b30fde9112 100644
 --- a/pyanaconda/core/configuration/storage.py
 +++ b/pyanaconda/core/configuration/storage.py
-@@ -146,6 +146,18 @@ class StorageSection(Section):
+@@ -149,6 +149,18 @@ class StorageSection(Section):
  
          return value
  
@@ -50,10 +50,10 @@ index 7f85d4078d..c9e7eae5ee 100644
      def default_partitioning(self):
          """Default partitioning.
 diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
-index 1f62472e65..8a1a9a6324 100644
+index 68225d6bc0..474d9cbd45 100644
 --- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
 +++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
-@@ -490,7 +490,14 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
+@@ -498,7 +498,14 @@ def schedule_volumes(storage, devices, scheme, requests, encrypted=False):
  
          if thinlv and pool is None:
              # create a single thin pool in the vg
@@ -70,5 +70,5 @@ index 1f62472e65..8a1a9a6324 100644
  
              # make sure VG reserves space for the pool to grow if needed
 -- 
-2.38.1
+2.45.2
 

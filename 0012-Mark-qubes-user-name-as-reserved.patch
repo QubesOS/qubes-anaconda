@@ -1,4 +1,4 @@
-From a71227e212b470a021bc703bd5648ccefc60e142 Mon Sep 17 00:00:00 2001
+From 77035a7a3cdda3f6385cdcb3ed3be11d6c97b52a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 16:47:44 +0100
@@ -12,22 +12,22 @@ Fixes QubesOS/qubes-issues#3777
 From 7a60d316ea32df7f9a0c25669b20a0b608a2e384
 By Marek Marczykowski <marmarek@invisiblethingslab.com>
 ---
- pyanaconda/core/users.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ pyanaconda/core/users.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/pyanaconda/core/users.py b/pyanaconda/core/users.py
-index 3adbd6769d..1b7569b771 100644
+index 5ea9051c78..f8de60b889 100644
 --- a/pyanaconda/core/users.py
 +++ b/pyanaconda/core/users.py
-@@ -79,7 +79,7 @@ def check_username(name):
-     """
- 
-     # Check reserved names.
--    if name in os.listdir("/") + ["root", "home", "daemon", "system"]:
-+    if name in os.listdir("/") + ["root", "home", "daemon", "system", "qubes"]:
+@@ -102,6 +102,8 @@ def check_username(name):
+         # from older version of the function
+         "home",
+         "system",
++        # qubes
++        "qubes"
+     ]
+     if name in os.listdir("/") + reserved_names:
          return False, _("User name is reserved for system: %s") % name
- 
-     return is_valid_name(name)
 -- 
-2.38.1
+2.45.2
 

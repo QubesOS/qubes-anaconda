@@ -1,41 +1,70 @@
-From ed7d365f536076e92072aef60023d145a01ef312 Mon Sep 17 00:00:00 2001
+From ebb7b214ced9d96e7bcef782ac05df5cb4ac74b2 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Mon, 20 Apr 2020 14:57:50 +0200
 Subject: [PATCH] Compute template RPMs needed spaces
 
 ---
- pyanaconda/payload/dnf/payload.py | 14 ++++++++++++++
- pyanaconda/ui/lib/space.py        |  7 ++++++-
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ .../modules/payloads/payload/dnf/dnf_interface.py    |  4 ++++
+ .../modules/payloads/payload/dnf/dnf_manager.py      | 12 ++++++++++++
+ pyanaconda/payload/dnf/payload.py                    |  6 ++++++
+ pyanaconda/ui/lib/space.py                           |  7 ++++++-
+ 4 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
-index 5312825fa1..2b0684a3a8 100644
---- a/pyanaconda/payload/dnf/payload.py
-+++ b/pyanaconda/payload/dnf/payload.py
-@@ -432,6 +432,20 @@ class DNFPayload(Payload):
-     def space_required(self):
-         return calculate_required_space(self._dnf_manager)
+diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf_interface.py b/pyanaconda/modules/payloads/payload/dnf/dnf_interface.py
+index 2d8be4fb56..948ec6ae68 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/dnf_interface.py
++++ b/pyanaconda/modules/payloads/payload/dnf/dnf_interface.py
+@@ -125,6 +125,10 @@ class DNFInterface(PayloadBaseInterface):
+         """
+         return self.implementation.packages_kickstarted
  
 +    @property
-+    def qubes_templates_size(self):
-+        from blivet.size import Size
++    def QubesTemplatesSize(self) -> UInt64:
++        return self.implementation._dnf_manager.get_qubes_templates_size()
++
+     def GetAvailableRepositories(self) -> List[Str]:
+         """Get a list of available repositories.
+ 
+diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
+index 79122ef0fa..c9948a6216 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
++++ b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
+@@ -1045,3 +1045,15 @@ class DNFManager(object):
+                 continue
+ 
+         return ""
++
++    def get_qubes_templates_size(self):
 +        # get all available Qubes templates in repos
 +        available_templates = self._base.sack.query().available() \
 +            .filter(name__glob="qubes-template-*")
-+        templates_size = Size()
++        templates_size = 0
 +        for template in available_templates:
-+            templates_size += Size(template.downloadsize)
++            templates_size += template.downloadsize
 +            log.debug("[Qubes OS]: Size of %s: %s", (template.name, template.downloadsize))
 +
 +        log.debug("[Qubes OS]: Total templates RPMs size: %s", templates_size)
 +        return templates_size
-+
-     def install(self):
-         self._progress_cb(0, _('Starting package installation process'))
+diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
+index 0d55a69fd2..68f16685d0 100644
+--- a/pyanaconda/payload/dnf/payload.py
++++ b/pyanaconda/payload/dnf/payload.py
+@@ -312,6 +312,12 @@ class DNFPayload(MigratedDBusPayload):
+         log.debug("Payload won't be restarted, repositories are still available.")
+         return True
  
++    @property
++    def qubes_templates_size(self):
++        """Return all templates size via dbus proxy"""
++        from blivet.size import Size
++        return Size(self.proxy.QubesTemplatesSize)
++
+     @property
+     def software_validation_required(self):
+         """Is it necessary to validate the software selection?"""
 diff --git a/pyanaconda/ui/lib/space.py b/pyanaconda/ui/lib/space.py
-index 5794b57ae0..c1a2a54f15 100644
+index 227ab1aebf..01d4a84eaf 100644
 --- a/pyanaconda/ui/lib/space.py
 +++ b/pyanaconda/ui/lib/space.py
 @@ -56,6 +56,10 @@ class FileSystemSpaceChecker(object):
@@ -60,5 +89,5 @@ index 5794b57ae0..c1a2a54f15 100644
  
          if free > needed:
 -- 
-2.38.1
+2.45.2
 

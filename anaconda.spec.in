@@ -25,52 +25,55 @@ Source7: 40-qubes-alt-kernels.ks
 Source8: 50-qubes.ks
 Source9: 60-systemd-preset.ks
 
-Patch0: 0001-profile-add-Qubes-OS.patch
-Patch1: 0002-Allow-to-specify-default-thin-pool-name-and-size.patch
-Patch2: 0003-Allow-to-provide-default_partitionning-based-on-sche.patch
-Patch3: 0004-Support-for-adding-bootloader-options-in-configurati.patch
-Patch4: 0005-Support-for-setting-encryption-from-configuration-fi.patch
-Patch5: 0006-Support-for-setting-hostname-from-configuration-file.patch
-Patch6: 0007-Use-grub-name-spaced-for-its-options.patch
-Patch7: 0008-Ignore-empty-values-when-parsing-additional_default_.patch
-Patch8: 0009-Fix-grub-config-setup-by-removing-non-xen-options.patch
-Patch9: 0010-Add-skip_grub-parameter-and-allow-boot-encryption-an.patch
-Patch10: 0011-Abort-installation-on-X-startup-fail.patch
-Patch11: 0012-Mark-qubes-user-name-as-reserved.patch
-Patch12: 0013-Check-add-user-to-wheel-and-qubes-groups.patch
-Patch13: 0014-Make-sure-that-a-user-is-created-at-installation-tim.patch
-Patch14: 0015-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
-Patch15: 0016-Use-installer-kernel-parameters-as-default-for-insta.patch
-Patch16: 0017-Generate-proper-extlinux.conf.patch
-Patch17: 0018-root_password-remove-ssh-options.patch
-Patch18: 0019-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
-Patch19: 0020-Setup-grubx64.efi-directly-as-a-bootloader.patch
-Patch20: 0021-enable-discard-option-for-dom0-filesystems-by-defaul.patch
-Patch21: 0022-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
-Patch22: 0023-Resolve-filename-into-associated-loop-device.patch
-Patch23: 0024-utils-avoid-adding-duplicated-kernel-entries.patch
-Patch24: 0025-Use-kernel-install-instead-of-grubby-to-regenerate.patch
-Patch25: 0026-Compute-template-RPMs-needed-spaces.patch
-Patch26: 0027-dnfpayload-make-available-repos-for-post-scripts.patch
-Patch27: 0028-Allow-to-skip-enabling-network-in-configuration-file.patch
-Patch28: 0029-Drop-NTP-configuration-spoke.patch
-Patch29: 0030-Simplify-USER-configuration-spoke.patch
-Patch30: 0031-Setting-root-is-not-mandatory.patch
-Patch31: 0032-efi-deal-with-verbose-by-default-output-from-efiboot.patch
-Patch32: 0033-Set-default-encryption-for-custom-partitioning-too.patch
-Patch33: 0034-Apply-hidden_spokes-setting-to-standalone-spokes-too.patch
-Patch34: 0035-Do-not-add-resume-to-the-kernel-cmdline.patch
-Patch35: 0036-Add-support-for-fstype-in-default-partitioning-confi.patch
-Patch36: 0037-Set-512-LUKS-sector-size-under-LVM.patch
-patch37: 0038-Restore-support-for-detection-of-unsupported-hardwar.patch
-patch38: 0039-check-for-Qubes-OS-hardware-required-features.patch
-Patch39: 0040-Use-another-type-to-make-new-GCC-warnings-go-away.patch
+Patch0001: 0001-profile-add-Qubes-OS.patch
+Patch0002: 0002-Allow-to-specify-default-thin-pool-name-and-size.patch
+Patch0003: 0003-Allow-to-provide-default_partitionning-based-on-sche.patch
+Patch0004: 0004-Support-for-adding-bootloader-options-in-configurati.patch
+Patch0005: 0005-Support-for-setting-encryption-from-configuration-fi.patch
+Patch0006: 0006-Support-for-setting-hostname-from-configuration-file.patch
+Patch0007: 0007-Use-grub-name-spaced-for-its-options.patch
+Patch0008: 0008-Ignore-empty-values-when-parsing-additional_default_.patch
+Patch0009: 0009-Fix-grub-config-setup-by-removing-non-xen-options.patch
+Patch0010: 0010-Add-skip_grub-parameter-and-allow-boot-encryption-an.patch
+Patch0011: 0011-Abort-installation-on-X-startup-fail.patch
+Patch0012: 0012-Mark-qubes-user-name-as-reserved.patch
+Patch0013: 0013-Check-add-user-to-wheel-and-qubes-groups.patch
+Patch0014: 0014-Make-sure-that-a-user-is-created-at-installation-tim.patch
+Patch0015: 0015-Drop-useless-on-Qubes-dependencies-on-network-filesy.patch
+Patch0016: 0016-Use-installer-kernel-parameters-as-default-for-insta.patch
+Patch0017: 0017-Generate-proper-extlinux.conf.patch
+Patch0018: 0018-root_password-remove-ssh-options.patch
+Patch0019: 0019-Do-not-mount-pre-existing-partitions-and-do-not-dete.patch
+Patch0020: 0020-Setup-grubx64.efi-directly-as-a-bootloader.patch
+Patch0021: 0021-enable-discard-option-for-dom0-filesystems-by-defaul.patch
+Patch0022: 0022-lvm-ensure-qubes-prefix-in-lvgroup-name.patch
+Patch0023: 0023-Resolve-filename-into-associated-loop-device.patch
+Patch0024: 0024-utils-avoid-adding-duplicated-kernel-entries.patch
+Patch0025: 0025-Use-kernel-install-instead-of-grubby-to-regenerate.patch
+Patch0026: 0026-Compute-template-RPMs-needed-spaces.patch
+Patch0027: 0027-dnfpayload-make-available-repos-for-post-scripts.patch
+Patch0028: 0028-Allow-to-skip-enabling-network-in-configuration-file.patch
+Patch0029: 0029-Drop-NTP-configuration-spoke.patch
+Patch0030: 0030-Simplify-USER-configuration-spoke.patch
+Patch0031: 0031-Setting-root-is-not-mandatory.patch
+Patch0032: 0032-Set-default-encryption-for-custom-partitioning-too.patch
+Patch0033: 0033-Apply-hidden_spokes-setting-to-standalone-spokes-too.patch
+Patch0034: 0034-Do-not-add-resume-to-the-kernel-cmdline.patch
+Patch0035: 0035-Add-support-for-fstype-in-default-partitioning-confi.patch
+Patch0036: 0036-Set-512-LUKS-sector-size-under-LVM.patch
+Patch0037: 0037-Restore-support-for-detection-of-unsupported-hardwar.patch
+Patch0038: 0038-check-for-Qubes-OS-hardware-required-features.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
 
 %if ! 0%{?rhel}
-%define blivetguiver 2.1.12-1
+%bcond_without glade
+%bcond_without live
+%define blivetguiver 2.4.2-3
+%else
+%bcond_with glade
+%bcond_with live
 %endif
 %define dasbusver 1.3
 %define dbusver 1.2.3
@@ -79,25 +82,23 @@ Patch39: 0040-Use-another-type-to-make-new-GCC-warnings-go-away.patch
 %define fcoeutilsver 1.0.12-3.20100323git
 %define gettextver 0.19.8
 %define gtk3ver 3.22.17
-%define helpver 26.2-1
 %define isomd5sumver 1.0.10
-%define langtablever 0.0.54
+%define langtablever 0.0.60
 %define libarchivever 3.0.4
 %define libblockdevver 2.1
 %define libreportanacondaver 2.0.21-1
-%define libtimezonemapver 0.4.1-2
 %define libxklavierver 5.4
 %define mehver 0.23-1
 %define nmver 1.0
-%define pykickstartver 3.41-1
+%define pykickstartver 3.52-1
 %define pypartedver 2.5-2
-%define pythonblivetver 1:3.4.4-3
+%define pythonblivetver 1:3.9.0-1
 %define rpmver 4.15.0
 %define simplelinever 1.9.0-1
 %define subscriptionmanagerver 1.26
 %define utillinuxver 2.15.1
+%define rpmostreever 2023.2
 
-BuildRequires: audit-libs-devel
 BuildRequires: libtool
 BuildRequires: gettext-devel >= %{gettextver}
 BuildRequires: gtk3-devel >= %{gtk3ver}
@@ -105,8 +106,9 @@ BuildRequires: gtk-doc
 BuildRequires: gtk3-devel-docs >= %{gtk3ver}
 BuildRequires: glib2-doc
 BuildRequires: gobject-introspection-devel
+%if %{with glade}
 BuildRequires: glade-devel
-BuildRequires: libgnomekbd-devel
+%endif
 BuildRequires: libxklavier-devel >= %{libxklavierver}
 BuildRequires: make
 BuildRequires: pango-devel
@@ -118,15 +120,11 @@ BuildRequires: libarchive-devel >= %{libarchivever}
 %ifarch s390 s390x
 BuildRequires: s390utils-devel
 %endif
-BuildRequires: libtimezonemap-devel >= %{libtimezonemapver}
 
 # Tools used by the widgets resource bundle generation
 BuildRequires: gdk-pixbuf2-devel
 BuildRequires: libxml2
 
-%if %{use_cockpit}
-Requires: anaconda-webui = %{epoch}:%{version}-%{release}
-%endif
 Requires: anaconda-gui = %{epoch}:%{version}-%{release}
 Requires: anaconda-tui = %{epoch}:%{version}-%{release}
 
@@ -135,12 +133,19 @@ The anaconda package is a metapackage for the Anaconda installer.
 
 %package core
 Summary: Core of the Anaconda installer
+# core/signal.py is under MIT
+License: GPL-2.0-or-later AND MIT
 Requires: python3-libs
+%if 0%{?rhel} > 10 || 0%{?fedora} > 40
+Requires: python3-crypt-r
+%endif
 Requires: python3-dnf >= %{dnfver}
 Requires: python3-blivet >= %{pythonblivetver}
 Requires: python3-blockdev >= %{libblockdevver}
 Requires: python3-meh >= %{mehver}
+%if 0%{?rhel} < 10 || 0%{?fedora}
 Requires: libreport-anaconda >= %{libreportanacondaver}
+%endif
 Requires: libselinux-python3
 Requires: python3-rpm >= %{rpmver}
 Requires: python3-pyparted >= %{pypartedver}
@@ -151,12 +156,10 @@ Requires: python3-kickstart >= %{pykickstartver}
 Requires: python3-langtable >= %{langtablever}
 Requires: util-linux >= %{utillinuxver}
 Requires: python3-gobject-base
-Requires: python3-dbus
 Requires: python3-pwquality
 Requires: python3-systemd
 Requires: python3-productmd
 Requires: python3-dasbus >= %{dasbusver}
-Requires: python3-packaging
 Requires: flatpak-libs
 %if %{defined rhel} && %{undefined centos}
 Requires: subscription-manager >= %{subscriptionmanagerver}
@@ -166,17 +169,21 @@ Requires: subscription-manager >= %{subscriptionmanagerver}
 # which is apparently great for containers but unhelpful for the rest of us
 Requires: cracklib-dicts
 
+%if 0%{?rhel} < 10 || 0%{?fedora}
 Requires: teamd
+Requires: NetworkManager-team
+%endif
 %ifarch s390 s390x
 Requires: openssh
 %endif
 Requires: NetworkManager >= %{nmver}
 Requires: NetworkManager-libnm >= %{nmver}
-Requires: NetworkManager-team
 Requires: kbd
 Requires: chrony
 Requires: systemd
+%if 0%{?rhel} > 10 || 0%{?fedora}
 Requires: systemd-resolved
+%endif
 Requires: python3-pid
 
 # Required by the systemd service anaconda-fips.
@@ -193,6 +200,9 @@ Requires: (glibc-langpack-en or glibc-all-langpacks)
 # even though the distro default is dbus-broker in F30+
 Requires: dbus-daemon
 
+# setting time from time spoke
+Requires: /usr/bin/date
+
 # Ensure it's not possible for a version of grubby to be installed
 # that doesn't work with btrfs subvolumes correctly...
 Conflicts: grubby < 8.40-10
@@ -201,27 +211,24 @@ Conflicts: grubby < 8.40-10
 Requires: xen-runtime
 
 Obsoletes: anaconda-images <= 10
-Provides: anaconda-images = %{version}-%{release}
-Obsoletes: anaconda-runtime < %{version}-%{release}
-Provides: anaconda-runtime = %{version}-%{release}
+Provides: anaconda-images = %{epoch}:%{version}-%{release}
+Obsoletes: anaconda-runtime < %{epoch}:%{version}-%{release}
+Provides: anaconda-runtime = %{epoch}:%{version}-%{release}
 Obsoletes: booty <= 0.107-1
 
 %description core
 The anaconda-core package contains the program which was used to install your
 system.
 
-%if ! 0%{?rhel}
+%if %{with live}
 # do not provide the live subpackage on RHEL
 
 %package live
 Summary: Live installation specific files and dependencies
+BuildArchitectures: noarch
 BuildRequires: desktop-file-utils
 # live installation currently implies a graphical installation
-%if %{use_cockpit}
-Requires: anaconda-webui = %{epoch}:%{version}-%{release}
-%endif
 Requires: anaconda-gui = %{epoch}:%{version}-%{release}
-Requires: usermode
 Requires: zenity
 Requires: xisxwayland
 Recommends: xhost
@@ -255,19 +262,32 @@ Requires: hfsplus-tools
 %ifnarch riscv64
 Requires: kexec-tools
 %endif
-# needed for proper driver disk support - if RPMs must be installed, a repo is needed
-Requires: createrepo_c
 # run's on TTY1 in install env
 Requires: tmux
 # install time crash handling
 Requires: gdb
 # support for installation from image and live & live image installations
 Requires: rsync
+# An addon that allows enabling kdump at install time
+Recommends: kdump-anaconda-addon
+# basic filesystem tools
+%if ! 0%{?rhel}
+Requires: btrfs-progs
+Requires: ntfs-3g
+Requires: ntfsprogs
+Requires: f2fs-tools
+%endif
+Requires: xfsprogs
+Requires: dosfstools
+Requires: e2fsprogs
+# External tooling for managing NVMe-FC devices in the installation environment
+Recommends: nvme-cli
 
 %description install-env-deps
-The anaconda-install-env-deps metapackage lists all installation environment dependencies.
-This makes it possible for packages (such as Initial Setup) to depend on the main Anaconda package without
-pulling in all the install time dependencies as well.
+The anaconda-install-env-deps metapackage lists all installation environment
+dependencies. This makes it possible for packages (such as Initial Setup) to
+depend on the main Anaconda package without pulling in all the install time
+dependencies as well.
 
 %package install-img-deps
 Summary: Installation image specific dependencies
@@ -278,18 +298,17 @@ Requires: anaconda-install-env-deps = %{epoch}:%{version}-%{release}
 %ifarch %{ix86} x86_64
 Requires: fcoe-utils >= %{fcoeutilsver}
 %endif
-%ifarch %{ix86} x86_64
-%if ! 0%{?rhel}
-Requires: hfsplus-tools
-%endif
-%endif
 # only WeakRequires elsewhere and not guaranteed to be present
 Requires: device-mapper-multipath
+# only WeakRequires in -env-
+Requires: kdump-anaconda-addon
 %if ! 0%{?rhel}
 Requires: zram-generator-defaults
 %else
 Requires: zram-generator
 %endif
+# needed for proper driver disk support - if RPMs must be installed, a repo is needed
+Requires: createrepo_c
 # Display stuff moved from lorax templates
 Requires: xorg-x11-drivers
 Requires: xorg-x11-server-Xorg
@@ -301,39 +320,36 @@ Requires: gsettings-desktop-schemas
 Requires: librsvg2
 Requires: gnome-kiosk
 Requires: brltty
+# dependencies for rpm-ostree payload module
+Requires: rpm-ostree >= %{rpmostreever}
+Requires: ostree
+# used by ostree command for native containers
+Requires: skopeo
+# External tooling for managing NVMe-FC devices in the installation environment
+Requires: nvme-cli
+# Needed for bootc
+Requires: podman
 
 %description install-img-deps
-The anaconda-install-img-deps metapackage lists all boot.iso installation image dependencies.
-Add this package to an image build (eg. with lorax) to ensure all Anaconda capabilities are supported in the resulting image.
-
-%if %use_cockpit
-%package webui
-Summary: Cockpit based user interface for the Anaconda installer
-Requires: cockpit-bridge
-Requires: cockpit-ws
-
-%description webui
-This package contains Cockpit based user interface for the Anaconda installer.
-
-%endif
+The anaconda-install-img-deps metapackage lists all boot.iso installation
+image dependencies. Add this package to an image build (eg. with lorax) to
+ensure all Anaconda capabilities are supported in the resulting image.
 
 %package gui
 Summary: Graphical user interface for the Anaconda installer
 Requires: anaconda-core = %{epoch}:%{version}-%{release}
 Requires: anaconda-widgets = %{epoch}:%{version}-%{release}
+Requires: python3-iso639
 Requires: python3-meh-gui >= %{mehver}
+Requires: python3-xkbregistry
 Requires: adwaita-icon-theme
+Requires: tecla
 Requires: tigervnc-server-minimal
 Requires: libxklavier >= %{libxklavierver}
-Requires: libgnomekbd
-Requires: libtimezonemap >= %{libtimezonemapver}
 #Requires: nm-connection-editor
-Requires: keybinder3
 #%ifnarch s390 s390x
 #Requires: NetworkManager-wifi
 #%endif
-Requires: anaconda-user-help >= %{helpver}
-Requires: yelp
 %if ! 0%{?rhel}
 Requires: blivet-gui-runtime >= %{blivetguiver}
 %endif
@@ -355,20 +371,23 @@ This package contains textual user interface for the Anaconda installer.
 
 %package widgets
 Summary: A set of custom GTK+ widgets for use with anaconda
-Requires: python3
+Requires: %{__python3}
 
 %description widgets
-This package contains a set of custom GTK+ widgets used by the anaconda installer.
+This package contains a set of custom GTK+ widgets used by the anaconda
+installer.
 
 %package widgets-devel
 Summary: Development files for anaconda-widgets
+%if %{with glade}
 Requires: glade
+%endif
 Requires: %{name}-widgets%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description widgets-devel
-This package contains libraries and header files needed for writing the anaconda
-installer.  It also contains Python and Glade support files, as well as
-documentation for working with this library.
+This package contains libraries and header files needed for writing the
+anaconda installer.  It also contains Python and Glade support files,
+as well as documentation for working with this library.
 
 %package dracut
 Summary: The anaconda dracut module
@@ -377,6 +396,7 @@ Requires: dracut-network
 Requires: dracut-live
 Requires: xz
 Requires: python3-kickstart
+Requires: iputils
 
 %description dracut
 The 'anaconda' dracut module handles installer-specific boot tasks and
@@ -388,7 +408,7 @@ runtime on NFS/HTTP/FTP servers or local disks.
 
 %build
 # use actual build-time release number, not tarball creation time release number
-%configure ANACONDA_RELEASE=%{release}
+%configure ANACONDA_RELEASE=%{release} %{!?with_glade:--disable-glade}
 %{__make} %{?_smp_mflags}
 
 %install
@@ -412,18 +432,24 @@ cp -r %{SOURCE4} %{SOURCE5} %{buildroot}%{_datadir}/anaconda/help/qubesos/en-US/
 # Copy QubesOS product file
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/profile.d/
 
+%if %{with live}
 # required for live installations
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/liveinst.desktop
+%else
+# Remove all live-installer files from the buildroot
+rm -rf \
+  %{buildroot}/%{_sysconfdir}/xdg/autostart/liveinst-setup.desktop \
+  %{buildroot}/%{_bindir}/liveinst \
+  %{buildroot}/%{_libexecdir}/liveinst-setup.sh \
+  %{buildroot}/%{_datadir}/anaconda/gnome \
+  %{buildroot}/%{_datadir}/anaconda/gnome/fedora-welcome \
+  %{buildroot}/%{_datadir}/anaconda/gnome/org.fedoraproject.welcome-screen.desktop \
+  %{buildroot}/%{_datadir}/polkit-1/actions/* \
+  %{buildroot}/%{_datadir}/applications/liveinst.desktop
+%endif
 
 # Add localization files
 %find_lang %{name}
-
-%if ! %use_cockpit
-    rm -rf %{buildroot}/%{_datadir}/cockpit/anaconda-webui
-    rm -f %{buildroot}/%{_datadir}/metainfo/org.cockpit-project.anaconda-webui.metainfo.xml
-    rm -f %{buildroot}/%{_libexecdir}/webui-desktop
-%endif
-
 
 # main package and install-env-deps are metapackages
 %files
@@ -454,7 +480,7 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_d
 %exclude %{_datadir}/anaconda/ui
 %exclude %{_datadir}/anaconda/window-manager
 %exclude %{_datadir}/anaconda/anaconda-gtk.css
-%{_datadir}/anaconda/post-scripts/*
+%dir %{_datadir}/anaconda/post-scripts
 %exclude %{_prefix}/libexec/anaconda/dd_*
 %{python3_sitearch}/pyanaconda
 %exclude %{python3_sitearch}/pyanaconda/rescue.py*
@@ -469,32 +495,16 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_d
 %dir %{_sysconfdir}/%{name}/profile.d
 %config %{_sysconfdir}/%{name}/profile.d/*
 
-%if ! 0%{?rhel}
+%if %{with live}
 # do not provide the live subpackage on RHEL
 
 %files live
 %{_bindir}/liveinst
-%{_sbindir}/liveinst
-%config(noreplace) %{_sysconfdir}/pam.d/*
-%config(noreplace) %{_sysconfdir}/security/console.apps/*
+%{_datadir}/polkit-1/actions/*
 %{_libexecdir}/liveinst-setup.sh
 %{_datadir}/applications/*.desktop
 %{_datadir}/anaconda/gnome
 %{_sysconfdir}/xdg/autostart/*.desktop
-
-%endif
-
-%if %use_cockpit
-%files webui
-%dir %{_datadir}/cockpit/anaconda-webui
-%{_datadir}/cockpit/anaconda-webui/index.js.LICENSE.txt.gz
-%{_datadir}/cockpit/anaconda-webui/index.html.gz
-%{_datadir}/cockpit/anaconda-webui/index.js.gz
-%{_datadir}/cockpit/anaconda-webui/index.css.gz
-%{_datadir}/cockpit/anaconda-webui/manifest.json
-%{_datadir}/metainfo/org.cockpit-project.anaconda-webui.metainfo.xml
-%{_datadir}/cockpit/anaconda-webui/po.*.js.gz
-%{_libexecdir}/webui-desktop
 
 %endif
 
@@ -509,6 +519,7 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_d
 %endif
 %{_datadir}/anaconda/window-manager
 %{_datadir}/anaconda/anaconda-gtk.css
+%{_datadir}/anaconda/gtk-4.0/settings.ini
 
 %files tui
 %{python3_sitearch}/pyanaconda/rescue.py
@@ -521,10 +532,12 @@ desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{buildroot}%{_d
 %{python3_sitearch}/gi/overrides/*
 
 %files widgets-devel
-%{_libdir}/libAnacondaWidgets.so
-%{_libdir}/glade/modules/libAnacondaWidgets.so
 %{_includedir}/*
+%{_libdir}/libAnacondaWidgets.so
+%if %{with glade}
+%{_libdir}/glade/modules/libAnacondaWidgets.so
 %{_datadir}/glade/catalogs/AnacondaWidgets.xml
+%endif
 %{_datadir}/gtk-doc
 
 %files dracut

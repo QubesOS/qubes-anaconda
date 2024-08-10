@@ -1,4 +1,4 @@
-From 226838a282e9172ee3578f250f5203541aec7764 Mon Sep 17 00:00:00 2001
+From 063875c7a7cbd6f92188793b5622bfd296167253 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Sun, 13 Aug 2023 04:00:50 +0200
@@ -20,7 +20,7 @@ QubesOS/qubes-issues#4974
  2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
-index 01c6cdcb23..1d14377cda 100644
+index 61e3849ed6..02e6d11ab4 100644
 --- a/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
 +++ b/pyanaconda/modules/storage/partitioning/automatic/automatic_partitioning.py
 @@ -17,6 +17,7 @@
@@ -42,10 +42,10 @@ index 01c6cdcb23..1d14377cda 100644
  
      @staticmethod
 diff --git a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py b/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
-index e2e67904bf..df62e94590 100644
+index e59509975f..68c4a49110 100644
 --- a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
 +++ b/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
-@@ -413,7 +413,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
+@@ -410,7 +410,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
                      escrow_cert=cert,
                      add_backup_passphrase=partition_data.backuppassphrase,
                      luks_version=partition_data.luks_version,
@@ -55,7 +55,7 @@ index e2e67904bf..df62e94590 100644
                  )
                  luksdev = LUKSDevice(
                      "luks%d" % storage.next_id,
-@@ -429,7 +430,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
+@@ -426,7 +427,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
                      escrow_cert=cert,
                      add_backup_passphrase=partition_data.backuppassphrase,
                      luks_version=partition_data.luks_version,
@@ -66,5 +66,5 @@ index e2e67904bf..df62e94590 100644
                  luksdev = LUKSDevice("luks%d" % storage.next_id,
                                       fmt=luksformat,
 -- 
-2.41.0
+2.45.2
 

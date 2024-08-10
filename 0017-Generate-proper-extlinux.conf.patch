@@ -1,4 +1,4 @@
-From 269866250f52767160e5ceb22fd5e1bdfe5ab68a Mon Sep 17 00:00:00 2001
+From dbc6d2b2054e3f1c12bb20ec1ff5bfcaac575c5b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:42:49 +0100
@@ -16,7 +16,7 @@ By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
  1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/extlinux.py b/pyanaconda/modules/storage/bootloader/extlinux.py
-index a12093ba83..6b9711ed8e 100644
+index d78a95e8f7..57825b173e 100644
 --- a/pyanaconda/modules/storage/bootloader/extlinux.py
 +++ b/pyanaconda/modules/storage/bootloader/extlinux.py
 @@ -66,6 +66,8 @@ class EXTLINUX(BootLoader):
@@ -45,5 +45,5 @@ index a12093ba83..6b9711ed8e 100644
                           "initrd": image.initrd,
                           "args": args,
 -- 
-2.38.1
+2.45.2
 

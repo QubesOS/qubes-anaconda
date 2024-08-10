@@ -1,4 +1,4 @@
-From 1f81ba6a21ac3783c17321d468589c62ecfaab1e Mon Sep 17 00:00:00 2001
+From 1ed039b26723f5f5ba552d7f0642969e4ad2a04d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:28:13 +0100
@@ -12,23 +12,24 @@ Installing Qubes on network drive is not supported, so drop those dependencies.
 From b5671d087a21b1095f77d2f6fccd7391fb7899e5
 By Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
 ---
- pyanaconda/modules/storage/reset.py | 3 ---
- 1 file changed, 3 deletions(-)
+ pyanaconda/modules/storage/reset.py | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/reset.py b/pyanaconda/modules/storage/reset.py
-index 71280a11a6..6299d9b338 100644
+index 5f56725f99..f2cbcd5da9 100644
 --- a/pyanaconda/modules/storage/reset.py
 +++ b/pyanaconda/modules/storage/reset.py
-@@ -71,9 +71,6 @@ class ScanDevicesTask(Task):
+@@ -72,10 +72,6 @@ class ScanDevicesTask(Task):
          if conf.target.is_image:
              return
  
 -        iscsi.startup()
 -        fcoe.startup()
+-        nvme.startup()
 -
          if arch.is_s390():
              zfcp.startup()
  
 -- 
-2.38.1
+2.45.2
 

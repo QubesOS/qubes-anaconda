@@ -1,4 +1,4 @@
-From 3400848da4a7e333092b32a70c794c9a29299750 Mon Sep 17 00:00:00 2001
+From 13c0d48590c8cc285bc3b783ac97301a583c1864 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sat, 16 Oct 2021 17:36:15 +0200
@@ -30,5 +30,5 @@ index 9d12238019..aecfff1fd8 100644
      ]
  
 -- 
-2.38.1
+2.45.2
 

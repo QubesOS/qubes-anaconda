@@ -1,8 +1,8 @@
-From bc63ca7d1869fe35e4e4350545de2f88815e5532 Mon Sep 17 00:00:00 2001
+From 748643a2811b5ea7896ae9be7e6886c4146a4605 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Sat, 2 Sep 2023 23:36:10 +0200
-Subject: [PATCH 38/39] Restore support for detection of unsupported hardware
+Subject: [PATCH] Restore support for detection of unsupported hardware
 
 This reverts commit 027ba76bd5c8e715451803b375661c7e0f07c571.
 ---
@@ -10,22 +10,22 @@ This reverts commit 027ba76bd5c8e715451803b375661c7e0f07c571.
  data/profile.d/rhel.conf                      |   5 +
  pyanaconda/core/configuration/system.py       |  10 ++
  pyanaconda/core/constants.py                  |  14 ++
- pyanaconda/core/util.py                       |  70 +++++++++-
+ pyanaconda/core/util.py                       |  72 +++++++++-
  .../gui/spokes/lib/unsupported_hardware.glade | 126 ++++++++++++++++++
  .../ui/gui/spokes/lib/unsupported_hardware.py |  48 +++++++
  pyanaconda/ui/gui/spokes/welcome.py           |  13 ++
  .../ui/tui/spokes/unsupported_hardware.py     |  57 ++++++++
  .../pyanaconda_tests/ui/test_simple_ui.py     |   2 +
- 10 files changed, 350 insertions(+), 1 deletion(-)
+ 10 files changed, 352 insertions(+), 1 deletion(-)
  create mode 100644 pyanaconda/ui/gui/spokes/lib/unsupported_hardware.glade
  create mode 100644 pyanaconda/ui/gui/spokes/lib/unsupported_hardware.py
  create mode 100644 pyanaconda/ui/tui/spokes/unsupported_hardware.py
 
 diff --git a/data/anaconda.conf b/data/anaconda.conf
-index 5b86f2074e..3a031974b1 100644
+index 351952bd00..d9c5553845 100644
 --- a/data/anaconda.conf
 +++ b/data/anaconda.conf
-@@ -37,6 +37,12 @@ optional_modules =
+@@ -29,6 +29,12 @@ optional_modules =
  # FIXME: This is a temporary solution.
  type = UNKNOWN
  
@@ -39,7 +39,7 @@ index 5b86f2074e..3a031974b1 100644
  can_detect_enabled_smt = False
  
 diff --git a/data/profile.d/rhel.conf b/data/profile.d/rhel.conf
-index a4976793a9..8d19dc1210 100644
+index b0f316a01a..238a1c949b 100644
 --- a/data/profile.d/rhel.conf
 +++ b/data/profile.d/rhel.conf
 @@ -9,6 +9,11 @@ profile_id = rhel
@@ -55,7 +55,7 @@ index a4976793a9..8d19dc1210 100644
  
  [Network]
 diff --git a/pyanaconda/core/configuration/system.py b/pyanaconda/core/configuration/system.py
-index 9138dd2d88..b2d53eef4f 100644
+index caedd1e5fa..889e5c1d7f 100644
 --- a/pyanaconda/core/configuration/system.py
 +++ b/pyanaconda/core/configuration/system.py
 @@ -147,6 +147,16 @@ class SystemSection(Section):
@@ -76,10 +76,10 @@ index 9138dd2d88..b2d53eef4f 100644
      def can_detect_enabled_smt(self):
          """Can we try to detect enabled SMT?"""
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index b130f71fd9..6762223385 100644
+index 06ff8cb041..5409536016 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -140,6 +140,20 @@ GEOLOC_CONNECTION_TIMEOUT = 5
+@@ -146,6 +146,20 @@ GEOLOC_CONNECTION_TIMEOUT = 5
  ANACONDA_ENVIRON = "anaconda"
  FIRSTBOOT_ENVIRON = "firstboot"
  
@@ -101,21 +101,25 @@ index b130f71fd9..6762223385 100644
  WARNING_NO_DISKS_DETECTED = N_(
      "No disks detected.  Please shut down the computer, connect at least one disk, and restart "
 diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
-index 5fe1fa62ba..553e24715c 100644
+index 537201995d..fbe811cf90 100644
 --- a/pyanaconda/core/util.py
 +++ b/pyanaconda/core/util.py
-@@ -43,7 +43,8 @@ from pyanaconda.core.path import make_directories, open_with_perm, join_paths
- from pyanaconda.flags import flags
+@@ -40,9 +40,12 @@ from pyanaconda.core.configuration.anaconda import conf
+ from pyanaconda.core.path import make_directories, open_with_perm, join_paths
  from pyanaconda.core.process_watchers import WatchProcesses
  from pyanaconda.core.constants import DRACUT_SHUTDOWN_EJECT, \
--    IPMI_ABORTED, X_TIMEOUT
-+    IPMI_ABORTED, X_TIMEOUT, TAINT_HARDWARE_UNSUPPORTED, TAINT_SUPPORT_REMOVED, \
+-    IPMI_ABORTED, X_TIMEOUT, PACKAGES_LIST_FILE
++    IPMI_ABORTED, X_TIMEOUT, PACKAGES_LIST_FILE, \
++    TAINT_HARDWARE_UNSUPPORTED, TAINT_SUPPORT_REMOVED, \
 +    WARNING_HARDWARE_UNSUPPORTED, WARNING_SUPPORT_REMOVED
+ from pyanaconda.core.live_user import get_live_user
  from pyanaconda.errors import RemovedModuleError
++from pyanaconda.flags import flags
  
  from pyanaconda.anaconda_logging import program_log_lock
-@@ -582,6 +583,73 @@ def cmp_obj_attrs(obj1, obj2, attr_list):
-     return True
+ from pyanaconda.anaconda_loggers import get_module_logger, get_program_logger
+@@ -596,6 +599,73 @@ def vtActivate(num):
+     return ret == 0
  
  
 +def get_kernel_taint(flag):
@@ -375,19 +379,19 @@ index 0000000000..d4542be054
 +        self.window.destroy()
 +        return rc
 diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
-index 9ed05bd1fe..a698e7acc1 100644
+index ef5921622d..f66667c372 100644
 --- a/pyanaconda/ui/gui/spokes/welcome.py
 +++ b/pyanaconda/ui/gui/spokes/welcome.py
-@@ -31,6 +31,8 @@ from pyanaconda.ui.gui.spokes import StandaloneSpoke
- from pyanaconda.ui.gui.utils import setup_gtk_direction, escape_markup
+@@ -32,6 +32,8 @@ from pyanaconda.ui.gui.utils import setup_gtk_direction, escape_markup
  from pyanaconda.core.async_utils import async_action_wait
+ from pyanaconda.ui.gui.spokes.lib.beta_warning_dialog import BetaWarningDialog
  from pyanaconda.ui.gui.spokes.lib.lang_locale_handler import LangLocaleHandler
 +from pyanaconda.ui.gui.spokes.lib.unsupported_hardware import UnsupportedHardwareDialog
 +
  from pyanaconda import localization
- from pyanaconda.product import distributionText, isFinal, productName, productVersion
- from pyanaconda import flags
-@@ -347,6 +349,17 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
+ from pyanaconda.ui.helpers import get_distribution_text
+ from pyanaconda.core.product import get_product_is_final_release, get_product_name, \
+@@ -285,6 +287,17 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
                  ipmi_abort(scripts=self.data.scripts)
                  sys.exit(0)
  
@@ -468,6 +472,26 @@ index 0000000000..97ad2e1488
 +
 +    def apply(self):
 +        pass
+diff --git a/tests/unit_tests/pyanaconda_tests/ui/test_simple_ui.py b/tests/unit_tests/pyanaconda_tests/ui/test_simple_ui.py
+index db24bd7d75..cbd41774b9 100644
+--- a/tests/unit_tests/pyanaconda_tests/ui/test_simple_ui.py
++++ b/tests/unit_tests/pyanaconda_tests/ui/test_simple_ui.py
+@@ -167,6 +167,7 @@ class SimpleUITestCase(unittest.TestCase):
+ 
+         # Check the actions classes.
+         self._check_actions([
++            "unsupported-hardware-warning",
+             "kernel-warning",
+             "installation-summary",
+             "installation-progress",
+@@ -197,6 +198,7 @@ class SimpleUITestCase(unittest.TestCase):
+         # Check the screens.
+         self._check_screens([
+             # Warnings
++            "unsupported-hardware-warning",
+             "kernel-warning",
+ 
+             # Installation
 -- 
-2.41.0
+2.45.2
 

@@ -1,8 +1,8 @@
-From 888f037e3b998c4ab32c8a4aa24307e4ca7e2b52 Mon Sep 17 00:00:00 2001
+From 7ff09f4961e2de71eeccb87c08e1fae6d5b74581 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sat, 30 Nov 2019 17:36:29 +0100
-Subject: [PATCH 39/39] check for Qubes OS hardware required features
+Subject: [PATCH] check for Qubes OS hardware required features
 
 Warn if the hardware lacks features required for proper Qubes OS operation.
 
@@ -13,10 +13,10 @@ Rework based on previous commits 696bd4c, 63043751a, 7489992dd, 3791fd7 and f6bf
  2 files changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index 6762223385..c31058d2a3 100644
+index 5409536016..9209ea70c5 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -150,8 +150,10 @@ WARNING_SUPPORT_REMOVED = N_(
+@@ -156,8 +156,10 @@ WARNING_SUPPORT_REMOVED = N_(
  )
  
  WARNING_HARDWARE_UNSUPPORTED = N_(
@@ -30,10 +30,10 @@ index 6762223385..c31058d2a3 100644
  
  # Storage messages
 diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
-index 553e24715c..f77bfc9cf8 100644
+index fbe811cf90..42e9d1fc4b 100644
 --- a/pyanaconda/core/util.py
 +++ b/pyanaconda/core/util.py
-@@ -626,10 +626,31 @@ def detect_unsupported_hardware():
+@@ -642,10 +642,31 @@ def detect_unsupported_hardware():
          return []
  
      # Check TAINT_HARDWARE_UNSUPPORTED
@@ -70,5 +70,5 @@ index 553e24715c..f77bfc9cf8 100644
      # Check TAINT_SUPPORT_REMOVED
      if not conf.system.can_detect_support_removed:
 -- 
-2.41.0
+2.45.2
 

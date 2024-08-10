@@ -1,24 +1,23 @@
-From dcc84fce747b84059915b44da626ffc9e1cfd121 Mon Sep 17 00:00:00 2001
+From 811b35eae9628198008284cfa1e6deb025e583a2 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Wed, 4 Jan 2023 14:12:17 +0100
 Subject: [PATCH] Support for adding bootloader options in configuration file
 
 ---
- data/anaconda.conf                            |  7 ++++++
- pyanaconda/core/configuration/bootloader.py   | 15 ++++++++++++
- .../modules/storage/bootloader/grub2.py       |  8 ++++---
- .../core/test_configuration.py                | 24 +++++++++++++++++++
- 4 files changed, 51 insertions(+), 3 deletions(-)
+ data/anaconda.conf                             |  7 +++++++
+ pyanaconda/core/configuration/bootloader.py    | 15 +++++++++++++++
+ pyanaconda/modules/storage/bootloader/grub2.py |  8 +++++---
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/data/anaconda.conf b/data/anaconda.conf
-index ed78944b37..b739c6e6ac 100644
+index 9f5b69cc07..70d286d490 100644
 --- a/data/anaconda.conf
 +++ b/data/anaconda.conf
 @@ -158,6 +158,13 @@ preserved_arguments =
      biosdevname ipv6.disable net.ifnames net.ifnames.prefix
-     nosmt
-
+     nosmt vga
+ 
 +# Disable the GRUB submenu
 +disable_submenu = True
 +
@@ -26,17 +25,17 @@ index ed78944b37..b739c6e6ac 100644
 +terminal_type =
 +
 +additional_default_grub_options =
-
+ 
  [Storage]
- # Enable dmraid usage during the installation.
+ # Enable iBFT usage during the installation.
 diff --git a/pyanaconda/core/configuration/bootloader.py b/pyanaconda/core/configuration/bootloader.py
-index 6746e4503e..def20475ca 100644
+index 18b956bbe4..89d3b8d075 100644
 --- a/pyanaconda/core/configuration/bootloader.py
 +++ b/pyanaconda/core/configuration/bootloader.py
-@@ -53,6 +53,11 @@ class BootloaderSection(Section):
+@@ -55,6 +55,11 @@ class BootloaderSection(Section):
          """Hide the GRUB menu."""
          return self._get_option("menu_auto_hide", bool)
-
+ 
 +    @property
 +    def disable_submenu(self):
 +        """Disable the GRUB submenu."""
@@ -45,7 +44,7 @@ index 6746e4503e..def20475ca 100644
      @property
      def nonibft_iscsi_boot(self):
          """Are non-iBFT iSCSI disks allowed?
-@@ -69,3 +74,13 @@ class BootloaderSection(Section):
+@@ -71,3 +76,13 @@ class BootloaderSection(Section):
          :return: a list of kernel arguments
          """
          return self._get_option("preserved_arguments", str).split()
@@ -60,7 +59,7 @@ index 6746e4503e..def20475ca 100644
 +        """List of additional default GRUB options"""
 +        return self._get_option("additional_default_grub_options", str).strip("\n").split("\n")
 diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
-index 74249a9507..a06a0fd84f 100644
+index 6adde7f364..fc3df80487 100644
 --- a/pyanaconda/modules/storage/bootloader/grub2.py
 +++ b/pyanaconda/modules/storage/bootloader/grub2.py
 @@ -256,12 +256,12 @@ class GRUB2(BootLoader):
@@ -75,7 +74,7 @@ index 74249a9507..a06a0fd84f 100644
          else:
 -            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n" % self.terminal_type)
 +            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n" % conf.bootloader.terminal_type or self.terminal_type)
-
+ 
          # this is going to cause problems for systems containing multiple
          # linux installations or even multiple boot entries with different
 @@ -269,7 +269,9 @@ class GRUB2(BootLoader):
@@ -86,9 +85,9 @@ index 74249a9507..a06a0fd84f 100644
 +        # defaults.write("GRUB_THEME=\"/boot/grub2/themes/system/theme.txt\"\n")
 +        for option in conf.bootloader.additional_default_grub_options:
 +            defaults.write("%s\n" % option)
-
+ 
          if self.use_bls and os.path.exists(conf.target.system_root + "/usr/sbin/new-kernel-pkg"):
              log.warning("BLS support disabled due new-kernel-pkg being present")
---
-2.38.1
+-- 
+2.45.2
 

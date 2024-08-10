@@ -1,4 +1,4 @@
-From 92977722d21f9f8e375432748e00800b5dc77403 Mon Sep 17 00:00:00 2001
+From 5164e845da52e7db750ebc8c76e4df9de980a001 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 12:01:21 +0100
@@ -15,17 +15,17 @@ Originally based on:
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
-index b1a9132ef0..6cf333ac17 100644
+index e4b12cf6ce..ccdbdd6dcf 100644
 --- a/pyanaconda/modules/storage/bootloader/grub2.py
 +++ b/pyanaconda/modules/storage/bootloader/grub2.py
-@@ -26,6 +26,7 @@ from pyanaconda.core import util
- from pyanaconda.core.configuration.anaconda import conf
+@@ -27,6 +27,7 @@ from pyanaconda.core.configuration.anaconda import conf
  from pyanaconda.core.i18n import _
  from pyanaconda.core.path import open_with_perm
+ from pyanaconda.core.product import get_product_name
 +from pyanaconda.core.kernel import kernel_arguments
- from pyanaconda.product import productName
  
  from pyanaconda.anaconda_loggers import get_module_logger
+ log = get_module_logger(__name__)
 @@ -130,6 +131,8 @@ class GRUB2(BootLoader):
      def __init__(self):
          super().__init__()
@@ -36,7 +36,7 @@ index b1a9132ef0..6cf333ac17 100644
      #
      # configuration
 @@ -187,7 +190,7 @@ class GRUB2(BootLoader):
-         if productName.startswith("Red Hat "): # pylint: disable=no-member
+         if get_product_name().startswith("Red Hat "): # pylint: disable=no-member
              return ["xfs", "ext4", "ext3", "ext2"]
          else:
 -            return ["ext4", "ext3", "ext2", "btrfs", "xfs"]
@@ -45,5 +45,5 @@ index b1a9132ef0..6cf333ac17 100644
      #
      # grub-related conveniences
 -- 
-2.38.1
+2.45.2
 

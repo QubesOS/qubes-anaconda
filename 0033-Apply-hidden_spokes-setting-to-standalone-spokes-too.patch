@@ -1,4 +1,4 @@
-From 65c2df5fd44a1a73d4a449e25c49761dd94e86ec Mon Sep 17 00:00:00 2001
+From b2cdd35312d16032bbfaa2c9e47e13c00f0e8fc1 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Thu, 9 Feb 2023 22:25:41 +0100
@@ -30,5 +30,5 @@ index b29a1e6923..45162c9d08 100644
                  getattr(obj, "postForHub", False)
  
 -- 
-2.39.0
+2.45.2
 

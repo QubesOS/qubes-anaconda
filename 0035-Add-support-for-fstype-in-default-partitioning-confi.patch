@@ -1,4 +1,4 @@
-From d124b7a829b1e74abd650b81369a180ab3bf57ed Mon Sep 17 00:00:00 2001
+From 7f76bff6e730bb507ea3723f28e59d0fa171c924 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Sun, 12 Feb 2023 03:38:37 +0100
@@ -8,18 +8,20 @@ Allow setting specific fstype for individual partitions in the config.
 This specifically allows different fstypes for different partitions.
 The feature is optional - if fstype is not set, the behavior is
 unchanged.
+
+v2: drop unit test from AutomaticPartitioningTaskTestCase, as it isn't
+part of the release tarball so the patch fails to apply
 ---
- pyanaconda/core/configuration/storage.py         | 11 +++++++++++
- .../storage/partitioning/automatic/utils.py      |  2 +-
- .../pyanaconda_tests/core/test_configuration.py  | 11 +++++++++++
- .../partitioning/test_module_part_automatic.py   | 16 ++++++++++++++++
- 4 files changed, 39 insertions(+), 1 deletion(-)
+ pyanaconda/core/configuration/storage.py              | 11 +++++++++++
+ .../modules/storage/partitioning/automatic/utils.py   |  2 +-
+ .../pyanaconda_tests/core/test_configuration.py       | 11 +++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
-index 9f0c31ab63..02db385bac 100644
+index 292262787f..31c180b92f 100644
 --- a/pyanaconda/core/configuration/storage.py
 +++ b/pyanaconda/core/configuration/storage.py
-@@ -178,6 +178,7 @@ class StorageSection(Section):
+@@ -180,6 +180,7 @@ class StorageSection(Section):
              min        The size will grow from min size to max size.
              max        The max size is unlimited by default.
              free       The required available space.
@@ -27,7 +29,7 @@ index 9f0c31ab63..02db385bac 100644
              btrfs      The mount point will be created only for the Btrfs scheme
  
          :return: a list of dictionaries with mount point attributes
-@@ -217,6 +218,9 @@ class StorageSection(Section):
+@@ -219,6 +220,9 @@ class StorageSection(Section):
              if not value and name in ("btrfs", ):
                  # Handle a boolean attribute.
                  attrs[name] = True
@@ -37,7 +39,7 @@ index 9f0c31ab63..02db385bac 100644
              elif value and name in ("size", "min", "max", "free"):
                  # Handle a size attribute.
                  attrs[name] = Size(value)
-@@ -243,3 +247,10 @@ class StorageSection(Section):
+@@ -245,3 +249,10 @@ class StorageSection(Section):
  
          if attrs.get("max") and not attrs.get("min"):
              raise ValueError("The attribute 'max' cannot be set without 'min'.")
@@ -49,18 +51,47 @@ index 9f0c31ab63..02db385bac 100644
 +                "jfs", "reiserfs", "hfs", "appleboot", "hfs+", "macefi", "ntfs"):
 +            raise ValueError("Unsupported 'fstype' value")
 diff --git a/pyanaconda/modules/storage/partitioning/automatic/utils.py b/pyanaconda/modules/storage/partitioning/automatic/utils.py
-index ff10dbd11b..14d58b36fe 100644
+index b496950fcc..36e647d6c8 100644
 --- a/pyanaconda/modules/storage/partitioning/automatic/utils.py
 +++ b/pyanaconda/modules/storage/partitioning/automatic/utils.py
-@@ -274,7 +274,7 @@ def get_default_partitioning(scheme=None):
+@@ -286,7 +286,7 @@ def get_part_spec(attrs):
  
-         spec = PartSpec(
-             mountpoint=name if not swap else None,
--            fstype=None if not swap else "swap",
-+            fstype=attrs.get("fstype") if not swap else "swap",
-             lv=True,
-             thin=not swap,
-             btr=not swap,
+     spec = PartSpec(
+         mountpoint=name if not swap else None,
+-        fstype=None if not swap else "swap",
++        fstype=attrs.get("fstype") if not swap else "swap",
+         lv=True,
+         thin=not swap,
+         btr=not swap,
+diff --git a/tests/unit_tests/pyanaconda_tests/core/test_configuration.py b/tests/unit_tests/pyanaconda_tests/core/test_configuration.py
+index 1617e2116e..e5bcbefa23 100644
+--- a/tests/unit_tests/pyanaconda_tests/core/test_configuration.py
++++ b/tests/unit_tests/pyanaconda_tests/core/test_configuration.py
+@@ -441,6 +441,11 @@ class AnacondaConfigurationTestCase(unittest.TestCase):
+             "name": "swap"
+         }
+ 
++        assert convert_line("/home (fstype xfs)") == {
++            "name": "/home",
++            "fstype": "xfs",
++        }
++
+         with pytest.raises(ValueError):
+             convert_line("")
+ 
+@@ -459,6 +464,12 @@ class AnacondaConfigurationTestCase(unittest.TestCase):
+         with pytest.raises(ValueError):
+             convert_line("/home  (max 2 GiB)")
+ 
++        with pytest.raises(ValueError):
++            convert_line("/home  (fstype invalid)")
++
++        with pytest.raises(ValueError):
++            convert_line("/home  (fstype)")
++
+     def test_default_installation_source(self):
+         conf = AnacondaConfiguration.from_defaults()
+         assert conf.payload.default_source == SOURCE_TYPE_CLOSEST_MIRROR
 -- 
-2.39.0
+2.45.2
 

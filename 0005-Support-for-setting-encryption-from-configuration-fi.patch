@@ -1,59 +1,57 @@
-From c7231e96756bf49cecf293e6aa22b9fb48781f99 Mon Sep 17 00:00:00 2001
+From 83fe902f59ab2ab05613e62d31a099012e275872 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Wed, 4 Jan 2023 16:22:55 +0100
 Subject: [PATCH] Support for setting encryption from configuration file
 
 ---
- data/anaconda.conf                                           | 3 +++
- pyanaconda/core/configuration/storage.py                     | 5 +++++
- pyanaconda/modules/common/structures/partitioning.py         | 2 +-
- tests/unit_tests/pyanaconda_tests/core/test_configuration.py | 4 ++++
- 4 files changed, 13 insertions(+), 1 deletion(-)
+ data/anaconda.conf                                   | 3 +++
+ pyanaconda/core/configuration/storage.py             | 4 ++++
+ pyanaconda/modules/common/structures/partitioning.py | 2 +-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/data/anaconda.conf b/data/anaconda.conf
-index b739c6e6ac..b4d4d93d47 100644
+index 70d286d490..23dad7cc0c 100644
 --- a/data/anaconda.conf
 +++ b/data/anaconda.conf
 @@ -167,6 +167,9 @@ terminal_type =
  additional_default_grub_options =
-
+ 
  [Storage]
 +# Set encryption
 +encrypted = False
 +
- # Enable dmraid usage during the installation.
- dmraid = True
-
+ # Enable iBFT usage during the installation.
+ ibft = True
+ 
 diff --git a/pyanaconda/core/configuration/storage.py b/pyanaconda/core/configuration/storage.py
-index 05982ebb85..9f0c31ab63 100644
+index fa95a8140b..292262787f 100644
 --- a/pyanaconda/core/configuration/storage.py
 +++ b/pyanaconda/core/configuration/storage.py
-@@ -50,6 +50,11 @@ class PartitioningScheme(Enum):
- class StorageSection(Section):
+@@ -51,6 +51,10 @@ class StorageSection(Section):
      """The Storage section."""
-
-+    @property
+ 
+     @property
 +    def encrypted(self):
 +        """Is encryption set?"""
 +        return self._get_option("encrypted", bool)
 +
-     @property
-     def dmraid(self):
-         """Enable dmraid usage during the installation."""
+     def ibft(self):
+         """Enable iBFT usage during the installation."""
+         return self._get_option("ibft", bool)
 diff --git a/pyanaconda/modules/common/structures/partitioning.py b/pyanaconda/modules/common/structures/partitioning.py
-index 2e22e6a58d..ff1238e177 100644
+index 20adc6f5c1..77db37633d 100644
 --- a/pyanaconda/modules/common/structures/partitioning.py
 +++ b/pyanaconda/modules/common/structures/partitioning.py
-@@ -33,7 +33,7 @@ class PartitioningRequest(DBusData):
-         self._file_system_type = ""
+@@ -34,7 +34,7 @@ class PartitioningRequest(DBusData):
          self._excluded_mount_points = []
-
+         self._hibernation = False
+ 
 -        self._encrypted = False
 +        self._encrypted = conf.storage.encrypted
          self._passphrase = ""
          self._cipher = ""
          self._luks_version = ""
---
-2.38.1
+-- 
+2.45.2
 

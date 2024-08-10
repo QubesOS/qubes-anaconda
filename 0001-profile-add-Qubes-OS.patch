@@ -1,4 +1,4 @@
-From b8fe9d396e68480d1c27569abf9690b3b64491b8 Mon Sep 17 00:00:00 2001
+From 37bbb17fefbd4885aec7d47b9439366a496923cc Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Wed, 4 Jan 2023 14:12:12 +0100
@@ -81,5 +81,5 @@ index 0000000000..2dffe345c0
 +    /       (btrfs, min 20 GiB)
 +    swap
 -- 
-2.38.1
+2.45.2
 

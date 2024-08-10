@@ -1,4 +1,4 @@
-From 0964a1b83d4b1b5cd38faab94da8d58feff76944 Mon Sep 17 00:00:00 2001
+From 4d53234264bd06322fc35aabdeea9f540902f6b9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 29 Jan 2023 17:46:18 +0100
@@ -10,7 +10,7 @@ Subject: [PATCH] Simplify USER configuration spoke
  2 files changed, 9 insertions(+), 91 deletions(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/user.glade b/pyanaconda/ui/gui/spokes/user.glade
-index 4783a9fd50..6beb05b00e 100644
+index 0dc9413355..893a888c43 100644
 --- a/pyanaconda/ui/gui/spokes/user.glade
 +++ b/pyanaconda/ui/gui/spokes/user.glade
 @@ -1,5 +1,5 @@
@@ -20,7 +20,7 @@ index 4783a9fd50..6beb05b00e 100644
  <interface>
    <requires lib="gtk+" version="3.6"/>
    <requires lib="AnacondaWidgets" version="1.0"/>
-@@ -200,23 +200,6 @@
+@@ -202,23 +202,6 @@
                          <property name="top-attach">7</property>
                        </packing>
                      </child>
@@ -44,7 +44,7 @@ index 4783a9fd50..6beb05b00e 100644
                      <child>
                        <object class="GtkBox" id="box2">
                          <property name="visible">True</property>
-@@ -259,43 +242,13 @@
+@@ -261,43 +244,13 @@
                          <property name="top-attach">6</property>
                        </packing>
                      </child>
@@ -89,7 +89,7 @@ index 4783a9fd50..6beb05b00e 100644
                          </child>
                          <child>
                            <placeholder/>
-@@ -372,6 +325,12 @@
+@@ -374,6 +327,12 @@
                      <child>
                        <placeholder/>
                      </child>
@@ -103,10 +103,10 @@ index 4783a9fd50..6beb05b00e 100644
                    <packing>
                      <property name="expand">True</property>
 diff --git a/pyanaconda/ui/gui/spokes/user.py b/pyanaconda/ui/gui/spokes/user.py
-index e70fbd7895..8a3c11fc40 100644
+index 9752a4ed5f..36cc66cb22 100644
 --- a/pyanaconda/ui/gui/spokes/user.py
 +++ b/pyanaconda/ui/gui/spokes/user.py
-@@ -287,8 +287,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -290,8 +290,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
          # check boxes
          self._admin_checkbox = self.builder.get_object("admin_checkbox")
          self._password_required_checkbox = self.builder.get_object("password_required_checkbox")
@@ -115,7 +115,7 @@ index e70fbd7895..8a3c11fc40 100644
          # password checking status bar & label
          self._password_bar = self.builder.get_object("password_bar")
          self._password_label = self.builder.get_object("password_label")
-@@ -362,19 +360,8 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -365,19 +363,8 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
          # the Gtk signal handlers use the input check variables.
          password_set_message = _("The password was set by kickstart.")
          if self.password_kickstarted:
@@ -133,9 +133,9 @@ index e70fbd7895..8a3c11fc40 100644
 -        self._advanced_user_dialog = AdvancedUserDialog(self)
 -        self._advanced_user_dialog.initialize()
  
-         # set the visibility of the password entries
-         # - without this the password visibility toggle icon will
-@@ -415,11 +402,7 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+         # report that we are done
+         self.initialize_done()
+@@ -412,11 +399,7 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
  
      @property
      def password_required(self):
@@ -148,7 +148,7 @@ index e70fbd7895..8a3c11fc40 100644
  
      @property
      def user(self):
-@@ -443,7 +426,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -440,7 +423,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
  
          self.username = self.user.name
          self.fullname = self.user.gecos
@@ -156,7 +156,7 @@ index e70fbd7895..8a3c11fc40 100644
  
          # rerun checks so that we have a correct status message, if any
          self.checker.run_checks()
-@@ -548,12 +530,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -555,12 +537,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
          """Called by Gtk on all username changes."""
          new_username = editable.get_text()
  
@@ -169,7 +169,7 @@ index e70fbd7895..8a3c11fc40 100644
          # update the username in checker
          self.checker.username = new_username
  
-@@ -579,23 +555,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -586,23 +562,6 @@ class UserSpoke(NormalSpoke, GUISpokeInputCheckHandler):
          # rerun the checks
          self.checker.run_checks()
  
@@ -194,5 +194,5 @@ index e70fbd7895..8a3c11fc40 100644
          """Update the warning with the input validation error from the first
             error message or clear warnings if all the checks were successful.
 -- 
-2.38.1
+2.45.2
 

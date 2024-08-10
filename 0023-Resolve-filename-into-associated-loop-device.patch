@@ -1,4 +1,4 @@
-From 05759ff6350563952f945c3d0286889daf889f9f Mon Sep 17 00:00:00 2001
+From 0d38e6e9ccec71c75fbf82d505df0325bf34ec53 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Sat, 31 Jul 2021 03:36:02 +0200
@@ -14,13 +14,13 @@ QubesOS/qubes-issues#6792
  1 file changed, 3 insertions(+)
 
 diff --git a/pyanaconda/payload/utils.py b/pyanaconda/payload/utils.py
-index f03d101a8d..b664b15db8 100644
+index fc6d4b9557..c9114973ef 100644
 --- a/pyanaconda/payload/utils.py
 +++ b/pyanaconda/payload/utils.py
-@@ -47,6 +47,9 @@ def get_device_path(device_name):
+@@ -37,6 +37,9 @@ def get_device_path(device_id):
  
      device_tree = STORAGE.get_proxy(DEVICE_TREE)
-     device_data = DeviceData.from_structure(device_tree.GetDeviceData(device_name))
+     device_data = DeviceData.from_structure(device_tree.GetDeviceData(device_id))
 +    if device_data.type == 'file' and device_data.children:
 +        # resolve file path to associated loop device, if any
 +        device_data = DeviceData.from_structure(device_tree.GetDeviceData(device_data.children[0]))
@@ -28,5 +28,5 @@ index f03d101a8d..b664b15db8 100644
  
  
 -- 
-2.38.1
+2.45.2
 

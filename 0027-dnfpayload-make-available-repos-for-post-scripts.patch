@@ -1,33 +1,70 @@
-From d56ad081582f63666847daf622e4053f6882c075 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>
-Date: Thu, 2 Feb 2023 06:16:37 +0100
+From 6bf4ecd55b3a1c241dfe6902e552216dfaca43b0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
+ <frederic.pierret@qubes-os.org>
+Date: Sun, 29 Jan 2023 14:10:19 +0100
 Subject: [PATCH] dnfpayload: make available repos for post-scripts
 
 This is used by kickstart post-scripts to copy templates and
 kernel-latest from installation source, whatever that source was.
----
- pyanaconda/payload/dnf/payload.py | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
-index 2b0684a3a8..e5d8905221 100644
---- a/pyanaconda/payload/dnf/payload.py
-+++ b/pyanaconda/payload/dnf/payload.py
-@@ -446,6 +446,13 @@ class DNFPayload(Payload):
-         log.debug("[Qubes OS]: Total templates RPMs size: %s", templates_size)
-         return templates_size
+The repositories used for actual installation are in payload.sources not
+payload.repositories (there is a bunch of comments it's a temporary
+solution, but it is this way right now).
+---
+ pyanaconda/modules/payloads/payload/dnf/dnf.py      |  1 +
+ .../modules/payloads/payload/dnf/installation.py    | 13 ++++++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf.py b/pyanaconda/modules/payloads/payload/dnf/dnf.py
+index cdfcf997ec..238dfdcf4f 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/dnf.py
++++ b/pyanaconda/modules/payloads/payload/dnf/dnf.py
+@@ -464,6 +464,7 @@ class DNFModule(PayloadBase):
+                 sysroot=conf.target.system_root,
+                 dnf_manager=self.dnf_manager,
+                 repositories=self.repositories,
++                sources=self.sources,
+             ),
+             ImportRPMKeysTask(
+                 sysroot=conf.target.system_root,
+diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
+index d5722fd768..a4648ad37a 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/installation.py
++++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
+@@ -252,7 +252,7 @@ class InstallPackagesTask(Task):
+ class WriteRepositoriesTask(Task):
+     """The installation task for writing repositories on the target system."""
  
-+    def pre_install(self):
-+        super().pre_install()
-+        for repo in self._dnf_manager._base.repos.iter_enabled():
-+            repo_file = '/tmp/installer.repo'
-+            with open(repo_file, 'a') as repo_fd:
-+                repo_fd.write(repo.dump())
+-    def __init__(self, sysroot, dnf_manager, repositories):
++    def __init__(self, sysroot, dnf_manager, repositories, sources):
+         """Create a new task.
+ 
+         :param str sysroot: a path to the system root
+@@ -263,6 +263,7 @@ class WriteRepositoriesTask(Task):
+         self._sysroot = sysroot
+         self._dnf_manager = dnf_manager
+         self._repositories = repositories
++        self._sources = sources
+ 
+     @property
+     def name(self):
+@@ -279,6 +280,16 @@ class WriteRepositoriesTask(Task):
+             content = self._dnf_manager.generate_repo_file(repo)
+             self._write_repo_file(repo.name, content)
+ 
++        for source in self._sources:
++            repo = source.repository
++            if not repo.name:
++                repo.name = "default"
++            log.info("Writing %s.repo to the installer.repo.", repo.name)
++            content = self._dnf_manager.generate_repo_file(repo)
++            make_directories("/tmp/installer.repos.d")
++            with open(f"/tmp/installer.repos.d/{repo.name}.repo", "w") as f:
++                f.write(content.strip() + "\n")
 +
-     def install(self):
-         self._progress_cb(0, _('Starting package installation process'))
+     def _can_write_repo(self, repo):
+         """Can we write the specified repository to the target system?
  
 -- 
-2.39.0
+2.45.2
 

@@ -1,4 +1,4 @@
-From 6775647e65b8f172672105f64cdf9a177457a2d1 Mon Sep 17 00:00:00 2001
+From 6186778acd90b5950a30bccebbcd0db7c0279b23 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Sun, 15 Dec 2019 18:39:15 +0100
@@ -14,10 +14,10 @@ Adapted from a98ba275162937a56f7ca1ee5428b00de883677a
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
-index da8272b7f3..273947a063 100644
+index ff527836d6..49938acb9b 100644
 --- a/pyanaconda/modules/storage/bootloader/base.py
 +++ b/pyanaconda/modules/storage/bootloader/base.py
-@@ -904,11 +904,14 @@ class BootLoader(object):
+@@ -920,11 +920,14 @@ class BootLoader(object):
  
      def _preserve_some_boot_args(self):
          """Preserve some of the boot args."""
@@ -36,5 +36,5 @@ index da8272b7f3..273947a063 100644
              if arg:
                  new_arg += "=%s" % arg
 -- 
-2.41.0
+2.45.2
 

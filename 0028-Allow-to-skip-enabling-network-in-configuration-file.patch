@@ -1,4 +1,4 @@
-From 3040a0aa13ba56047d948af78e2462c5abd09917 Mon Sep 17 00:00:00 2001
+From 69b34830dee44a7bebbd86f156e03133152383ab Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
  <frederic.pierret@qubes-os.org>
 Date: Tue, 10 Jan 2023 15:30:14 +0100
@@ -8,14 +8,14 @@ Subject: [PATCH] Allow to skip enabling network in configuration file
  data/anaconda.conf                       |  3 +++
  data/profile.d/qubesos.conf              | 10 ++++++++++
  pyanaconda/core/configuration/network.py |  5 +++++
- pyanaconda/modules/network/network.py    | 23 +++++++++++++----------
- 4 files changed, 31 insertions(+), 10 deletions(-)
+ pyanaconda/modules/network/network.py    | 24 ++++++++++++++----------
+ 4 files changed, 32 insertions(+), 10 deletions(-)
 
 diff --git a/data/anaconda.conf b/data/anaconda.conf
-index cab5eaf54c..5b86f2074e 100644
+index b3423e521c..351952bd00 100644
 --- a/data/anaconda.conf
 +++ b/data/anaconda.conf
-@@ -77,6 +77,9 @@ default_on_boot = NONE
+@@ -69,6 +69,9 @@ default_on_boot = NONE
  # Set hostname
  hostname =
  
@@ -67,39 +67,40 @@ index b3cb43a828..4066014ac1 100644
 +        """Should we skip enabling network?"""
 +        return self._get_option("skip_enable", bool)
 diff --git a/pyanaconda/modules/network/network.py b/pyanaconda/modules/network/network.py
-index cd2156e62d..4d17d036f1 100644
+index a31189e68e..9160b99e45 100644
 --- a/pyanaconda/modules/network/network.py
 +++ b/pyanaconda/modules/network/network.py
-@@ -71,16 +71,19 @@ class NetworkService(KickstartService):
+@@ -74,16 +74,20 @@ class NetworkService(KickstartService):
+         self.capabilities_changed = Signal()
  
          self.connected_changed = Signal()
-         self.nm_client = None
 -        # TODO fallback solution - use Gio/GNetworkMonitor ?
--        if SystemBus.check_connection():
--            nm_client = NM.Client.new(None)
--            if nm_client.get_nm_running():
--                self.nm_client = nm_client
--                self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
--                initial_state = self.nm_client.get_state()
--                self.set_connected(self._nm_state_connected(initial_state))
--            else:
--                log.debug("NetworkManager is not running.")
+-        self.nm_client = get_new_nm_client()
+-        if self.nm_client:
+-            self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
+-            initial_state = self.nm_client.get_state()
+-            self.set_connected(self._nm_state_connected(initial_state))
+-            self.nm_client.connect("notify::%s" % NM.CLIENT_CAPABILITIES,
+-                                   self._nm_capabilities_changed)
+-            nm_capabilities = self.nm_client.get_capabilities()
+-            self.set_capabilities(self._get_capabilities_from_nm(nm_capabilities))
++        self.nm_client = None
 +        if not conf.network.skip_enable:
 +            # TODO fallback solution - use Gio/GNetworkMonitor ?
-+            if SystemBus.check_connection():
-+                nm_client = NM.Client.new(None)
-+                if nm_client.get_nm_running():
-+                    self.nm_client = nm_client
-+                    self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
-+                    initial_state = self.nm_client.get_state()
-+                    self.set_connected(self._nm_state_connected(initial_state))
-+                else:
-+                    log.debug("NetworkManager is not running.")
++            self.nm_client = get_new_nm_client()
++            if self.nm_client:
++                self.nm_client.connect("notify::%s" % NM.CLIENT_STATE, self._nm_state_changed)
++                initial_state = self.nm_client.get_state()
++                self.set_connected(self._nm_state_connected(initial_state))
++                self.nm_client.connect("notify::%s" % NM.CLIENT_CAPABILITIES,
++                                       self._nm_capabilities_changed)
++                nm_capabilities = self.nm_client.get_capabilities()
++                self.set_capabilities(self._get_capabilities_from_nm(nm_capabilities))
 +        else:
 +            log.debug("Enabling network is skipped.")
  
          self._original_network_data = []
          self._device_configurations = None
 -- 
-2.38.1
+2.45.2
 

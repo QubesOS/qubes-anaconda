@@ -1,4 +1,4 @@
-From 6ee759df73b6c5f541116e60224e18d1c20431be Mon Sep 17 00:00:00 2001
+From 8dcab0ad4c2b6e92125ba25ab02804f9879e80c8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Fri, 10 Feb 2023 22:19:57 +0100
@@ -11,10 +11,10 @@ about hibernating dom0, it would need to handle all the other VMs too.
  1 file changed, 6 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
-index df907d7493..415a1294ad 100644
+index 49938acb9b..36236e0ac7 100644
 --- a/pyanaconda/modules/storage/bootloader/base.py
 +++ b/pyanaconda/modules/storage/bootloader/base.py
-@@ -802,12 +802,6 @@ class BootLoader(object):
+@@ -816,12 +816,6 @@ class BootLoader(object):
          swap_devices = storage.fsset.swap_devices
          dracut_devices.extend(swap_devices)
  
@@ -28,5 +28,5 @@ index df907d7493..415a1294ad 100644
          usr_device = storage.mountpoints.get("/usr")
          if usr_device:
 -- 
-2.39.0
+2.45.2
 

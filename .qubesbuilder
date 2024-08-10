@@ -4,5 +4,5 @@ host:
     - anaconda.spec
 source:
   files:
-  - url: https://ftp.qubes-os.org/distfiles/anaconda-37.12.6.tar.bz2
-    sha512: anaconda-37.12.6.tar.bz2.sha512
+  - url: https://ftp.qubes-os.org/distfiles/anaconda-@VERSION@.tar.bz2
+    sha512: anaconda-@VERSION@.tar.bz2.sha512
