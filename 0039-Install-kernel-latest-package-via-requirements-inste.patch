@@ -1,0 +1,80 @@
+From 35be92ac41479829f014bcf2202c0c0d4b9396bd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>
+Date: Tue, 13 Aug 2024 02:09:08 +0200
+Subject: [PATCH] Install kernel-latest package via "requirements" instead of
+ post-script
+
+This way it's properly included in the installation progress.
+---
+ .../payloads/payload/dnf/installation.py      |  3 +-
+ .../payloads/payload/dnf/requirements.py      | 32 +++++++++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
+index a4648ad37a..1d29fccff2 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/installation.py
++++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
+@@ -31,7 +31,7 @@ from pyanaconda.modules.common.structures.packages import PackagesConfigurationD
+ from pyanaconda.modules.common.task import Task
+ from pyanaconda.modules.payloads.payload.dnf.requirements import collect_remote_requirements, \
+     collect_language_requirements, collect_platform_requirements, \
+-    collect_driver_disk_requirements, apply_requirements
++    collect_driver_disk_requirements, collect_kernel_requirements, apply_requirements
+ from pyanaconda.modules.payloads.payload.dnf.utils import pick_download_location, \
+     get_kernel_version_list
+ from pyanaconda.modules.payloads.payload.dnf.validation import CheckPackagesSelectionTask
+@@ -132,6 +132,7 @@ class ResolvePackagesTask(CheckPackagesSelectionTask):
+         return collect_remote_requirements() \
+             + collect_language_requirements(self._dnf_manager) \
+             + collect_platform_requirements(self._dnf_manager) \
++            + collect_kernel_requirements() \
+             + collect_driver_disk_requirements()
+ 
+     def _collect_required_specs(self):
+diff --git a/pyanaconda/modules/payloads/payload/dnf/requirements.py b/pyanaconda/modules/payloads/payload/dnf/requirements.py
+index ee1f517ce2..7ce20aae19 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/requirements.py
++++ b/pyanaconda/modules/payloads/payload/dnf/requirements.py
+@@ -127,6 +127,38 @@ def collect_driver_disk_requirements(path="/run/install/dd_packages"):
+     return requirements
+ 
+ 
++def collect_kernel_requirements():
++    """Collect extra kernel requirements based on the kernel version selected
++    for the installation.
++    """
++    # take kernel version and discard release part as it may be encoded
++    # differently in the package name
++    running_version = os.uname().release.split("-")[0]
++    lorax_packages = "/root/lorax-packages.log"
++    if not os.path.exists(lorax_packages):
++        # not running from installation image, nothing to detect
++        return []
++
++    with open(lorax_packages) as f:
++        for pkg in f.readlines():
++            if not pkg.startswith("kernel"):
++                continue
++            if not running_version in pkg:
++                continue
++            if "latest" in pkg:
++                return [
++                    Requirement.for_package(
++                        package_name="kernel-latest",
++                        reason="Required by launching installer with kernel-latest"
++                    ),
++                    Requirement.for_package(
++                        package_name="kernel-latest-qubes-vm",
++                        reason="Required by launching installer with kernel-latest"
++                    ),
++                ]
++    return []
++
++
+ def apply_requirements(requirements, include_list, exclude_list):
+     """Apply the provided requirements.
+ 
+-- 
+2.45.2
+

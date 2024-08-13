@@ -21,7 +21,6 @@ Source3: anaconda-tui.json
 Source4: QubesPlaceholder.html
 Source5: QubesPlaceholderWithLinks.html
 Source6: 30-qubes-templates.ks
-Source7: 40-qubes-alt-kernels.ks
 Source8: 50-qubes.ks
 Source9: 60-systemd-preset.ks
 
@@ -63,6 +62,7 @@ Patch0035: 0035-Add-support-for-fstype-in-default-partitioning-confi.patch
 Patch0036: 0036-Set-512-LUKS-sector-size-under-LVM.patch
 Patch0037: 0037-Restore-support-for-detection-of-unsupported-hardwar.patch
 Patch0038: 0038-check-for-Qubes-OS-hardware-required-features.patch
+Patch0039: 0039-Install-kernel-latest-package-via-requirements-inste.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
@@ -422,7 +422,7 @@ mkdir %{buildroot}%{_datadir}/anaconda/addons
 mkdir %{buildroot}%{_datadir}/anaconda/post-scripts
 
 # Copy Qubes OS post-install scripts
-cp -r %{SOURCE6} %{SOURCE7} %{SOURCE8} %{SOURCE9} %{buildroot}%{_datadir}/anaconda/post-scripts
+cp -r %{SOURCE6} %{SOURCE8} %{SOURCE9} %{buildroot}%{_datadir}/anaconda/post-scripts
 
 # Inject Qubes OS documentation directly
 mkdir -p %{buildroot}%{_datadir}/anaconda/help/qubesos/en-US
