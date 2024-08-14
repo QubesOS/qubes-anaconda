@@ -170,20 +170,23 @@ Requires: subscription-manager >= %{subscriptionmanagerver}
 # which is apparently great for containers but unhelpful for the rest of us
 Requires: cracklib-dicts
 
+# do not pull NetworkManager and friends into dom0, install it in the installer
+# via lorax only
 %if 0%{?rhel} < 10 || 0%{?fedora}
-Requires: teamd
-Requires: NetworkManager-team
+#Requires: teamd
+#Requires: NetworkManager-team
 %endif
 %ifarch s390 s390x
 Requires: openssh
 %endif
-Requires: NetworkManager >= %{nmver}
+#Requires: NetworkManager >= %{nmver}
+# NetworkManager-libnm is just a client part, doesn't pull extra deps
 Requires: NetworkManager-libnm >= %{nmver}
 Requires: kbd
-Requires: chrony
+#Requires: chrony
 Requires: systemd
 %if 0%{?rhel} > 10 || 0%{?fedora}
-Requires: systemd-resolved
+#Requires: systemd-resolved
 %endif
 Requires: python3-pid
 
