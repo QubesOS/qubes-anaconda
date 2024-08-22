@@ -4,7 +4,7 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Pierret=20=28fepitre=29?=
 Date: Sun, 15 Dec 2019 18:39:15 +0100
 Subject: [PATCH] Use installer kernel parameters as default for installed
 
-This way if any kernel parameter was need to boot Qubes on particular hardware, it will also be set to installed system
+This way if any kernel parameter was needed to boot Qubes on particular hardware, it will also be set to installed system
 
 Fixes QubesOS/qubes-issues#1650
 
@@ -17,7 +17,7 @@ diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/
 index ff527836d6..49938acb9b 100644
 --- a/pyanaconda/modules/storage/bootloader/base.py
 +++ b/pyanaconda/modules/storage/bootloader/base.py
-@@ -920,11 +920,14 @@ class BootLoader(object):
+@@ -920,11 +920,17 @@ class BootLoader(object):
  
      def _preserve_some_boot_args(self):
          """Preserve some of the boot args."""
@@ -26,10 +26,13 @@ index ff527836d6..49938acb9b 100644
 +        global_no_preserve_args = ["stage2", "root", "rescue", "rd.live.check",
 +                                   "ip", "repo", "ks", "rd.md", "rd.luks",
 +                                   "rd.dm", "rd.lvm.lv", "rd.lvm", "rd.neednet",
-+                                   "rd.net.dhcp.vendor-class", "rd.driver.pre"]
++                                   "rd.net.dhcp.vendor-class", "rd.driver.pre",
++                                   "rd.live.overlay.overlayfs", "x86_64"]
 +        for opt, arg in kernel_arguments.items():
 +            if opt in global_no_preserve_args:
                  continue
++            if opt == os.uname().release:
++                continue
  
 -            arg = kernel_arguments.get(opt)
              new_arg = opt
