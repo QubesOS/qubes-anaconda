@@ -64,6 +64,7 @@ Patch0036: 0036-Set-512-LUKS-sector-size-under-LVM.patch
 Patch0037: 0037-Restore-support-for-detection-of-unsupported-hardwar.patch
 Patch0038: 0038-check-for-Qubes-OS-hardware-required-features.patch
 Patch0039: 0039-Install-kernel-latest-package-via-requirements-inste.patch
+Patch0040: 0040-Verify-clock-against-ISO-creation.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
