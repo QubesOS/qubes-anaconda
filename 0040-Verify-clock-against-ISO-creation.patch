@@ -65,7 +65,7 @@ index f1ad774006..4d1ec92202 100644
 +            now_utc = intended_local.astimezone(datetime.timezone.utc)
 +        else:
 +            log.debug("Time set pending but widgets incomplete.")
-+            return False
++            now_utc = datetime.datetime.now(tz=datetime.timezone.utc)
 +
 +        if now_utc < iso_dt:
 +            log.error("Current clock (%s) is earlier than ISO creation (%s).",
