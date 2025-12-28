@@ -2,11 +2,13 @@ From a359a9a6edffa6a2cd3bf35ba15954ade3c8aa30 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
  <marmarek@invisiblethingslab.com>
 Date: Wed, 25 Dec 2019 09:36:06 +0100
-Subject: [PATCH] enable discard option for dom0 filesystems by default
+Subject: [PATCH] enable discard option for some dom0 filesystems by default
 
 This may have performance impact on some older SSD, but on the other
 hand, without this option it's pretty easy to fill the whole LVM thin
 pool even if there is plenty free space in dom0.
+The option is not added on Btrfs, where the default since kernel 6.2 is
+discard=async and discard would mean discard=sync instead.
 
 Fixes QubesOS/qubes-issues#3226
 ---
@@ -21,7 +23,7 @@ index af97dc3bba..fcd889e93b 100644
                      break
              if device.encrypted:
                  options += ",x-systemd.device-timeout=0"
-+            if fstype in ('ext4', 'btrfs', 'xfs', 'vfat'):
++            if fstype in ('ext4', 'xfs', 'vfat'):
 +                options += ",discard"
              devspec = device.fstab_spec
              dump = device.format.dump
