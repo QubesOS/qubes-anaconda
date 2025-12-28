@@ -7,8 +7,6 @@ Subject: [PATCH] enable discard option for dom0 filesystems by default
 This may have performance impact on some older SSD, but on the other
 hand, without this option it's pretty easy to fill the whole LVM thin
 pool even if there is plenty free space in dom0.
-Note that this doesn't enable it on LUKS layer, this is still disabled
-by default.
 
 Fixes QubesOS/qubes-issues#3226
 ---
