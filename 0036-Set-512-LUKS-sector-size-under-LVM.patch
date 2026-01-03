@@ -32,9 +32,9 @@ index 61e3849ed6..02e6d11ab4 100644
  from pyanaconda.anaconda_loggers import get_module_logger
  from pyanaconda.modules.common.structures.partitioning import PartitioningRequest
 @@ -119,6 +120,9 @@ class AutomaticPartitioningTask(NonInteractivePartitioningTask):
-             "pbkdf_args": pbkdf_args,
              "escrow_cert": escrow_cert,
              "add_backup_passphrase": request.backup_passphrase_enabled,
+             "opal_admin_passphrase": request.opal_admin_passphrase,
 +            "luks_sector_size": (
 +                512 if request.partitioning_scheme == AUTOPART_TYPE_LVM_THINP else 0
 +            ),
@@ -45,22 +45,18 @@ diff --git a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.
 index e59509975f..68c4a49110 100644
 --- a/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
 +++ b/pyanaconda/modules/storage/partitioning/custom/custom_partitioning.py
-@@ -410,7 +410,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
-                     escrow_cert=cert,
-                     add_backup_passphrase=partition_data.backuppassphrase,
+@@ -412,6 +412,7 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
                      luks_version=partition_data.luks_version,
--                    pbkdf_args=pbkdf_args
-+                    pbkdf_args=pbkdf_args,
+                     pbkdf_args=pbkdf_args,
+                     opal_admin_passphrase=partition_data.hw_passphrase,
 +                    luks_sector_size=(512 if ty == "lvmpv" else 0),
                  )
                  luksdev = LUKSDevice(
                      "luks%d" % storage.next_id,
-@@ -426,7 +427,8 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
-                     escrow_cert=cert,
-                     add_backup_passphrase=partition_data.backuppassphrase,
+@@ -429,6 +429,7 @@ class CustomPartitioningTask(NonInteractivePartitioningTask):
                      luks_version=partition_data.luks_version,
--                    pbkdf_args=pbkdf_args
-+                    pbkdf_args=pbkdf_args,
+                     pbkdf_args=pbkdf_args,
+                     opal_admin_passphrase=partition_data.hw_passphrase,
 +                    luks_sector_size=(512 if ty == "lvmpv" else 0),
                  )
                  luksdev = LUKSDevice("luks%d" % storage.next_id,
