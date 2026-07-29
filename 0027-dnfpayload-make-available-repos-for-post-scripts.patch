@@ -12,8 +12,8 @@ payload.repositories (there is a bunch of comments it's a temporary
 solution, but it is this way right now).
 ---
  pyanaconda/modules/payloads/payload/dnf/dnf.py      |  1 +
- .../modules/payloads/payload/dnf/installation.py    | 13 ++++++++++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ .../modules/payloads/payload/dnf/installation.py    | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf.py b/pyanaconda/modules/payloads/payload/dnf/dnf.py
 index cdfcf997ec..238dfdcf4f 100644
@@ -48,12 +48,18 @@ index d5722fd768..a4648ad37a 100644
  
      @property
      def name(self):
-@@ -279,6 +280,16 @@ class WriteRepositoriesTask(Task):
+@@ -279,6 +280,22 @@ class WriteRepositoriesTask(Task):
              content = self._dnf_manager.generate_repo_file(repo)
              self._write_repo_file(repo.name, content)
  
 +        for source in self._sources:
-+            repo = source.repository
++            repo = source.generate_repo_configuration()
++            if repo is None or not repo.url:
++                log.debug(
++                    "Skipping source %s with no repository to write.",
++                    type(source).__name__,
++                )
++                continue
 +            if not repo.name:
 +                repo.name = "default"
 +            log.info("Writing %s.repo to the installer.repo.", repo.name)
