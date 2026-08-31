@@ -1,0 +1,72 @@
+From 14b9f861fee57d5e2ff2a08f6bcf17f391458ce1 Mon Sep 17 00:00:00 2001
+From: Ari Tsyganskiy <213909808+aritsyg@users.noreply.github.com>
+Date: Sun, 30 Aug 2026 22:19:38 -0700
+Subject: [PATCH] Do not leak installer-only boot options into the installed
+ system
+
+The installer-argument preservation added in "Use installer kernel
+parameters as default for installed system" iterates every normalized
+kernel argument and copies everything not on a short denylist into the
+installed system's bootloader configuration.  KernelArguments strips
+the "inst." prefix before storing, so installer-only options leak in
+unprefixed form: an installation started with
+inst.updates=hd:LABEL=X:/u.img inst.xtimeout=60 ends up with
+"updates=... xtimeout=60" permanently on the installed kernel command
+line (observed in the field), inst.vncpassword would leak a secret in
+plain text, and a preserved "resume=" defeats the "Do not add resume
+to the kernel cmdline" patch.
+
+Iterate the raw argument spellings instead and skip everything that
+was given with the "inst." prefix - installer namespace by definition
+(mandatory since Fedora 34) - and add "resume" to the denylist.
+Hardware workarounds (the original purpose of the preservation patch,
+e.g. nomodeset or module parameters) are unprefixed and continue to be
+carried over.
+
+Also correct for the record: the original patch's commit message
+references QubesOS/qubes-issues#1650, which describes a different
+feature (default kernel selection).
+---
+ pyanaconda/modules/storage/bootloader/base.py | 22 ++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
+index 2bc322e19..057de1cdc 100644
+--- a/pyanaconda/modules/storage/bootloader/base.py
++++ b/pyanaconda/modules/storage/bootloader/base.py
+@@ -913,13 +913,29 @@ class BootLoader(object):
+             self.boot_args.add("rd.iscsi.firmware")
+ 
+     def _preserve_some_boot_args(self):
+-        """Preserve some of the boot args."""
++        """Preserve some of the boot args.
++
++        Carry kernel arguments that were needed to boot the installation
++        environment on this hardware into the installed system, but never
++        installer-only options: they are meaningless after installation
++        and some carry secrets (e.g. inst.vncpassword).
++        """
+         global_no_preserve_args = ["stage2", "root", "rescue", "rd.live.check",
+                                    "ip", "repo", "ks", "rd.md", "rd.luks",
+                                    "rd.dm", "rd.lvm.lv", "rd.lvm", "rd.neednet",
+                                    "rd.net.dhcp.vendor-class", "rd.driver.pre",
+-                                   "rd.live.overlay.overlayfs", "x86_64"]
+-        for opt, arg in kernel_arguments.items():
++                                   "rd.live.overlay.overlayfs", "x86_64",
++                                   # never carry hibernation resume settings:
++                                   # Qubes does not generate them either (see
++                                   # "Do not add resume to the kernel cmdline")
++                                   "resume"]
++        for opt, arg in kernel_arguments.items_raw():
++            # Options spelled with the "inst." prefix are installer
++            # namespace by definition (the prefix is mandatory since
++            # Fedora 34).  Never preserve them.
++            if opt.startswith("inst."):
++                continue
++
+             if opt in global_no_preserve_args:
+                 continue
+             if opt == os.uname().release:
+-- 
+2.54.0
+
