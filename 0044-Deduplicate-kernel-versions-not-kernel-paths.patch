@@ -1,0 +1,37 @@
+From 538f30be68a47ef8ae98537392c71472686c6882 Mon Sep 17 00:00:00 2001
+From: Ari Tsyganskiy <213909808+aritsyg@users.noreply.github.com>
+Date: Sun, 30 Aug 2026 22:20:13 -0700
+Subject: [PATCH] Deduplicate kernel versions, not kernel paths
+
+"utils: avoid adding duplicated kernel entries" wrapped the globbed
+file list in set() before the version string is extracted.  Distinct
+paths are never equal, so the same kernel version present in both
+/boot and the ESP still produced duplicate entries - the case the
+patch was written for.  Deduplicate the extracted version strings
+instead (a set comprehension), with an intermediate sort for
+deterministic order before the version-aware sort.
+---
+ pyanaconda/modules/payloads/payload/live_os/utils.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/modules/payloads/payload/live_os/utils.py b/pyanaconda/modules/payloads/payload/live_os/utils.py
+index aecfff1fd..cb2f8ffd2 100644
+--- a/pyanaconda/modules/payloads/payload/live_os/utils.py
++++ b/pyanaconda/modules/payloads/payload/live_os/utils.py
+@@ -35,10 +35,10 @@ def get_kernel_version_list(root_path):
+     files = glob.glob(root_path + "/boot/vmlinuz-*")
+     files.extend(glob.glob(root_path + "/boot/efi/EFI/{}/vmlinuz-*".format(efi_dir)))
+ 
+-    kernel_version_list = [
+-        f.split("/")[-1][8:] for f in set(files)
++    kernel_version_list = sorted({
++        f.split("/")[-1][8:] for f in files
+         if os.path.isfile(f) and "-rescue-" not in f
+-    ]
++    })
+ 
+     sort_kernel_version_list(kernel_version_list)
+     return kernel_version_list
+-- 
+2.54.0
+
