@@ -1,0 +1,54 @@
+From a61e9d8a195181f76f1d10fce87a17f83394aab0 Mon Sep 17 00:00:00 2001
+From: Ari Tsyganskiy <213909808+aritsyg@users.noreply.github.com>
+Date: Sun, 30 Aug 2026 22:20:41 -0700
+Subject: [PATCH] Fix dead GRUB terminal fallback and a template-size logging
+ error
+
+Two small defects introduced by earlier patches in this queue:
+
+- "Support for adding bootloader options in configuration" (and its
+  rename follow-up) writes GRUB_TERMINAL_OUTPUT with
+      "..." % conf.bootloader.grub_terminal_type or self.terminal_type
+  where %-formatting binds before "or": an empty configured value
+  produces the truthy string GRUB_TERMINAL_OUTPUT="" and the
+  advertised fallback to the detected terminal type is dead code.
+  Parenthesize the fallback.
+
+- "Compute template RPMs needed spaces" passes a single tuple to a
+  two-placeholder log.debug call, raising a logging formatting error
+  whenever debug output is emitted.  Pass the two arguments.
+---
+ pyanaconda/modules/payloads/payload/dnf/dnf_manager.py | 2 +-
+ pyanaconda/modules/storage/bootloader/grub2.py         | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
+index 5fee0c1fa..5203cb9cd 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
++++ b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
+@@ -1015,7 +1015,7 @@ class DNFManager(object):
+         templates_size = 0
+         for template in available_templates:
+             templates_size += template.downloadsize
+-            log.debug("[Qubes OS]: Size of %s: %s", (template.name, template.downloadsize))
++            log.debug("[Qubes OS]: Size of %s: %s", template.name, template.downloadsize)
+ 
+         log.debug("[Qubes OS]: Total templates RPMs size: %s", templates_size)
+         return templates_size
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index ccdbdd6dc..aad339297 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -264,7 +264,8 @@ class GRUB2(BootLoader):
+             defaults.write("GRUB_TERMINAL=\"serial console\"\n")
+             defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
+         else:
+-            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n" % conf.bootloader.grub_terminal_type or self.terminal_type)
++            defaults.write("GRUB_TERMINAL_OUTPUT=\"%s\"\n"
++                           % (conf.bootloader.grub_terminal_type or self.terminal_type))
+ 
+         # this is going to cause problems for systems containing multiple
+         # linux installations or even multiple boot entries with different
+-- 
+2.54.0
+

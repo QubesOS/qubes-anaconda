@@ -1,0 +1,37 @@
+From 48f0586084cdabac2b26893743ed521f15bf2592 Mon Sep 17 00:00:00 2001
+From: Ari Tsyganskiy <213909808+aritsyg@users.noreply.github.com>
+Date: Sun, 30 Aug 2026 22:19:59 -0700
+Subject: [PATCH] Fix hidden_spokes filtering of post-hub standalone spokes
+
+The predicate added in "Apply hidden_spokes setting to standalone
+spokes too" parses as
+
+    (issubclass(...) and not-hidden and preForHub) or postForHub
+
+because "and" binds tighter than "or".  Any object with a truthy
+postForHub therefore bypasses both the hidden_spokes filter and even
+the standalone-class check, so the setting only ever worked for
+pre-hub spokes.  Parenthesize the hub-attachment test so hidden_spokes
+applies to both kinds.
+---
+ pyanaconda/ui/__init__.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/ui/__init__.py b/pyanaconda/ui/__init__.py
+index 45162c9d0..41b624045 100644
+--- a/pyanaconda/ui/__init__.py
++++ b/pyanaconda/ui/__init__.py
+@@ -156,8 +156,8 @@ class UserInterface(object):
+         def check_standalone_spokes(obj):
+             return issubclass(obj, standalone_class) and \
+                 obj.__name__ not in conf.ui.hidden_spokes and \
+-                getattr(obj, "preForHub", False) or \
+-                getattr(obj, "postForHub", False)
++                (getattr(obj, "preForHub", False) or
++                 getattr(obj, "postForHub", False))
+ 
+         for module_pattern, path in module_pattern_w_path:
+             standalones.extend(
+-- 
+2.54.0
+

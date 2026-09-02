@@ -67,6 +67,9 @@ Patch0039: 0039-Install-kernel-latest-package-via-requirements-inste.patch
 Patch0040: 0040-Verify-clock-against-ISO-creation.patch
 Patch0041: 0041-Retry-X-server-startup-and-recover-the-console-on-fa.patch
 Patch0042: 0042-Do-not-leak-installer-only-boot-options-into-the-ins.patch
+Patch0043: 0043-Fix-hidden_spokes-filtering-of-post-hub-standalone-s.patch
+Patch0044: 0044-Deduplicate-kernel-versions-not-kernel-paths.patch
+Patch0045: 0045-Fix-dead-GRUB-terminal-fallback-and-a-template-size-.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
