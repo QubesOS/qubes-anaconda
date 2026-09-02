@@ -1,0 +1,248 @@
+From 35c468f6ea2fd65fc23968a2a90c98505aaff63a Mon Sep 17 00:00:00 2001
+From: Ari Tsyganskiy <213909808+aritsyg@users.noreply.github.com>
+Date: Sun, 30 Aug 2026 21:45:36 -0700
+Subject: [PATCH] Retry X server startup and recover the console on failure
+
+On some hardware the first Xorg launch nondeterministically hangs
+before signalling readiness with SIGUSR1, while a fresh attempt
+succeeds within seconds.  Observed on ASUS ProArt Z790-CREATOR /
+i9-14900K (UHD 770) under Xen: in identical environments X either
+became ready in ~2 seconds or hung past even inst.xtimeout=300.  The
+current code gives X exactly one chance and aborts the installation
+with a wedged console and no readable logs.
+
+- retry the X startup once if the X server itself failed to come up:
+  wait (bounded) for the terminated server to actually release the
+  display first, restore the original SIGUSR1 handler that startX
+  leaves modified after a timeout, and reset the console (KD_TEXT,
+  VT_AUTO) before the new attempt
+- do not retry if the X server started and the window manager spawn
+  failed instead - a second server on the same display cannot succeed
+- on final failure, reset the console and switch back to tty1; the
+  vtActivate(1) call existed upstream and was lost in the Qubes abort
+  patch, which is why every failure since has left the console wedged
+- print the tails of /tmp/X.log and /tmp/X.log.old (a retry rotates
+  the log) before the abort prompt: /tmp is a tmpfs, so today the
+  actual X error is destroyed by the reboot that follows
+- log /dev/dri contents, bound DRM driver and VT/console state before
+  each attempt so failure reports are diagnosable
+---
+ pyanaconda/display.py | 188 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 177 insertions(+), 11 deletions(-)
+
+diff --git a/pyanaconda/display.py b/pyanaconda/display.py
+index 0ec4bc2a7..e4c296656 100644
+--- a/pyanaconda/display.py
++++ b/pyanaconda/display.py
+@@ -20,6 +20,8 @@
+ # Author(s):  Martin Kolman <mkolman@redhat.com>
+ #
+ import sys
++import array
++import fcntl
+ import os
+ import subprocess
+ import time
+@@ -186,6 +188,140 @@ def check_vnc_can_be_started(anaconda):
+ 
+ # X11
+ 
++
++# Number of attempts to start the X server before giving up.  On some
++# hardware (observed on Raptor Lake iGPU under Xen) the first X start
++# can wedge nondeterministically inside early mode setting while a
++# fresh attempt moments later succeeds within seconds.
++X_STARTUP_ATTEMPTS = 2
++
++# How long to wait for a terminated X server to actually exit before
++# starting a new one on the same display.
++X_EXIT_TIMEOUT = 10
++
++
++def _log_display_diagnostics():
++    """Record console/VT/DRM state before starting the X server.
++
++    This information is what makes an "X startup failed" report
++    diagnosable after the fact, so log it unconditionally.
++    """
++    KDGETMODE = 0x4B3B
++    VT_GETMODE = 0x5601
++    VT_GETSTATE = 0x5603
++    VT_MODE_NAMES = {0: "VT_AUTO", 1: "VT_PROCESS", 2: "VT_ACKACQ"}
++
++    try:
++        log.info("display: /dev/dri: %s", sorted(os.listdir("/dev/dri")))
++    except OSError as e:
++        log.info("display: /dev/dri unreadable: %s", e)
++
++    for card in ("card0", "card1"):
++        path = "/sys/class/drm/%s/device/driver" % card
++        if os.path.exists(path):
++            log.info("display: %s driver=%s", card, os.path.basename(os.readlink(path)))
++
++    try:
++        fd = os.open("/dev/tty0", os.O_RDWR)
++        try:
++            kd_mode = array.array("i", [0])
++            fcntl.ioctl(fd, KDGETMODE, kd_mode, True)
++            vt_state = array.array("H", [0, 0, 0])
++            fcntl.ioctl(fd, VT_GETSTATE, vt_state, True)
++            vt_mode = array.array("b", [0] * 8)
++            fcntl.ioctl(fd, VT_GETMODE, vt_mode, True)
++            log.info("display: active_vt=%d kd_mode=%s vt_mode=%s",
++                     vt_state[0], "KD_GRAPHICS" if kd_mode[0] else "KD_TEXT",
++                     VT_MODE_NAMES.get(vt_mode[0], vt_mode[0]))
++        finally:
++            os.close(fd)
++    except OSError as e:
++        log.info("display: VT state unreadable: %s", e)
++
++
++def _reset_console_for_restart():
++    """Make the active console usable for another X attempt or for text.
++
++    An X server killed during startup can leave the active VT in
++    KD_GRAPHICS mode and/or holding VT_PROCESS ownership.  The kernel
++    ignores or blocks console switch requests in those states
++    (drivers/tty/vt/vt_ioctl.c), which would make both a retry and the
++    console unusable, so restore KD_TEXT and VT_AUTO explicitly.
++    """
++    KDSETMODE = 0x4B3A
++    KD_TEXT = 0x00
++    VT_SETMODE = 0x5602
++
++    try:
++        fd = os.open("/dev/tty0", os.O_RDWR)
++    except OSError as e:
++        log.warning("Could not open /dev/tty0 to reset the console: %s", e)
++        return
++
++    try:
++        fcntl.ioctl(fd, KDSETMODE, KD_TEXT)
++        # struct vt_mode with mode=VT_AUTO and all other fields zeroed
++        fcntl.ioctl(fd, VT_SETMODE, array.array("b", [0] * 8), False)
++    except OSError as e:
++        log.warning("Could not reset the console: %s", e)
++    finally:
++        os.close(fd)
++
++
++def _wait_for_x_server_exit(timeout=X_EXIT_TIMEOUT):
++    """Wait for a terminated X server to actually release the display.
++
++    startX() sends SIGTERM to a timed-out X server but does not wait for
++    it to exit.  A wedged server may need a while to die, and a new
++    server started too early would just fail on the stale display lock.
++
++    :param int timeout: seconds to wait for the old server to exit
++    :return: True if the display is free, False if the server survived
++    """
++    lock_path = "/tmp/.X%s-lock" % constants.X_DISPLAY_NUMBER
++
++    pid = None
++    for _i in range(int(timeout / 0.5)):
++        try:
++            with open(lock_path) as f:
++                pid = int(f.read().strip())
++            os.kill(pid, 0)
++        except (OSError, ValueError):
++            # no lock file, unreadable pid, or process gone
++            return True
++        time.sleep(0.5)
++
++    log.warning("The previous X server (pid %s) did not exit in %s seconds.",
++                pid, timeout)
++    return False
++
++
++def _print_x_log_excerpt(lines=15):
++    """Print the tail of the X server logs to help with bug reports.
++
++    Without this the actual X error is invisible: the logs live on a
++    tmpfs that is lost on the reboot that follows the abort.  A retried
++    X server renames the previous log to X.log.old, so show that too.
++    """
++    printed_any = False
++
++    for log_path in ("/tmp/X.log.old", "/tmp/X.log"):
++        try:
++            with open(log_path) as f:
++                tail = f.readlines()[-lines:]
++        except OSError:
++            continue
++
++        printed_any = True
++        print(_("Last lines of %s:") % log_path)
++        for line in tail:
++            print("  " + line.rstrip())
++
++    if not printed_any:
++        print(_("No X server log was written to /tmp/X.log."))
++    print(_("Full logs are in /tmp (X.log, anaconda.log)."))
++
++
+ def start_x11(xtimeout):
+     """Start the X server for the Anaconda GUI."""
+ 
+@@ -382,17 +518,47 @@ def setup_display(anaconda, options):
+     # check_memory may have changed the display mode
+     want_x = want_x and (anaconda.gui_mode)
+     if want_x:
+-        try:
+-            start_x11(xtimeout)
+-            do_startup_x11_actions()
+-        except (OSError, RuntimeError, TimeoutError) as e:
+-            log.warning("X startup failed, aborting installation")
+-            stdout_log.error("X startup failed, aborting installation")
+-            print(_("The installation cannot continue and the system will be rebooted"))
+-            print(_("Press ENTER to continue"))
+-            input()
+-            util.ipmi_report(constants.IPMI_ABORTED)
+-            sys.exit(1)
++        # startX() manipulates the SIGUSR1 handler and, after a timeout,
++        # deliberately leaves a "too late" handler installed.  Remember
++        # the real handler so a retry starts from a clean state.
++        original_sigusr1 = signal.getsignal(signal.SIGUSR1)
++
++        for attempt in range(1, X_STARTUP_ATTEMPTS + 1):
++            x_server_started = False
++            try:
++                _log_display_diagnostics()
++                start_x11(xtimeout)
++                x_server_started = True
++                do_startup_x11_actions()
++                break
++            except (OSError, RuntimeError, TimeoutError) as e:
++                log.warning("X startup attempt %d of %d failed: %s",
++                            attempt, X_STARTUP_ATTEMPTS, e)
++                # A killed X server can leave the console in graphics
++                # mode or holding the VT; reset it so a retry (or the
++                # abort message) works.
++                _reset_console_for_restart()
++
++                # Retry only when the X server itself failed to come up
++                # (do_startup_x11_actions() only spawns the window
++                # manager; a second X server on the same display would
++                # just collide with the first) and the failed server has
++                # actually exited and released the display.
++                if attempt < X_STARTUP_ATTEMPTS and not x_server_started \
++                        and _wait_for_x_server_exit():
++                    signal.signal(signal.SIGUSR1, original_sigusr1)
++                    stdout_log.warning("X startup failed, trying again...")
++                    time.sleep(2)
++                    continue
++
++                stdout_log.error("X startup failed, aborting installation")
++                util.vtActivate(1)
++                _print_x_log_excerpt()
++                print(_("The installation cannot continue and the system will be rebooted"))
++                print(_("Press ENTER to continue"))
++                input()
++                util.ipmi_report(constants.IPMI_ABORTED)
++                sys.exit(1)
+ 
+         if not anaconda.gui_startup_failed:
+             do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
+-- 
+2.54.0
+
