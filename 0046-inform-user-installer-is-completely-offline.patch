@@ -1,0 +1,63 @@
+From 9b2d8612f0e9f029a1b18ce4210e302be8d91011 Mon Sep 17 00:00:00 2001
+From: Akshat Lakhera <akshatlnct2024@gmail.com>
+Date: Mon, 28 Sep 2026 04:20:00 +0200
+Subject: [PATCH] welcome: inform user that installation process is completely
+ offline
+
+Inform users on the initial Welcome screen, below the language selection,
+that the Qubes OS installer is completely offline.
+
+Fixes QubesOS/qubes-issues#10213
+---
+ pyanaconda/ui/gui/spokes/welcome.glade | 20 ++++++++++++++++++++
+ pyanaconda/ui/gui/spokes/welcome.py    |  7 +++++++
+ 2 files changed, 27 insertions(+)
+
+--- a/pyanaconda/ui/gui/spokes/welcome.glade
++++ b/pyanaconda/ui/gui/spokes/welcome.glade
+@@ -276,6 +276,26 @@
+                     <property name="position">2</property>
+                   </packing>
+                 </child>
++                <child>
++                  <object class="GtkLabel" id="offlineNoticeLabel">
++                    <property name="visible">True</property>
++                    <property name="can_focus">False</property>
++                    <property name="margin_left">36</property>
++                    <property name="margin_right">36</property>
++                    <property name="margin_top">6</property>
++                    <property name="label" translatable="yes">The Qubes OS installer is completely offline. It does not access Internet at all.</property>
++                    <property name="wrap">True</property>
++                    <property name="xalign">0</property>
++                    <attributes>
++                      <attribute name="font-desc" value="Cantarell Italic 11"/>
++                    </attributes>
++                  </object>
++                  <packing>
++                    <property name="expand">False</property>
++                    <property name="fill">True</property>
++                    <property name="position">3</property>
++                  </packing>
++                </child>
+               </object>
+             </child>
+           </object>
+--- a/pyanaconda/ui/gui/spokes/welcome.py
++++ b/pyanaconda/ui/gui/spokes/welcome.py
+@@ -210,6 +210,13 @@
+         welcomeLabel.set_text(_("WELCOME TO %(name)s %(version)s.") %
+                 {"name" : get_product_name().upper(), "version" : get_product_version()})
+ 
++        offlineNoticeLabel = self.builder.get_object("offlineNoticeLabel")
++        if offlineNoticeLabel:
++            offlineNoticeLabel.set_text(_(
++                "The Qubes OS installer is completely offline. "
++                "It does not access Internet at all."
++            ))
++
+         # Retranslate the language (filtering) entry's placeholder text
+         languageEntry = self.builder.get_object("languageEntry")
+         languageEntry.set_placeholder_text(_("Type here to search."))
+-- 
+2.45.2
+

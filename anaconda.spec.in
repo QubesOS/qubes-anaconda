@@ -70,6 +70,7 @@ Patch0042: 0042-Do-not-leak-installer-only-boot-options-into-the-ins.patch
 Patch0043: 0043-Fix-hidden_spokes-filtering-of-post-hub-standalone-s.patch
 Patch0044: 0044-Deduplicate-kernel-versions-not-kernel-paths.patch
 Patch0045: 0045-Fix-dead-GRUB-terminal-fallback-and-a-template-size-.patch
+Patch0046: 0046-inform-user-installer-is-completely-offline.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
